@@ -1,0 +1,29 @@
+name: StopScroll
+options:
+  bundleIdPrefix: com.stopscroll
+  deploymentTarget:
+    iOS: "16.0"
+  xcodeVersion: "16.0"
+
+targets:
+  StopScroll:
+    type: application
+    platform: iOS
+    sources:
+      - path: StopScroll
+        excludes:
+          - "*.xcassets/AppIcon.appiconset"
+    resources:
+      - path: StopScroll/Scripts/block_reels.js
+      - path: StopScroll/Assets.xcassets
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.stopscroll.app
+        MARKETING_VERSION: "1.0.0"
+        CURRENT_PROJECT_VERSION: 1
+        INFOPLIST_FILE: StopScroll/Resources/Info.plist
+        DEVELOPMENT_TEAM: ""
+        CODE_SIGN_STYLE: Automatic
+        SWIFT_VERSION: "5.9"
+        TARGETED_DEVICE_FAMILY: "1"
+        SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD: false
