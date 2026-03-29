@@ -55,18 +55,6 @@
 
     // ——— CSS layer ———
     const BLOCK_CSS = `
-        /* Reels tab in bottom nav — match links that go exactly to /reels/ */
-        a[href="/reels/"],
-        a[href="/reels"] {
-            display: none !important;
-        }
-
-        /* Reels aria labels */
-        [aria-label="Reels"],
-        [aria-label="reels"] {
-            display: none !important;
-        }
-
         /* Ad tracking iframes */
         iframe[src*="doubleclick"],
         iframe[src*="facebook.com/tr"] {
@@ -76,15 +64,8 @@
 
     // ——— CSS injected on reel pages to lock scrolling ———
     const REEL_SCROLL_LOCK_CSS = `
-        /* Prevent scrolling to next/previous reel — only on reel pages */
+        /* Prevent scrolling to next/previous reel */
         html, body {
-            overflow: hidden !important;
-            overscroll-behavior: none !important;
-            height: 100vh !important;
-        }
-        /* Lock scrollable containers but keep video interactive */
-        main {
-            overflow: hidden !important;
             overscroll-behavior: none !important;
         }
     `;
@@ -100,10 +81,15 @@
     // ——— Reel scroll lock: prevents swiping to next reel (reel pages only) ———
     function applyScrollLock() {
         if (scrollLockActive) return;
-        if (!isReelPage()) return;  // only lock scroll on /reel/ pages
+        if (!isReelPage()) return;
+
+        // Wait until the video element is actually in the DOM before locking
+        const video = document.querySelector('video');
+        if (!video) return;  // reel hasn't loaded yet — will retry on next cleanup
+
         scrollLockActive = true;
 
-        // Inject scroll-lock CSS
+        // Inject scroll-lock CSS (lightweight — only overscroll-behavior)
         if (!document.getElementById('stopscroll-reel-lock')) {
             const style = document.createElement('style');
             style.id = 'stopscroll-reel-lock';
@@ -120,6 +106,9 @@
     // ——— Hide suggested content below the main post/reel ———
     function hideExtraContent() {
         if (!isSingleContentPage()) return;
+
+        // On reel pages, wait until the video is loaded before hiding anything
+        if (isReelPage() && !document.querySelector('video')) return;
 
         // 1. Find "More posts like this" / "Suggested posts" headers and hide from there down
         //    Only check h2 and span with short own-text to avoid matching parent containers
@@ -223,23 +212,57 @@
         }
     }
 
+    // ——— Transform Reels nav button into a Book reader button ———
+    function transformReelsToBook(link) {
+        link.setAttribute('data-ss-book', '1');
+
+        // Replace the SVG icon with an open-book icon
+        const svg = link.querySelector('svg');
+        if (svg) {
+            svg.setAttribute('aria-label', 'Read');
+            svg.setAttribute('viewBox', '0 0 24 24');
+            svg.setAttribute('width', '24');
+            svg.setAttribute('height', '24');
+            svg.innerHTML = '<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>'
+                          + '<path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>';
+        }
+
+        // Change href so CSS a[href="/reels/"] no longer hides it, and prevent navigation
+        link.setAttribute('href', '#book');
+
+        // Make sure the link and its wrappers are visible
+        link.style.cssText += ';display:flex!important;align-items:center;justify-content:center;';
+        const li = link.closest('li');
+        if (li) li.style.cssText += ';display:list-item!important;';
+        const wrapper = link.parentElement;
+        if (wrapper && wrapper.children.length <= 2) {
+            wrapper.style.cssText += ';display:flex!important;';
+        }
+
+        // Open the book reader on click
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.openBookReader) {
+                window.webkit.messageHandlers.openBookReader.postMessage('open');
+            }
+        });
+    }
+
     // ——— Reels cleanup (only in main feed) ———
     function cleanReels() {
-        // Hide the Reels nav tab — match only links whose href IS /reels/ or /reels (the tab)
-        // Do NOT match /reels/XXXID (individual reel) or /reel/XXXID
-        document.querySelectorAll('a[href="/reels/"]:not([' + MARK + ']), a[href="/reels"]:not([' + MARK + '])').forEach(el => {
-            hide(el);
-            const li = el.closest('li');
-            if (li) hide(li);
-            // Also walk up to the parent div that acts as a tab wrapper
-            const tabWrapper = el.parentElement;
-            if (tabWrapper && tabWrapper.children.length === 1) {
-                hide(tabWrapper);
-            }
+        // Transform the Reels nav tab into a Book button
+        document.querySelectorAll('a[href="/reels/"]:not([data-ss-book]), a[href="/reels"]:not([data-ss-book])').forEach(el => {
+            transformReelsToBook(el);
         });
 
         // Only hide reel content when on the main feed
         if (!isMainFeed()) return;
+
+        // Hide Reels aria-label sections in feed only (not in DMs)
+        document.querySelectorAll('[aria-label="Reels"]:not([' + MARK + ']), [aria-label="reels"]:not([' + MARK + '])').forEach(el => {
+            hide(el);
+        });
 
         // "Reels" / "Suggested Reels" section headers in feed
         document.querySelectorAll('span:not([' + MARK + ']), h2:not([' + MARK + '])').forEach(el => {

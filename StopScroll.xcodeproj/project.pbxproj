@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		0E0A5E093DD39A3D6BA043CC /* block_reels.js in Resources */ = {isa = PBXBuildFile; fileRef = E8B9D70AE41E090020003432 /* block_reels.js */; };
+		196B2146F76AB27B059B4958 /* BookReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5A34E345922B0FB77B065C /* BookReaderView.swift */; };
+		27EACB1BA89A36C1613B4AAB /* BookParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26DD5F6A438B9CB04D159E58 /* BookParser.swift */; };
 		767CD5C99713E1A7FABA3036 /* InstagramView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7458C392340CA051B9872EA /* InstagramView.swift */; };
 		83F82C06AE917D7565F44576 /* InstagramWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98D36FB79C7EDDFDA593A7C9 /* InstagramWebView.swift */; };
 		A31410EE5D6322D2100BC284 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F5264B0892789360AAE52D0D /* Assets.xcassets */; };
@@ -15,8 +17,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		26DD5F6A438B9CB04D159E58 /* BookParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookParser.swift; sourceTree = "<group>"; };
 		4F8E5453518C42B23702CCBB /* StopScrollApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StopScrollApp.swift; sourceTree = "<group>"; };
 		7C3519B92634CB61271300F7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		7E5A34E345922B0FB77B065C /* BookReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookReaderView.swift; sourceTree = "<group>"; };
 		86AF0E37D9B2DA48FC635A6D /* StopScroll.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = StopScroll.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		98D36FB79C7EDDFDA593A7C9 /* InstagramWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstagramWebView.swift; sourceTree = "<group>"; };
 		E8B9D70AE41E090020003432 /* block_reels.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = block_reels.js; sourceTree = "<group>"; };
@@ -52,6 +56,7 @@
 		A9AA752D3FE8FA725F1FA8CB /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				7E5A34E345922B0FB77B065C /* BookReaderView.swift */,
 				F7458C392340CA051B9872EA /* InstagramView.swift */,
 				98D36FB79C7EDDFDA593A7C9 /* InstagramWebView.swift */,
 			);
@@ -74,11 +79,20 @@
 			path = App;
 			sourceTree = "<group>";
 		};
+		D2FE0D65A435A8E992E4EC84 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				26DD5F6A438B9CB04D159E58 /* BookParser.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
 		DB3CE55B0E0A22345CD06982 /* StopScroll */ = {
 			isa = PBXGroup;
 			children = (
 				F5264B0892789360AAE52D0D /* Assets.xcassets */,
 				BCC0221AD69FE0A23A6D0508 /* App */,
+				D2FE0D65A435A8E992E4EC84 /* Models */,
 				3C36802E3A22469D9BA5B4DB /* Resources */,
 				7361DFA925892C916BCF5414 /* Scripts */,
 				A9AA752D3FE8FA725F1FA8CB /* Views */,
@@ -158,6 +172,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				27EACB1BA89A36C1613B4AAB /* BookParser.swift in Sources */,
+				196B2146F76AB27B059B4958 /* BookReaderView.swift in Sources */,
 				767CD5C99713E1A7FABA3036 /* InstagramView.swift in Sources */,
 				83F82C06AE917D7565F44576 /* InstagramWebView.swift in Sources */,
 				D4185F5DE07CEB7C876C81DB /* StopScrollApp.swift in Sources */,

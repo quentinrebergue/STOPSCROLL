@@ -3,6 +3,7 @@ import WebKit
 
 struct InstagramWebView: UIViewRepresentable {
     @Binding var isLoading: Bool
+    @Binding var showingReader: Bool
 
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
@@ -24,6 +25,12 @@ struct InstagramWebView: UIViewRepresentable {
             config.userContentController.addUserScript(userScript)
         }
 
+        // Register message handler for book reader (using leak-safe wrapper)
+        config.userContentController.add(
+            LeakAvoider(delegate: context.coordinator),
+            name: "openBookReader"
+        )
+
         let webView = WKWebView(frame: .zero, configuration: config)
         webView.navigationDelegate = context.coordinator
         webView.isOpaque = false
@@ -43,11 +50,37 @@ struct InstagramWebView: UIViewRepresentable {
 
     func updateUIView(_ uiView: WKWebView, context: Context) {}
 
-    class Coordinator: NSObject, WKNavigationDelegate {
+    // MARK: - Leak-safe WKScriptMessageHandler wrapper
+
+    class LeakAvoider: NSObject, WKScriptMessageHandler {
+        weak var delegate: WKScriptMessageHandler?
+
+        init(delegate: WKScriptMessageHandler) {
+            self.delegate = delegate
+            super.init()
+        }
+
+        func userContentController(_ controller: WKUserContentController, didReceive message: WKScriptMessage) {
+            delegate?.userContentController(controller, didReceive: message)
+        }
+    }
+
+    // MARK: - Coordinator
+
+    class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
         var parent: InstagramWebView
 
         init(_ parent: InstagramWebView) {
             self.parent = parent
+        }
+
+        // Handle messages from JavaScript
+        func userContentController(_ controller: WKUserContentController, didReceive message: WKScriptMessage) {
+            if message.name == "openBookReader" {
+                DispatchQueue.main.async {
+                    self.parent.showingReader = true
+                }
+            }
         }
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
