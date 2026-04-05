@@ -9,11 +9,10 @@ struct InstagramView: View {
             InstagramWebView(isLoading: $isLoading, showingReader: $showingReader)
                 .ignoresSafeArea(edges: .bottom)
 
-            if showingReader {
-                BookReaderView(onDismiss: { showingReader = false })
-                    .transition(.opacity)
-                    .ignoresSafeArea(edges: .bottom)
-            }
+            BookReaderView(onDismiss: { showingReader = false })
+                .opacity(showingReader ? 1 : 0)
+                .allowsHitTesting(showingReader)
+                .ignoresSafeArea(edges: .bottom)
 
             if isLoading {
                 Color.black

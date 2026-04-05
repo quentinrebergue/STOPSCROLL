@@ -21,7 +21,7 @@
 		4F8E5453518C42B23702CCBB /* StopScrollApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StopScrollApp.swift; sourceTree = "<group>"; };
 		7C3519B92634CB61271300F7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		7E5A34E345922B0FB77B065C /* BookReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookReaderView.swift; sourceTree = "<group>"; };
-		86AF0E37D9B2DA48FC635A6D /* StopScroll.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = StopScroll.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		86AF0E37D9B2DA48FC635A6D /* StopScroll.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StopScroll.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		98D36FB79C7EDDFDA593A7C9 /* InstagramWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstagramWebView.swift; sourceTree = "<group>"; };
 		E8B9D70AE41E090020003432 /* block_reels.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = block_reels.js; sourceTree = "<group>"; };
 		F5264B0892789360AAE52D0D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -131,7 +131,6 @@
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {
 					180F3B4834C9782D757B939A = {
-						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -309,7 +308,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = C7DKBX3YUF;
 				INFOPLIST_FILE = StopScroll/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -331,7 +330,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = C7DKBX3YUF;
 				INFOPLIST_FILE = StopScroll/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
