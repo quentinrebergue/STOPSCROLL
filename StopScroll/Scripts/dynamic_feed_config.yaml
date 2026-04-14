@@ -1,0 +1,31 @@
+feed_injection:
+  enabled: true
+  ad_replacement: true
+  max_dynamic_posts_per_session: 30
+
+cards:
+  metrics:
+    enabled: true
+    every_n_opportunities: 1
+  mood:
+    enabled: true
+    every_n_opportunities: 2
+  stop:
+    enabled: true
+    every_n_opportunities: 3
+
+reload:
+  floating_button_enabled: true
+
+# Card content templates.
+# Use {skipped} and {minutes} placeholders in metrics_body.
+card_templates:
+  metrics_title: "Session snapshot"
+  metrics_body: "You skipped {skipped} dopamine loops and protected {minutes} min of focus."
+  mood_title: "Mood check"
+  mood_prompt_1: "What do you want to feel after this session?"
+  mood_prompt_2: "What is one useful thing you can do in 10 minutes?"
+  mood_prompt_3: "Pause: are you scrolling by choice or habit?"
+  stop_title: "Stop plan"
+  stop_body: "Set a concrete stop point now and switch to intentional time."
+

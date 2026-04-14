@@ -8,27 +8,126 @@
 
 /* Begin PBXBuildFile section */
 		0E0A5E093DD39A3D6BA043CC /* block_reels.js in Resources */ = {isa = PBXBuildFile; fileRef = E8B9D70AE41E090020003432 /* block_reels.js */; };
+		11C1E2D4B60A4E7E9B2A8A01 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11C1E2D4B60A4E7E9B2A8A02 /* AppSettings.swift */; };
 		196B2146F76AB27B059B4958 /* BookReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5A34E345922B0FB77B065C /* BookReaderView.swift */; };
-		27EACB1BA89A36C1613B4AAB /* BookParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26DD5F6A438B9CB04D159E58 /* BookParser.swift */; };
+		1DEDEA7847183B5BC857B069 /* 1984.json in Resources */ = {isa = PBXBuildFile; fileRef = 31DB646D651FFA19E393C1F3 /* 1984.json */; };
+		1F837C1C326B82742E999373 /* l-etranger.json in Resources */ = {isa = PBXBuildFile; fileRef = DC4274BB75882A985CB5C0BE /* l-etranger.json */; };
+		24151CCC554C18A28694D3EC /* dynamic_feed_config.yaml in Resources */ = {isa = PBXBuildFile; fileRef = F1AFCEC8E424892E0BC875EC /* dynamic_feed_config.yaml */; };
+		3DFB4A28B148B1DFFC2C66EA /* EPUBParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BD4C6C201D9F5F16A434A29 /* EPUBParser.swift */; };
+		4730F705C47912493598425B /* ReadingMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF11588F033C75B560C0FFC8 /* ReadingMode.swift */; };
+		4DE917A22D9B670A345EBF68 /* MiniZIP.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3511D2DC94E15A5FB361C282 /* MiniZIP.swift */; };
+		596CA626D098C5B97511B1FA /* BookCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A0650330F1551DE7DD9680 /* BookCard.swift */; };
+		5EDC12D4C1609F10C7414C18 /* l-etranger.epub in Resources */ = {isa = PBXBuildFile; fileRef = E19848A043D0CF43AB8B195A /* l-etranger.epub */; };
+		733AE0251F257E9A545EFDAE /* dorian-gray.json in Resources */ = {isa = PBXBuildFile; fileRef = 0EE8292651B5683F1566C909 /* dorian-gray.json */; };
 		767CD5C99713E1A7FABA3036 /* InstagramView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7458C392340CA051B9872EA /* InstagramView.swift */; };
 		83F82C06AE917D7565F44576 /* InstagramWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98D36FB79C7EDDFDA593A7C9 /* InstagramWebView.swift */; };
+		11C1E2D4B60A4E7E9B2A8A03 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11C1E2D4B60A4E7E9B2A8A04 /* SettingsView.swift */; };
+		9041891F5A55383856E0C868 /* CardType.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC266854481DCE0687F62A4A /* CardType.swift */; };
 		A31410EE5D6322D2100BC284 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F5264B0892789360AAE52D0D /* Assets.xcassets */; };
+		A4057A3018DF90737D19AC67 /* 1984.epub in Resources */ = {isa = PBXBuildFile; fileRef = 42EA0EE9A5B088DE2E527697 /* 1984.epub */; };
+		D19A3ED8A8C44F7639C83E2B /* le-petit-prince.json in Resources */ = {isa = PBXBuildFile; fileRef = 7EF2D7B2839CD4D31A83AA97 /* le-petit-prince.json */; };
+		D2A88B199E5AFA3204E3A400 /* String+HTMLStripping.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBDA853E4D3537C6E8F986AC /* String+HTMLStripping.swift */; };
 		D4185F5DE07CEB7C876C81DB /* StopScrollApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F8E5453518C42B23702CCBB /* StopScrollApp.swift */; };
+		D9C99F5FA0994BBFE0BD0DB5 /* BookParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D72F7704B8A034E5CC1CF8D2 /* BookParser.swift */; };
+		DA53C6993F4764F522EF04FF /* le-petit-prince.epub in Resources */ = {isa = PBXBuildFile; fileRef = 21B81C876FDD84E814F5A389 /* le-petit-prince.epub */; };
+		EB23AA3BFD54DE2E2E8C7F47 /* BookParserEPUBTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49830F744711A2144EE7185B /* BookParserEPUBTests.swift */; };
+		F02FAA985CC67A6BEAE1E355 /* dorian-gray.epub in Resources */ = {isa = PBXBuildFile; fileRef = 9A79C980F9AD98BD101601E9 /* dorian-gray.epub */; };
+		FF2BE8CECF7504888ABD0C9D /* TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D621B9E95F4CDC4E78C462C /* TestHelpers.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		C0D44B6D5F962AA401A75254 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 742975AE0258353861E61B22 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 180F3B4834C9782D757B939A;
+			remoteInfo = StopScroll;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
-		26DD5F6A438B9CB04D159E58 /* BookParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookParser.swift; sourceTree = "<group>"; };
+		0EE8292651B5683F1566C909 /* dorian-gray.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "dorian-gray.json"; sourceTree = "<group>"; };
+		11C1E2D4B60A4E7E9B2A8A02 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
+		11C1E2D4B60A4E7E9B2A8A04 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		21B81C876FDD84E814F5A389 /* le-petit-prince.epub */ = {isa = PBXFileReference; lastKnownFileType = file; path = "le-petit-prince.epub"; sourceTree = "<group>"; };
+		2BD4C6C201D9F5F16A434A29 /* EPUBParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EPUBParser.swift; sourceTree = "<group>"; };
+		31DB646D651FFA19E393C1F3 /* 1984.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = 1984.json; sourceTree = "<group>"; };
+		3511D2DC94E15A5FB361C282 /* MiniZIP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniZIP.swift; sourceTree = "<group>"; };
+		42EA0EE9A5B088DE2E527697 /* 1984.epub */ = {isa = PBXFileReference; lastKnownFileType = file; path = 1984.epub; sourceTree = "<group>"; };
+		43A0650330F1551DE7DD9680 /* BookCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookCard.swift; sourceTree = "<group>"; };
+		49830F744711A2144EE7185B /* BookParserEPUBTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookParserEPUBTests.swift; sourceTree = "<group>"; };
 		4F8E5453518C42B23702CCBB /* StopScrollApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StopScrollApp.swift; sourceTree = "<group>"; };
 		7C3519B92634CB61271300F7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		7E5A34E345922B0FB77B065C /* BookReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookReaderView.swift; sourceTree = "<group>"; };
+		7EF2D7B2839CD4D31A83AA97 /* le-petit-prince.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "le-petit-prince.json"; sourceTree = "<group>"; };
 		86AF0E37D9B2DA48FC635A6D /* StopScroll.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StopScroll.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D621B9E95F4CDC4E78C462C /* TestHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestHelpers.swift; sourceTree = "<group>"; };
 		98D36FB79C7EDDFDA593A7C9 /* InstagramWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstagramWebView.swift; sourceTree = "<group>"; };
+		9A79C980F9AD98BD101601E9 /* dorian-gray.epub */ = {isa = PBXFileReference; lastKnownFileType = file; path = "dorian-gray.epub"; sourceTree = "<group>"; };
+		C1396E0D9C909791D84E4FC3 /* StopScrollTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = StopScrollTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CBDA853E4D3537C6E8F986AC /* String+HTMLStripping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+HTMLStripping.swift"; sourceTree = "<group>"; };
+		CC266854481DCE0687F62A4A /* CardType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardType.swift; sourceTree = "<group>"; };
+		CF11588F033C75B560C0FFC8 /* ReadingMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingMode.swift; sourceTree = "<group>"; };
+		D72F7704B8A034E5CC1CF8D2 /* BookParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookParser.swift; sourceTree = "<group>"; };
+		DC4274BB75882A985CB5C0BE /* l-etranger.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "l-etranger.json"; sourceTree = "<group>"; };
+		E19848A043D0CF43AB8B195A /* l-etranger.epub */ = {isa = PBXFileReference; lastKnownFileType = file; path = "l-etranger.epub"; sourceTree = "<group>"; };
 		E8B9D70AE41E090020003432 /* block_reels.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = block_reels.js; sourceTree = "<group>"; };
+		F1AFCEC8E424892E0BC875EC /* dynamic_feed_config.yaml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = dynamic_feed_config.yaml; sourceTree = "<group>"; };
 		F5264B0892789360AAE52D0D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F7458C392340CA051B9872EA /* InstagramView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstagramView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
+		002F22D747E63E13E20EF310 /* Fixtures */ = {
+			isa = PBXGroup;
+			children = (
+				1476D6657FCF347F92439B9B /* books */,
+				11C7A774F4F56AAD93225136 /* manifests */,
+			);
+			path = Fixtures;
+			sourceTree = "<group>";
+		};
+		041B6EC618876AAB818A8D52 /* Parser */ = {
+			isa = PBXGroup;
+			children = (
+				D72F7704B8A034E5CC1CF8D2 /* BookParser.swift */,
+			);
+			path = Parser;
+			sourceTree = "<group>";
+		};
+		11C7A774F4F56AAD93225136 /* manifests */ = {
+			isa = PBXGroup;
+			children = (
+				31DB646D651FFA19E393C1F3 /* 1984.json */,
+				0EE8292651B5683F1566C909 /* dorian-gray.json */,
+				DC4274BB75882A985CB5C0BE /* l-etranger.json */,
+				7EF2D7B2839CD4D31A83AA97 /* le-petit-prince.json */,
+			);
+			path = manifests;
+			sourceTree = "<group>";
+		};
+		1476D6657FCF347F92439B9B /* books */ = {
+			isa = PBXGroup;
+			children = (
+				42EA0EE9A5B088DE2E527697 /* 1984.epub */,
+				9A79C980F9AD98BD101601E9 /* dorian-gray.epub */,
+				E19848A043D0CF43AB8B195A /* l-etranger.epub */,
+				21B81C876FDD84E814F5A389 /* le-petit-prince.epub */,
+			);
+			path = books;
+			sourceTree = "<group>";
+		};
+		1FAF7B9B73AB4621AB2A3F76 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				49830F744711A2144EE7185B /* BookParserEPUBTests.swift */,
+				8D621B9E95F4CDC4E78C462C /* TestHelpers.swift */,
+				002F22D747E63E13E20EF310 /* Fixtures */,
+			);
+			name = Tests;
+			path = StopScroll/Tests;
+			sourceTree = "<group>";
+		};
 		3C36802E3A22469D9BA5B4DB /* Resources */ = {
 			isa = PBXGroup;
 			children = (
@@ -37,10 +136,57 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
+		3DE876ED1202BB24B72F17D8 /* Reading */ = {
+			isa = PBXGroup;
+			children = (
+				CF11588F033C75B560C0FFC8 /* ReadingMode.swift */,
+			);
+			path = Reading;
+			sourceTree = "<group>";
+		};
+		60E01CD27F7F56974C67A460 /* EPUB */ = {
+			isa = PBXGroup;
+			children = (
+				2BD4C6C201D9F5F16A434A29 /* EPUBParser.swift */,
+				3511D2DC94E15A5FB361C282 /* MiniZIP.swift */,
+			);
+			path = EPUB;
+			sourceTree = "<group>";
+		};
+		66E8BB0425358AA81C1BA1F0 /* Text */ = {
+			isa = PBXGroup;
+			children = (
+				CBDA853E4D3537C6E8F986AC /* String+HTMLStripping.swift */,
+			);
+			path = Text;
+			sourceTree = "<group>";
+		};
+		6AFF02DF949F413AE232B75E /* BookParsing */ = {
+			isa = PBXGroup;
+			children = (
+				6FDCC71C7D34FFCBA9E6F6A3 /* Cards */,
+				60E01CD27F7F56974C67A460 /* EPUB */,
+				041B6EC618876AAB818A8D52 /* Parser */,
+				3DE876ED1202BB24B72F17D8 /* Reading */,
+				66E8BB0425358AA81C1BA1F0 /* Text */,
+			);
+			path = BookParsing;
+			sourceTree = "<group>";
+		};
+		6FDCC71C7D34FFCBA9E6F6A3 /* Cards */ = {
+			isa = PBXGroup;
+			children = (
+				43A0650330F1551DE7DD9680 /* BookCard.swift */,
+				CC266854481DCE0687F62A4A /* CardType.swift */,
+			);
+			path = Cards;
+			sourceTree = "<group>";
+		};
 		7361DFA925892C916BCF5414 /* Scripts */ = {
 			isa = PBXGroup;
 			children = (
 				E8B9D70AE41E090020003432 /* block_reels.js */,
+				F1AFCEC8E424892E0BC875EC /* dynamic_feed_config.yaml */,
 			);
 			path = Scripts;
 			sourceTree = "<group>";
@@ -49,6 +195,7 @@
 			isa = PBXGroup;
 			children = (
 				86AF0E37D9B2DA48FC635A6D /* StopScroll.app */,
+				C1396E0D9C909791D84E4FC3 /* StopScrollTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -58,6 +205,7 @@
 			children = (
 				7E5A34E345922B0FB77B065C /* BookReaderView.swift */,
 				F7458C392340CA051B9872EA /* InstagramView.swift */,
+				11C1E2D4B60A4E7E9B2A8A04 /* SettingsView.swift */,
 				98D36FB79C7EDDFDA593A7C9 /* InstagramWebView.swift */,
 			);
 			path = Views;
@@ -67,6 +215,7 @@
 			isa = PBXGroup;
 			children = (
 				DB3CE55B0E0A22345CD06982 /* StopScroll */,
+				1FAF7B9B73AB4621AB2A3F76 /* Tests */,
 				83AF0653200CABF4733EE477 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -82,7 +231,8 @@
 		D2FE0D65A435A8E992E4EC84 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				26DD5F6A438B9CB04D159E58 /* BookParser.swift */,
+				6AFF02DF949F413AE232B75E /* BookParsing */,
+				11C1E2D4B60A4E7E9B2A8A02 /* AppSettings.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -121,6 +271,25 @@
 			productReference = 86AF0E37D9B2DA48FC635A6D /* StopScroll.app */;
 			productType = "com.apple.product-type.application";
 		};
+		B62CF5372B78E51D7DDC87EF /* StopScrollTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6D42E09C0FB37CC250A52978 /* Build configuration list for PBXNativeTarget "StopScrollTests" */;
+			buildPhases = (
+				8813CF6615F7E29A4774031E /* Sources */,
+				7C28CB8DAF98DD6390EF9D5F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CA185402572118F1603A0C0D /* PBXTargetDependency */,
+			);
+			name = StopScrollTests;
+			packageProductDependencies = (
+			);
+			productName = StopScrollTests;
+			productReference = C1396E0D9C909791D84E4FC3 /* StopScrollTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -150,17 +319,34 @@
 			projectRoot = "";
 			targets = (
 				180F3B4834C9782D757B939A /* StopScroll */,
+				B62CF5372B78E51D7DDC87EF /* StopScrollTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		7C28CB8DAF98DD6390EF9D5F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A4057A3018DF90737D19AC67 /* 1984.epub in Resources */,
+				1DEDEA7847183B5BC857B069 /* 1984.json in Resources */,
+				F02FAA985CC67A6BEAE1E355 /* dorian-gray.epub in Resources */,
+				733AE0251F257E9A545EFDAE /* dorian-gray.json in Resources */,
+				5EDC12D4C1609F10C7414C18 /* l-etranger.epub in Resources */,
+				1F837C1C326B82742E999373 /* l-etranger.json in Resources */,
+				DA53C6993F4764F522EF04FF /* le-petit-prince.epub in Resources */,
+				D19A3ED8A8C44F7639C83E2B /* le-petit-prince.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		991E8F786DB9CADB86C306D3 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				A31410EE5D6322D2100BC284 /* Assets.xcassets in Resources */,
 				0E0A5E093DD39A3D6BA043CC /* block_reels.js in Resources */,
+				24151CCC554C18A28694D3EC /* dynamic_feed_config.yaml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -171,15 +357,40 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				27EACB1BA89A36C1613B4AAB /* BookParser.swift in Sources */,
+				11C1E2D4B60A4E7E9B2A8A01 /* AppSettings.swift in Sources */,
+				596CA626D098C5B97511B1FA /* BookCard.swift in Sources */,
+				D9C99F5FA0994BBFE0BD0DB5 /* BookParser.swift in Sources */,
 				196B2146F76AB27B059B4958 /* BookReaderView.swift in Sources */,
+				9041891F5A55383856E0C868 /* CardType.swift in Sources */,
+				3DFB4A28B148B1DFFC2C66EA /* EPUBParser.swift in Sources */,
 				767CD5C99713E1A7FABA3036 /* InstagramView.swift in Sources */,
 				83F82C06AE917D7565F44576 /* InstagramWebView.swift in Sources */,
+				4DE917A22D9B670A345EBF68 /* MiniZIP.swift in Sources */,
+				4730F705C47912493598425B /* ReadingMode.swift in Sources */,
+				11C1E2D4B60A4E7E9B2A8A03 /* SettingsView.swift in Sources */,
 				D4185F5DE07CEB7C876C81DB /* StopScrollApp.swift in Sources */,
+				D2A88B199E5AFA3204E3A400 /* String+HTMLStripping.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8813CF6615F7E29A4774031E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EB23AA3BFD54DE2E2E8C7F47 /* BookParserEPUBTests.swift in Sources */,
+				FF2BE8CECF7504888ABD0C9D /* TestHelpers.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		CA185402572118F1603A0C0D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 180F3B4834C9782D757B939A /* StopScroll */;
+			targetProxy = C0D44B6D5F962AA401A75254 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		371973AE47E4B15D7A980A40 /* Debug */ = {
@@ -244,6 +455,24 @@
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
+		};
+		764047D36DE8BBDE2B4B8497 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.stopscroll.app.tests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/StopScroll.app/StopScroll";
+			};
+			name = Release;
 		};
 		833382DD96E223B17B569C84 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -345,9 +574,36 @@
 			};
 			name = Release;
 		};
+		E92FE0FE05A6D454E341E036 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.stopscroll.app.tests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/StopScroll.app/StopScroll";
+			};
+			name = Debug;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		6D42E09C0FB37CC250A52978 /* Build configuration list for PBXNativeTarget "StopScrollTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E92FE0FE05A6D454E341E036 /* Debug */,
+				764047D36DE8BBDE2B4B8497 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		BC054B34B95E8FDBDAF55731 /* Build configuration list for PBXProject "StopScroll" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
