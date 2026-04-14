@@ -77,9 +77,7 @@
         seenPosts: new WeakSet(),
         periodicScanTimer: null,
         scanScheduled: false,
-        scrollLockActive: false,
-        wasOnReelPage: false,
-        bookReaderOpen: false
+        scrollLockActive: false
     };
 
     function isMainFeed() {
@@ -490,27 +488,41 @@
         }
     }
 
-    function manageBookReaderVisibility() {
-        const isCurrentlyOnReel = isReelPage();
-        
-        if (isCurrentlyOnReel && !state.bookReaderOpen) {
-            // Entering reel page: open book reader
-            state.bookReaderOpen = true;
-            try {
-                if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.openBookReader) {
-                    window.webkit.messageHandlers.openBookReader.postMessage({ action: 'show' });
-                }
-            } catch (_) {}
-        } else if (!isCurrentlyOnReel && state.bookReaderOpen) {
-            // Leaving reel page: close book reader
-            state.bookReaderOpen = false;
-            try {
-                if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.stopScrollBridge) {
-                    window.webkit.messageHandlers.stopScrollBridge.postMessage({ type: 'bookReader', action: 'hide' });
-                }
-            } catch (_) {}
+    // ——— Transform Reels nav button into a Book reader button ———
+    function transformReelsToBook(link) {
+        link.setAttribute('data-ss-book', '1');
+
+        // Replace the SVG icon with an open-book icon
+        const svg = link.querySelector('svg');
+        if (svg) {
+            svg.setAttribute('aria-label', 'Read');
+            svg.setAttribute('viewBox', '0 0 24 24');
+            svg.setAttribute('width', '24');
+            svg.setAttribute('height', '24');
+            svg.innerHTML = '<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>'
+                          + '<path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>';
         }
-        state.wasOnReelPage = isCurrentlyOnReel;
+
+        // Change href so CSS a[href="/reels/"] no longer hides it, and prevent navigation
+        link.setAttribute('href', '#book');
+
+        // Make sure the link and its wrappers are visible
+        link.style.cssText += ';display:flex!important;align-items:center;justify-content:center;';
+        const li = link.closest('li');
+        if (li) li.style.cssText += ';display:list-item!important;';
+        const wrapper = link.parentElement;
+        if (wrapper && wrapper.children.length <= 2) {
+            wrapper.style.cssText += ';display:flex!important;';
+        }
+
+        // Open the book reader on click
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.openBookReader) {
+                window.webkit.messageHandlers.openBookReader.postMessage('open');
+            }
+        });
     }
 
     function manageReelPageRestrictions() {
@@ -518,9 +530,6 @@
             window.location.href = '/';
             return;
         }
-
-        // Handle book reader visibility based on reel page state
-        manageBookReaderVisibility();
 
         if (isReelPage()) {
             applyScrollLock();
@@ -669,43 +678,11 @@
     }
 
     // Replace the Reels icon in Instagram's bottom nav with a book icon.
-    function injectBookIconInNav() {
-        var ns = 'http://www.w3.org/2000/svg';
-        var allLinks = document.querySelectorAll('a');
-        for (var i = 0; i < allLinks.length; i++) {
-            var link = allLinks[i];
-            if (link.getAttribute('data-ss-book-icon')) continue;
-            var href = link.getAttribute('href') || '';
-            // Match only the bottom-nav Reels entry (exact /reels or /reels/).
-            if (!/^\/reels\/?$/.test(href)) continue;
-            if (!link.closest('nav, [role="tablist"]')) continue;
-
-            link.setAttribute('data-ss-book-icon', 'true');
-
-            var svgs = link.querySelectorAll('svg');
-            for (var s = 0; s < svgs.length; s++) {
-                var newSvg = document.createElementNS(ns, 'svg');
-                newSvg.setAttribute('viewBox', '0 0 24 24');
-                newSvg.setAttribute('width', svgs[s].getAttribute('width') || '24');
-                newSvg.setAttribute('height', svgs[s].getAttribute('height') || '24');
-                newSvg.setAttribute('fill', 'none');
-                newSvg.setAttribute('stroke', 'currentColor');
-                newSvg.setAttribute('stroke-width', '2');
-                newSvg.setAttribute('stroke-linecap', 'round');
-                newSvg.setAttribute('stroke-linejoin', 'round');
-                var path = document.createElementNS(ns, 'path');
-                path.setAttribute('d', 'M6 2h12a2 2 0 0 1 2 2v16l-7-3-7 3V4a2 2 0 0 1 2-2z');
-                newSvg.appendChild(path);
-                svgs[s].parentElement.replaceChild(newSvg, svgs[s]);
-            }
-
-            // Intercept clicks before Instagram's own handlers.
-            link.addEventListener('click', function (e) {
-                e.preventDefault();
-                e.stopImmediatePropagation();
-                postToNative('open');
-            }, true);
-        }
+    function cleanReels() {
+        // Transform the Reels nav tab into a Book button
+        document.querySelectorAll('a[href="/reels/"]:not([data-ss-book]), a[href="/reels"]:not([data-ss-book])').forEach(el => {
+            transformReelsToBook(el);
+        });
     }
 
     // Inject a reload button into Instagram's top nav bar, left of the + (create) button.
@@ -759,7 +736,7 @@
     }
 
     function checkNavInjections() {
-        injectBookIconInNav();
+        cleanReels();
         injectReloadButton();
     }
 
