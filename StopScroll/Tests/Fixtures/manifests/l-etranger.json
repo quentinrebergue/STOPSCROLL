@@ -1,0 +1,21 @@
+{
+  "testName": "L'etranger chapter detection",
+  "bookFile": "l-etranger.epub",
+  "expectedChapterCount": 14,
+  "expectedChapterTitles": [
+    "PREMIÈRE PARTIE",
+    "I",
+    "II",
+    "III",
+    "IV",
+    "V",
+    "VI",
+    "DEUXIÈME PARTIE",
+    "I",
+    "II",
+    "III",
+    "IV",
+    "V",
+    "À propos de cette édition électronique"
+  ]
+}

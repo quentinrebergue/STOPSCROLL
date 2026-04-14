@@ -13,8 +13,10 @@ targets:
       - path: StopScroll
         excludes:
           - "*.xcassets/AppIcon.appiconset"
+          - Tests/**
     resources:
       - path: StopScroll/Scripts/block_reels.js
+      - path: StopScroll/Scripts/dynamic_feed_config.yaml
       - path: StopScroll/Assets.xcassets
     settings:
       base:
@@ -27,3 +29,16 @@ targets:
         SWIFT_VERSION: "5.9"
         TARGETED_DEVICE_FAMILY: "1"
         SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD: false
+
+  StopScrollTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: StopScroll/Tests
+    dependencies:
+      - target: StopScroll
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.stopscroll.app.tests
+        GENERATE_INFOPLIST_FILE: YES
+        SWIFT_VERSION: "5.9"

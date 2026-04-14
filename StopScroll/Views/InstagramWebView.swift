@@ -130,12 +130,18 @@ struct InstagramWebView: UIViewRepresentable {
                 return
             }
             if let dict = body as? [String: Any],
-               let type = dict["type"] as? String,
-               type == "language",
-               let lang = dict["value"] as? String {
-                AppSettings.shared.seedLabels(forLanguage: lang)
-                DispatchQueue.main.async {
-                    self.webView?.evaluateJavaScript(self.parent.buildLabelsInjectionScript())
+               let type = dict["type"] as? String {
+                if type == "language",
+                   let lang = dict["value"] as? String {
+                    AppSettings.shared.seedLabels(forLanguage: lang)
+                    DispatchQueue.main.async {
+                        self.webView?.evaluateJavaScript(self.parent.buildLabelsInjectionScript())
+                    }
+                } else if type == "bookReader",
+                          let action = dict["action"] as? String {
+                    if action == "hide" {
+                        DispatchQueue.main.async { self.parent.showingReader = false }
+                    }
                 }
             }
         }

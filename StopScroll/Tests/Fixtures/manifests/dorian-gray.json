@@ -1,0 +1,28 @@
+{
+  "testName": "Dorian Gray chapter detection",
+  "bookFile": "dorian-gray.epub",
+  "expectedChapterCount": 21,
+  "expectedChapterTitles": [
+  "THE PREFACE",
+  "CHAPTER I",
+  "CHAPTER II",
+  "CHAPTER III",
+  "CHAPTER IV",
+  "CHAPTER V",
+  "CHAPTER VI",
+  "CHAPTER VII",
+  "CHAPTER VIII",
+  "CHAPTER IX",
+  "CHAPTER X",
+  "CHAPTER XI",
+  "CHAPTER XII",
+  "CHAPTER XIII",
+  "CHAPTER XIV",
+  "CHAPTER XV",
+  "CHAPTER XVI",
+  "CHAPTER XVII",
+  "CHAPTER XVIII",
+  "CHAPTER XIX",
+  "CHAPTER XX"
+  ]
+}

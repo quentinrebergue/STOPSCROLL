@@ -77,7 +77,9 @@
         seenPosts: new WeakSet(),
         periodicScanTimer: null,
         scanScheduled: false,
-        scrollLockActive: false
+        scrollLockActive: false,
+        wasOnReelPage: false,
+        bookReaderOpen: false
     };
 
     function isMainFeed() {
@@ -488,11 +490,37 @@
         }
     }
 
+    function manageBookReaderVisibility() {
+        const isCurrentlyOnReel = isReelPage();
+        
+        if (isCurrentlyOnReel && !state.bookReaderOpen) {
+            // Entering reel page: open book reader
+            state.bookReaderOpen = true;
+            try {
+                if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.openBookReader) {
+                    window.webkit.messageHandlers.openBookReader.postMessage({ action: 'show' });
+                }
+            } catch (_) {}
+        } else if (!isCurrentlyOnReel && state.bookReaderOpen) {
+            // Leaving reel page: close book reader
+            state.bookReaderOpen = false;
+            try {
+                if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.stopScrollBridge) {
+                    window.webkit.messageHandlers.stopScrollBridge.postMessage({ type: 'bookReader', action: 'hide' });
+                }
+            } catch (_) {}
+        }
+        state.wasOnReelPage = isCurrentlyOnReel;
+    }
+
     function manageReelPageRestrictions() {
         if (isReelsTab()) {
             window.location.href = '/';
             return;
         }
+
+        // Handle book reader visibility based on reel page state
+        manageBookReaderVisibility();
 
         if (isReelPage()) {
             applyScrollLock();
