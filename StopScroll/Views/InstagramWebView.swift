@@ -263,9 +263,6 @@ struct InstagramWebView: UIViewRepresentable {
             }
         }
 
-        /// Save a Wikipedia article into BookStorage & library, then open the reader.
-        private func handleOpenArticle(title: String, text: String) {
-
         /// Fetch a random Wikipedia article natively (bypasses CSP) and inject it into JS.
         private func fetchWikipediaArticle(lang: String) {
             let safeLang = lang.prefix(5).filter { $0.isLetter }
@@ -306,6 +303,8 @@ struct InstagramWebView: UIViewRepresentable {
             }.resume()
         }
 
+        /// Save a Wikipedia article into BookStorage & library, then open the reader.
+        private func handleOpenArticle(title: String, text: String) {
             let bookId = UUID().uuidString
             let chapters: [(title: String, text: String)] = [(title, text)]
             BookStorage.save(chapters: chapters, bookId: bookId)
