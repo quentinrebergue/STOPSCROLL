@@ -6,8 +6,27 @@ struct SettingsView: View {
     @State private var showResetAlert = false
     let onDismiss: () -> Void
 
+    /// Discrete frequency steps mapped to slider positions.
+    /// 0 = off (no cards injected).
+    private static let frequencySteps: [Int] = [1, 2, 3, 5, 10, 20, 30, 50, 100, 0]
+
+    /// Slider index (0..steps.count-1) mapped to the actual frequency value.
+    @State private var freqSliderIndex: Double = 0
+
     private var langDisplay: String {
         settings.detectedLanguage.isEmpty ? "unknown" : settings.detectedLanguage
+    }
+
+    private var currentFreq: Int {
+        let idx = Int(freqSliderIndex.rounded())
+        return Self.frequencySteps[min(idx, Self.frequencySteps.count - 1)]
+    }
+
+    private var freqLabel: String {
+        let f = currentFreq
+        if f == 0 { return "Off" }
+        if f == 1 { return "Every post" }
+        return "1 / \(f) posts"
     }
 
     var body: some View {
@@ -25,6 +44,27 @@ struct SettingsView: View {
                             Text("Detected Instagram language: **\(langDisplay)**")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
+                        }
+                    }
+                    .padding(.vertical, 4)
+                }
+
+                // Card injection frequency
+                Section(header: Text("Card frequency")) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Text("Injection rate")
+                            Spacer()
+                            Text(freqLabel)
+                                .foregroundColor(.secondary)
+                        }
+                        Slider(
+                            value: $freqSliderIndex,
+                            in: 0...Double(Self.frequencySteps.count - 1),
+                            step: 1
+                        )
+                        .onChange(of: freqSliderIndex) { _ in
+                            settings.injectionFrequency = currentFreq
                         }
                     }
                     .padding(.vertical, 4)
@@ -86,5 +126,10 @@ struct SettingsView: View {
             }
         }
         .preferredColorScheme(.dark)
+        .onAppear {
+            if let idx = Self.frequencySteps.firstIndex(of: settings.injectionFrequency) {
+                freqSliderIndex = Double(idx)
+            }
+        }
     }
 }

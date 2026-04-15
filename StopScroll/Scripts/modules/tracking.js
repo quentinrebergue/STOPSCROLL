@@ -12,9 +12,21 @@
     ns.adDetection.scanForNewAds(state, function (post) {
       state.opportunities += 1;
       var chosen = ns.cardLogic.chooseCardType(state, state.config);
-      if (chosen && ns.cardInjection.injectCardIntoPost(post, chosen, state.config)) {
-        state.shownCards += 1;
-        state.byTypeCount[chosen] += 1;
+      if (!chosen) return;
+
+      // Try the chosen type; if its builder returns null (e.g. no book loaded),
+      // fall back to another random type up to 3 times.
+      var attempts = 0;
+      var tried = {};
+      while (chosen && attempts < 4) {
+        if (!tried[chosen] && ns.cardInjection.injectCardIntoPost(post, chosen, state.config)) {
+          state.shownCards += 1;
+          state.byTypeCount[chosen] += 1;
+          return;
+        }
+        tried[chosen] = true;
+        attempts += 1;
+        chosen = ns.cardLogic.chooseCardType(state, state.config);
       }
     });
   }

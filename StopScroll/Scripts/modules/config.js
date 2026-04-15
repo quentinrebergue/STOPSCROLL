@@ -92,7 +92,12 @@
     function loadConfig() {
         const yamlText = global.__STOPSCROLL_DYNAMIC_YAML || '';
         const parsed = parseSimpleYAML(yamlText);
-        return deepMerge(constants.DEFAULT_CONFIG, parsed);
+        var config = deepMerge(constants.DEFAULT_CONFIG, parsed);
+        // User-set injection frequency from native settings overrides YAML/defaults
+        if (typeof global.__STOPSCROLL_FREQUENCY === 'number') {
+            config.cards.every_n_opportunities = global.__STOPSCROLL_FREQUENCY;
+        }
+        return config;
     }
 
     function getAdLabels() {

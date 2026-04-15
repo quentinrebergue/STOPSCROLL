@@ -11,6 +11,8 @@
   function initializeRuntimeState(state) {
     state.config = ns.config.loadConfig();
     ns.dom.detectLanguage();
+    // Pre-fetch a Wikipedia article so the culture card has content ready
+    if (ns.wikipedia && ns.wikipedia.prefetch) ns.wikipedia.prefetch();
   }
 
   ns.runtimeState = {

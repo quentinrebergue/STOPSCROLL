@@ -70,7 +70,9 @@
     mood:    '#ffd37a',
     timer:   '#ffd37a',
     stop:    '#ffd37a',
-    stats:   '#c4b5fd'
+    stats:   '#c4b5fd',
+    book:    '#90eeb0',
+    culture: '#f9a825'
   };
 
   /**
@@ -141,6 +143,8 @@
     if (type === 'timer')   card = cb.buildTimerCard(config);
     if (type === 'stop')    card = cb.buildStopCard(config);
     if (type === 'stats')   card = cb.buildStatsCard(config);
+    if (type === 'book')    card = cb.buildBookCard(config);
+    if (type === 'culture') card = cb.buildCultureCard(config);
     if (card) {
       var colors = detectInstagramColors();
       applyGradientBg(card, type);

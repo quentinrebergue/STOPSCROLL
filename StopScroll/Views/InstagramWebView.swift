@@ -17,6 +17,7 @@ struct InstagramWebView: UIViewRepresentable {
         "dom-utils",
         "scroll-lock",
         "card-logic",
+        "wikipedia",
         // card-builder sub-modules (helpers first, index last)
         "card-builder-helpers",
         "card-metrics",
@@ -24,6 +25,8 @@ struct InstagramWebView: UIViewRepresentable {
         "card-timer",
         "card-stop",
         "card-stats",
+        "card-book",
+        "card-culture",
         "card-builder",
         // remaining modules
         "card-injection",
@@ -52,6 +55,20 @@ struct InstagramWebView: UIViewRepresentable {
                 forMainFrameOnly: true
             ))
         }
+
+        // Inject ad labels + frequency so they're available before modules load
+        config.userContentController.addUserScript(WKUserScript(
+            source: buildLabelsInjectionScript(),
+            injectionTime: .atDocumentStart,
+            forMainFrameOnly: true
+        ))
+
+        // Expose current book reading state to JS
+        config.userContentController.addUserScript(WKUserScript(
+            source: buildBookStateScript(),
+            injectionTime: .atDocumentStart,
+            forMainFrameOnly: true
+        ))
 
         // Inject all module scripts in dependency order, then the bootstrap.
         for script in Self.loadAllScripts() {
@@ -95,18 +112,28 @@ struct InstagramWebView: UIViewRepresentable {
         }
         if context.coordinator.lastLabelsToken != labelsToken {
             context.coordinator.lastLabelsToken = labelsToken
-            uiView.evaluateJavaScript(buildLabelsInjectionScript())
+            // Re-inject globals AND reload config into the running state
+            let reloadScript = buildLabelsInjectionScript() + """
+            (function() {
+                var ns = window.StopScroll;
+                if (ns && ns.config && ns.config.loadConfig && ns._state) {
+                    ns._state.config = ns.config.loadConfig();
+                }
+            })();
+            """
+            uiView.evaluateJavaScript(reloadScript)
         }
     }
 
     // MARK: - Script builders
 
-    /// Serialises AppSettings.adLabels to window.__STOPSCROLL_AD_LABELS in the WebView.
+    /// Serialises AppSettings.adLabels and injectionFrequency to the WebView.
     func buildLabelsInjectionScript() -> String {
         let labels = AppSettings.shared.adLabels
         let jsonData = (try? JSONSerialization.data(withJSONObject: labels)) ?? Data()
         let json = String(data: jsonData, encoding: .utf8) ?? "[]"
-        return "window.__STOPSCROLL_AD_LABELS = \(json);"
+        let freq = AppSettings.shared.injectionFrequency
+        return "window.__STOPSCROLL_AD_LABELS = \(json); window.__STOPSCROLL_FREQUENCY = \(freq);"
     }
 
     private func buildYAMLInjectionScript() -> String? {
@@ -117,6 +144,28 @@ struct InstagramWebView: UIViewRepresentable {
             .replacingOccurrences(of: "`", with: "\\`")
             .replacingOccurrences(of: "${", with: "\\${")
         return "window.__STOPSCROLL_DYNAMIC_YAML = `\(escaped)`;"
+    }
+
+    /// Reads persisted book state from UserDefaults and exposes it to JS.
+    func buildBookStateScript() -> String {
+        let title = UserDefaults.standard.string(forKey: "savedBookTitle") ?? ""
+        let cardIndex = UserDefaults.standard.integer(forKey: "savedCardIndex")
+        let bookId = UserDefaults.standard.string(forKey: "currentBookId") ?? ""
+
+        // Try to get totalPages from the library entry
+        var totalPages = 0
+        if !bookId.isEmpty,
+           let data = UserDefaults.standard.data(forKey: "library"),
+           let lib = try? JSONDecoder().decode([LibraryBook].self, from: data) {
+            if let entry = lib.first(where: { $0.id == bookId }) {
+                totalPages = entry.totalPages
+            }
+        }
+
+        let escapedTitle = title
+            .replacingOccurrences(of: "\\", with: "\\\\")
+            .replacingOccurrences(of: "'", with: "\\'")
+        return "window.__STOPSCROLL_BOOK = {title:'\(escapedTitle)',page:\(cardIndex),totalPages:\(totalPages),hasBook:\(!bookId.isEmpty)};"
     }
 
     /// Loads all module scripts + bootstrap in dependency order from the bundle.
@@ -201,6 +250,48 @@ struct InstagramWebView: UIViewRepresentable {
                         self.webView?.evaluateJavaScript(self.parent.buildLabelsInjectionScript())
                     }
                 }
+                if type == "openArticle",
+                   let title = dict["title"] as? String,
+                   let text = dict["text"] as? String,
+                   !text.isEmpty {
+                    handleOpenArticle(title: title, text: text)
+                }
+            }
+        }
+
+        /// Save a Wikipedia article into BookStorage & library, then open the reader.
+        private func handleOpenArticle(title: String, text: String) {
+            let bookId = UUID().uuidString
+            let chapters: [(title: String, text: String)] = [(title, text)]
+            BookStorage.save(chapters: chapters, bookId: bookId)
+
+            // Build cards to get totalCards / totalPages
+            let cards = BookParser.makeCards(from: chapters, mode: .flow)
+            let textCards = cards.filter { if case .text = $0.type { return true }; return false }
+            let totalPages = textCards.isEmpty ? 0 : textCards.last!.page
+
+            // Add to library
+            var library: [LibraryBook] = []
+            if let data = UserDefaults.standard.data(forKey: "library"),
+               let lib = try? JSONDecoder().decode([LibraryBook].self, from: data) {
+                library = lib
+            }
+            library.append(LibraryBook(
+                id: bookId, title: title,
+                savedCardIndex: 0, totalCards: cards.count,
+                currentChapter: 1, totalPages: totalPages,
+                readingMode: ReadingMode.flow.rawValue, isArticle: true
+            ))
+            if let encoded = try? JSONEncoder().encode(library) {
+                UserDefaults.standard.set(encoded, forKey: "library")
+            }
+
+            // Update AppStorage keys so BookReaderView picks it up
+            DispatchQueue.main.async {
+                UserDefaults.standard.set(bookId, forKey: "currentBookId")
+                UserDefaults.standard.set(0, forKey: "savedCardIndex")
+                UserDefaults.standard.set(title, forKey: "savedBookTitle")
+                self.parent.showingReader = true
             }
         }
 
@@ -208,6 +299,8 @@ struct InstagramWebView: UIViewRepresentable {
             if let yamlInjection = parent.buildYAMLInjectionScript() {
                 webView.evaluateJavaScript(yamlInjection)
             }
+            // Refresh book reading state
+            webView.evaluateJavaScript(parent.buildBookStateScript())
             // Inject user label list (UserDefaults) so JS picks up any edits.
             webView.evaluateJavaScript(parent.buildLabelsInjectionScript())
             // Re-inject all module scripts + bootstrap after each navigation.

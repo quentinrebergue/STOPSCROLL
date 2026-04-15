@@ -18,12 +18,15 @@
 		CB01A00000000000000000A4 /* card-timer.js in Resources */ = {isa = PBXBuildFile; fileRef = CB01F00000000000000000A4 /* card-timer.js */; };
 		CB01A00000000000000000A5 /* card-stop.js in Resources */ = {isa = PBXBuildFile; fileRef = CB01F00000000000000000A5 /* card-stop.js */; };
 		CB01A00000000000000000A6 /* card-stats.js in Resources */ = {isa = PBXBuildFile; fileRef = CB01F00000000000000000A6 /* card-stats.js */; };
+		CB01A00000000000000000A8 /* card-book.js in Resources */ = {isa = PBXBuildFile; fileRef = CB01F00000000000000000A8 /* card-book.js */; };
+		CB01A00000000000000000A9 /* card-culture.js in Resources */ = {isa = PBXBuildFile; fileRef = CB01F00000000000000000A9 /* card-culture.js */; };
 		CB01A00000000000000000A7 /* card-builder.js in Resources */ = {isa = PBXBuildFile; fileRef = CB01F00000000000000000A7 /* card-builder.js */; };
 		1DEDEA7847183B5BC857B069 /* 1984.json in Resources */ = {isa = PBXBuildFile; fileRef = 31DB646D651FFA19E393C1F3 /* 1984.json */; };
 		1F837C1C326B82742E999373 /* l-etranger.json in Resources */ = {isa = PBXBuildFile; fileRef = DC4274BB75882A985CB5C0BE /* l-etranger.json */; };
 		24151CCC554C18A28694D3EC /* dynamic_feed_config.yaml in Resources */ = {isa = PBXBuildFile; fileRef = F1AFCEC8E424892E0BC875EC /* dynamic_feed_config.yaml */; };
 		26286AE36E3383D42914218D /* constants.js in Resources */ = {isa = PBXBuildFile; fileRef = 426826A738B07C445AB3F826 /* constants.js */; };
 		2656A10B9F5D592B94197708 /* tracking.js in Resources */ = {isa = PBXBuildFile; fileRef = 2AE21283A700ADC65F40A964 /* tracking.js */; };
+		WK01A000000000000000B001 /* wikipedia.js in Resources */ = {isa = PBXBuildFile; fileRef = WK01F000000000000000B001 /* wikipedia.js */; };
 		3DFB4A28B148B1DFFC2C66EA /* EPUBParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BD4C6C201D9F5F16A434A29 /* EPUBParser.swift */; };
 		4730F705C47912493598425B /* ReadingMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF11588F033C75B560C0FFC8 /* ReadingMode.swift */; };
 		4DE917A22D9B670A345EBF68 /* MiniZIP.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3511D2DC94E15A5FB361C282 /* MiniZIP.swift */; };
@@ -80,10 +83,13 @@
 		CB01F00000000000000000A4 /* card-timer.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "card-timer.js"; sourceTree = "<group>"; };
 		CB01F00000000000000000A5 /* card-stop.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "card-stop.js"; sourceTree = "<group>"; };
 		CB01F00000000000000000A6 /* card-stats.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "card-stats.js"; sourceTree = "<group>"; };
+		CB01F00000000000000000A8 /* card-book.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "card-book.js"; sourceTree = "<group>"; };
+		CB01F00000000000000000A9 /* card-culture.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "card-culture.js"; sourceTree = "<group>"; };
 		CB01F00000000000000000A7 /* card-builder.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "card-builder.js"; sourceTree = "<group>"; };
 		21B81C876FDD84E814F5A389 /* le-petit-prince.epub */ = {isa = PBXFileReference; lastKnownFileType = file; path = "le-petit-prince.epub"; sourceTree = "<group>"; };
 		25FF4AF8D9F7E63AB024811A /* card-logic.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "card-logic.js"; sourceTree = "<group>"; };
 		2AE21283A700ADC65F40A964 /* tracking.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = tracking.js; sourceTree = "<group>"; };
+		WK01F000000000000000B001 /* wikipedia.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "wikipedia.js"; sourceTree = "<group>"; };
 		2BD4C6C201D9F5F16A434A29 /* EPUBParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EPUBParser.swift; sourceTree = "<group>"; };
 		31DB646D651FFA19E393C1F3 /* 1984.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = 1984.json; sourceTree = "<group>"; };
 		3511D2DC94E15A5FB361C282 /* MiniZIP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniZIP.swift; sourceTree = "<group>"; };
@@ -274,6 +280,8 @@
 				CB01F00000000000000000A4 /* card-timer.js */,
 				CB01F00000000000000000A5 /* card-stop.js */,
 				CB01F00000000000000000A6 /* card-stats.js */,
+				CB01F00000000000000000A8 /* card-book.js */,
+				CB01F00000000000000000A9 /* card-culture.js */,
 				CB01F00000000000000000A7 /* card-builder.js */,
 			);
 			path = "card-builder";
@@ -295,6 +303,7 @@
 				9BA157D7898D2DA526AFDCB1 /* top-menu.js */,
 				459D5381A32D4A489B570713 /* session-stats.js */,
 				2AE21283A700ADC65F40A964 /* tracking.js */,
+				WK01F000000000000000B001 /* wikipedia.js */,
 			);
 			path = modules;
 			sourceTree = "<group>";
@@ -455,6 +464,8 @@
 				CB01A00000000000000000A4 /* card-timer.js in Resources */,
 				CB01A00000000000000000A5 /* card-stop.js in Resources */,
 				CB01A00000000000000000A6 /* card-stats.js in Resources */,
+				CB01A00000000000000000A8 /* card-book.js in Resources */,
+				CB01A00000000000000000A9 /* card-culture.js in Resources */,
 				CB01A00000000000000000A7 /* card-builder.js in Resources */,
 				C8CD3BDC6ADADE184817FBB1 /* card-injection.js in Resources */,
 				E6D38C57ACFC342FFCE57D67 /* card-logic.js in Resources */,
@@ -471,6 +482,7 @@
 				F0AA0D272D88F462AF10C5A0 /* top-menu.js in Resources */,
 				7484628AC4F24FC3A62D0BEE /* session-stats.js in Resources */,
 				2656A10B9F5D592B94197708 /* tracking.js in Resources */,
+				WK01A000000000000000B001 /* wikipedia.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -62,10 +62,31 @@ struct LibraryBook: Codable, Identifiable {
     var currentChapter: Int
     var totalPages: Int
     var readingMode: String
+    var isArticle: Bool
 
     var progressPercent: Double {
         guard totalCards > 0 else { return 0 }
         return Double(savedCardIndex) / Double(totalCards) * 100
+    }
+
+    // Backward-compatible decoding: existing entries default isArticle to false
+    init(id: String, title: String, savedCardIndex: Int, totalCards: Int,
+         currentChapter: Int, totalPages: Int, readingMode: String, isArticle: Bool = false) {
+        self.id = id; self.title = title; self.savedCardIndex = savedCardIndex
+        self.totalCards = totalCards; self.currentChapter = currentChapter
+        self.totalPages = totalPages; self.readingMode = readingMode; self.isArticle = isArticle
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(String.self, forKey: .id)
+        title = try c.decode(String.self, forKey: .title)
+        savedCardIndex = try c.decode(Int.self, forKey: .savedCardIndex)
+        totalCards = try c.decode(Int.self, forKey: .totalCards)
+        currentChapter = try c.decode(Int.self, forKey: .currentChapter)
+        totalPages = try c.decode(Int.self, forKey: .totalPages)
+        readingMode = try c.decode(String.self, forKey: .readingMode)
+        isArticle = try c.decodeIfPresent(Bool.self, forKey: .isArticle) ?? false
     }
 }
 
@@ -183,6 +204,10 @@ struct BookReaderView: View {
             )
         }
         .onAppear {
+            loadLastBook()
+            loadBookmarks()
+        }
+        .onChange(of: currentBookId) { _ in
             loadLastBook()
             loadBookmarks()
         }
@@ -665,14 +690,14 @@ struct BookReaderView: View {
         }
     }
 
-    private func addToLibrary(bookId: String, title: String) {
+    private func addToLibrary(bookId: String, title: String, isArticle: Bool = false) {
         var library = loadLibrary()
         if !library.contains(where: { $0.id == bookId }) {
             library.append(LibraryBook(
                 id: bookId, title: title,
                 savedCardIndex: 0, totalCards: cards.count,
                 currentChapter: 1, totalPages: totalPages,
-                readingMode: readingModeRaw
+                readingMode: readingModeRaw, isArticle: isArticle
             ))
             saveLibrary(library)
         }
@@ -1101,7 +1126,7 @@ struct SettingsSheet: View {
                         }
                     }
 
-                    ForEach(library) { book in
+                    ForEach(library.filter { !$0.isArticle }) { book in
                         Button {
                             selectedBook = book
                         } label: {
@@ -1134,6 +1159,51 @@ struct SettingsSheet: View {
                                 Image(systemName: "chevron.right")
                                     .font(.caption)
                                     .foregroundColor(Color(white: 0.3))
+                            }
+                        }
+                    }
+                }
+
+                let articles = library.filter { $0.isArticle }
+                if !articles.isEmpty {
+                    Section("Articles") {
+                        ForEach(articles) { article in
+                            Button {
+                                selectedBook = article
+                            } label: {
+                                HStack {
+                                    Image(systemName: "doc.text")
+                                        .font(.system(size: 22))
+                                        .foregroundColor(Color(red: 0.98, green: 0.66, blue: 0.15))
+                                        .frame(width: 38, height: 38)
+
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(article.title)
+                                            .foregroundColor(.white)
+                                            .lineLimit(1)
+                                        HStack(spacing: 8) {
+                                            Text("\(Int(article.progressPercent))%")
+                                                .font(.caption)
+                                                .foregroundColor(.gray)
+                                            ProgressView(value: article.progressPercent, total: 100)
+                                                .tint(article.progressPercent >= 100 ? .green : .orange)
+                                                .frame(width: 80)
+                                        }
+                                    }
+                                    Spacer()
+                                    if article.id == currentBookId {
+                                        Text("Reading")
+                                            .font(.caption2)
+                                            .foregroundColor(.green)
+                                            .padding(.horizontal, 6)
+                                            .padding(.vertical, 2)
+                                            .background(Color.green.opacity(0.15))
+                                            .clipShape(Capsule())
+                                    }
+                                    Image(systemName: "chevron.right")
+                                        .font(.caption)
+                                        .foregroundColor(Color(white: 0.3))
+                                }
                             }
                         }
                     }

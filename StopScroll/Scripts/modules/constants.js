@@ -28,15 +28,18 @@
             feed_injection: {
                 enabled: true,
                 ad_replacement: true,
+                replace_suggested: true,
                 max_dynamic_posts_per_session: 30
             },
             cards: {
-                every_n_opportunities: 3,
+                every_n_opportunities: 1,
                 metrics: { enabled: true, weight: 20 },
                 mood:    { enabled: true, weight: 15 },
                 timer:   { enabled: true, weight: 10 },
                 stop:    { enabled: true, weight: 30 },
-                stats:   { enabled: true, weight: 30 }
+                stats:   { enabled: true, weight: 30 },
+                book:    { enabled: true, weight: 25 },
+                culture: { enabled: true, weight: 20 }
             },
             captions: [
                 'Your time is the most valuable thing you own.',
@@ -76,7 +79,9 @@
                 mood: 0,
                 timer: 0,
                 stop: 0,
-                stats: 0
+                stats: 0,
+                book: 0,
+                culture: 0
             },
             seenPosts: new WeakSet(),
             periodicScanTimer: null,

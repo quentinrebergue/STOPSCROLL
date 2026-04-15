@@ -12,6 +12,11 @@ final class AppSettings: ObservableObject {
         didSet { UserDefaults.standard.set(adLabels, forKey: Keys.adLabels) }
     }
 
+    /// Card injection frequency: replace 1 out of every N detected posts. 0 = disabled.
+    @Published var injectionFrequency: Int {
+        didSet { UserDefaults.standard.set(injectionFrequency, forKey: Keys.injectionFrequency) }
+    }
+
     /// Most recent Instagram UI language reported by the WebView (BCP-47, e.g. "fr", "en-US").
     @Published private(set) var detectedLanguage: String = ""
 
@@ -38,6 +43,8 @@ final class AppSettings: ObservableObject {
         } else {
             adLabels = []
         }
+        let savedFreq = UserDefaults.standard.object(forKey: Keys.injectionFrequency)
+        injectionFrequency = (savedFreq as? Int) ?? 1
     }
 
     // MARK: - Language seeding
@@ -74,5 +81,6 @@ final class AppSettings: ObservableObject {
 
     private enum Keys {
         static let adLabels = "ss_ad_labels"
+        static let injectionFrequency = "ss_injection_frequency"
     }
 }
