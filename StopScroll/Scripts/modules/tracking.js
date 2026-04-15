@@ -11,22 +11,17 @@
     }
     ns.adDetection.scanForNewAds(state, function (post) {
       state.opportunities += 1;
-      var chosen = ns.cardLogic.chooseCardType(state, state.config);
-      if (!chosen) return;
-
-      // Try the chosen type; if its builder returns null (e.g. no book loaded),
-      // fall back to another random type up to 3 times.
-      var attempts = 0;
       var tried = {};
-      while (chosen && attempts < 4) {
-        if (!tried[chosen] && ns.cardInjection.injectCardIntoPost(post, chosen, state.config)) {
+      for (var attempts = 0; attempts < 5; attempts++) {
+        var chosen = ns.cardLogic.chooseCardType(state, state.config, tried);
+        if (!chosen) return; // no eligible type left
+        if (ns.cardInjection.injectCardIntoPost(post, chosen, state.config)) {
+          ns.cardLogic.recordChoice(chosen);
           state.shownCards += 1;
           state.byTypeCount[chosen] += 1;
           return;
         }
-        tried[chosen] = true;
-        attempts += 1;
-        chosen = ns.cardLogic.chooseCardType(state, state.config);
+        tried[chosen] = true; // builder failed, exclude and retry
       }
     });
   }

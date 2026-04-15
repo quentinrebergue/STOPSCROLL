@@ -13,7 +13,12 @@
     return !!(config.cards[type] && config.cards[type].enabled);
   }
 
-  function chooseCardType(state, config) {
+  /**
+   * Pick a card type. Does NOT record the choice — the caller must
+   * call recordChoice() once the card is successfully shown.
+   * @param {Set|Object} [exclude] — types to skip (e.g. already tried)
+   */
+  function chooseCardType(state, config, exclude) {
     // Frequency 0 = cards disabled
     var freq = Number(config.cards.every_n_opportunities);
     if (freq <= 0) return null;
@@ -21,19 +26,24 @@
     // Global frequency gate: only show a card every N opportunities
     if (state.opportunities % freq !== 0) return null;
 
+    var lastShown = _history.length > 0 ? _history[0] : null;
+
     // Collect enabled cards with adjusted weights
     var pool = [];
     var totalWeight = 0;
     for (var i = 0; i < TYPES.length; i++) {
       var type = TYPES[i];
       if (!cardEnabled(config, type)) continue;
+      // Hard-exclude the last shown type (no repeat)
+      if (type === lastShown) continue;
+      // Skip types the caller already tried and failed
+      if (exclude && exclude[type]) continue;
+
       var w = Number(config.cards[type].weight) || 1;
 
-      // Penalise recently shown types:
-      // last shown → weight ÷ 8, second-to-last → ÷ 3, third → ÷ 1.5
+      // Softer penalty for 2nd and 3rd in history
       var histIdx = _history.indexOf(type);
-      if (histIdx === 0) w = Math.max(w / 8, 1);
-      else if (histIdx === 1) w = Math.max(w / 3, 1);
+      if (histIdx === 1) w = Math.max(w / 3, 1);
       else if (histIdx === 2) w = Math.max(w / 1.5, 1);
 
       pool.push({ type: type, weight: w });
@@ -42,24 +52,16 @@
     if (pool.length === 0) return null;
 
     // If only one type available, just return it
-    if (pool.length === 1) {
-      recordChoice(pool[0].type);
-      return pool[0].type;
-    }
+    if (pool.length === 1) return pool[0].type;
 
     // Weighted random pick
     var roll = Math.random() * totalWeight;
     var cum = 0;
     for (var j = 0; j < pool.length; j++) {
       cum += pool[j].weight;
-      if (roll < cum) {
-        recordChoice(pool[j].type);
-        return pool[j].type;
-      }
+      if (roll < cum) return pool[j].type;
     }
-    var last = pool[pool.length - 1].type;
-    recordChoice(last);
-    return last;
+    return pool[pool.length - 1].type;
   }
 
   function recordChoice(type) {
@@ -69,6 +71,7 @@
 
   ns.cardLogic = {
     cardEnabled: cardEnabled,
-    chooseCardType: chooseCardType
+    chooseCardType: chooseCardType,
+    recordChoice: recordChoice
   };
 })(window);
