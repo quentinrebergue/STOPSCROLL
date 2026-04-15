@@ -7,31 +7,56 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		072134CAB4546F774C9B15EF /* runtime-ui.js in Resources */ = {isa = PBXBuildFile; fileRef = 6B73D89F1A2CA5F420AD4585 /* runtime-ui.js */; };
 		0E0A5E093DD39A3D6BA043CC /* block_reels.js in Resources */ = {isa = PBXBuildFile; fileRef = E8B9D70AE41E090020003432 /* block_reels.js */; };
-		11C1E2D4B60A4E7E9B2A8A01 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11C1E2D4B60A4E7E9B2A8A02 /* AppSettings.swift */; };
+		11757E0E955326E948703CF4 /* nav-management.js in Resources */ = {isa = PBXBuildFile; fileRef = 5B8AD3F66D765FAD4883A275 /* nav-management.js */; };
+		167E89196B678BCEBA68007A /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6A095CCE50876F59118428 /* AppSettings.swift */; };
 		196B2146F76AB27B059B4958 /* BookReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5A34E345922B0FB77B065C /* BookReaderView.swift */; };
+		CB01A00000000000000000A1 /* card-builder-helpers.js in Resources */ = {isa = PBXBuildFile; fileRef = CB01F00000000000000000A1 /* card-builder-helpers.js */; };
+		CB01A00000000000000000A2 /* card-metrics.js in Resources */ = {isa = PBXBuildFile; fileRef = CB01F00000000000000000A2 /* card-metrics.js */; };
+		CB01A00000000000000000A3 /* card-mood.js in Resources */ = {isa = PBXBuildFile; fileRef = CB01F00000000000000000A3 /* card-mood.js */; };
+		CB01A00000000000000000A4 /* card-timer.js in Resources */ = {isa = PBXBuildFile; fileRef = CB01F00000000000000000A4 /* card-timer.js */; };
+		CB01A00000000000000000A5 /* card-stop.js in Resources */ = {isa = PBXBuildFile; fileRef = CB01F00000000000000000A5 /* card-stop.js */; };
+		CB01A00000000000000000A6 /* card-stats.js in Resources */ = {isa = PBXBuildFile; fileRef = CB01F00000000000000000A6 /* card-stats.js */; };
+		CB01A00000000000000000A7 /* card-builder.js in Resources */ = {isa = PBXBuildFile; fileRef = CB01F00000000000000000A7 /* card-builder.js */; };
 		1DEDEA7847183B5BC857B069 /* 1984.json in Resources */ = {isa = PBXBuildFile; fileRef = 31DB646D651FFA19E393C1F3 /* 1984.json */; };
 		1F837C1C326B82742E999373 /* l-etranger.json in Resources */ = {isa = PBXBuildFile; fileRef = DC4274BB75882A985CB5C0BE /* l-etranger.json */; };
 		24151CCC554C18A28694D3EC /* dynamic_feed_config.yaml in Resources */ = {isa = PBXBuildFile; fileRef = F1AFCEC8E424892E0BC875EC /* dynamic_feed_config.yaml */; };
+		26286AE36E3383D42914218D /* constants.js in Resources */ = {isa = PBXBuildFile; fileRef = 426826A738B07C445AB3F826 /* constants.js */; };
+		2656A10B9F5D592B94197708 /* tracking.js in Resources */ = {isa = PBXBuildFile; fileRef = 2AE21283A700ADC65F40A964 /* tracking.js */; };
 		3DFB4A28B148B1DFFC2C66EA /* EPUBParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BD4C6C201D9F5F16A434A29 /* EPUBParser.swift */; };
 		4730F705C47912493598425B /* ReadingMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF11588F033C75B560C0FFC8 /* ReadingMode.swift */; };
 		4DE917A22D9B670A345EBF68 /* MiniZIP.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3511D2DC94E15A5FB361C282 /* MiniZIP.swift */; };
 		596CA626D098C5B97511B1FA /* BookCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A0650330F1551DE7DD9680 /* BookCard.swift */; };
 		5EDC12D4C1609F10C7414C18 /* l-etranger.epub in Resources */ = {isa = PBXBuildFile; fileRef = E19848A043D0CF43AB8B195A /* l-etranger.epub */; };
+		60D2C4E49811A72D0BDC744D /* runtime-scan.js in Resources */ = {isa = PBXBuildFile; fileRef = E4CD51E6F16178205EDAB216 /* runtime-scan.js */; };
+		720A7F23F1DF3E1DB2B8AA31 /* block_reels_entry.js in Resources */ = {isa = PBXBuildFile; fileRef = D2B9DF084BF8BB4FB369AC1C /* block_reels_entry.js */; };
 		733AE0251F257E9A545EFDAE /* dorian-gray.json in Resources */ = {isa = PBXBuildFile; fileRef = 0EE8292651B5683F1566C909 /* dorian-gray.json */; };
+		741C3867BFC8FD6966C495D0 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAF2D46EF1C6E4B340BA1FC8 /* SettingsView.swift */; };
 		767CD5C99713E1A7FABA3036 /* InstagramView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7458C392340CA051B9872EA /* InstagramView.swift */; };
+		81C4BF166B93D00B3D6765B9 /* scroll-lock.js in Resources */ = {isa = PBXBuildFile; fileRef = 47C612B0F7A1DCD29ADBEEF9 /* scroll-lock.js */; };
 		83F82C06AE917D7565F44576 /* InstagramWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98D36FB79C7EDDFDA593A7C9 /* InstagramWebView.swift */; };
-		11C1E2D4B60A4E7E9B2A8A03 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11C1E2D4B60A4E7E9B2A8A04 /* SettingsView.swift */; };
+		87D5B5C7224D6580853F46AC /* build_block_reels.mjs in Resources */ = {isa = PBXBuildFile; fileRef = F6C771D48DF469657B4736F9 /* build_block_reels.mjs */; };
 		9041891F5A55383856E0C868 /* CardType.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC266854481DCE0687F62A4A /* CardType.swift */; };
+		9AEDCF87B455004504649DF7 /* runtime-state.js in Resources */ = {isa = PBXBuildFile; fileRef = FCC3507A23B2C8EF5C9F1582 /* runtime-state.js */; };
+		A08075D69A4203AFCA89DB8D /* page-manager.js in Resources */ = {isa = PBXBuildFile; fileRef = 3E2D1A03E4BE037A0217B8E1 /* page-manager.js */; };
 		A31410EE5D6322D2100BC284 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F5264B0892789360AAE52D0D /* Assets.xcassets */; };
 		A4057A3018DF90737D19AC67 /* 1984.epub in Resources */ = {isa = PBXBuildFile; fileRef = 42EA0EE9A5B088DE2E527697 /* 1984.epub */; };
+		AE82571374B15A67AD8769CF /* ad-detection.js in Resources */ = {isa = PBXBuildFile; fileRef = 5C66F51A6E14B547DFE57A28 /* ad-detection.js */; };
+		B968E8762E78B55C46861445 /* dom-utils.js in Resources */ = {isa = PBXBuildFile; fileRef = 0629F99C39F502C163050F96 /* dom-utils.js */; };
+		C8CD3BDC6ADADE184817FBB1 /* card-injection.js in Resources */ = {isa = PBXBuildFile; fileRef = E2ECEDAD8271AE991EADE90C /* card-injection.js */; };
+		CE148C2C2BC7651AE31FC005 /* config.js in Resources */ = {isa = PBXBuildFile; fileRef = F37A75B1FDB803D6858E0529 /* config.js */; };
 		D19A3ED8A8C44F7639C83E2B /* le-petit-prince.json in Resources */ = {isa = PBXBuildFile; fileRef = 7EF2D7B2839CD4D31A83AA97 /* le-petit-prince.json */; };
 		D2A88B199E5AFA3204E3A400 /* String+HTMLStripping.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBDA853E4D3537C6E8F986AC /* String+HTMLStripping.swift */; };
 		D4185F5DE07CEB7C876C81DB /* StopScrollApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F8E5453518C42B23702CCBB /* StopScrollApp.swift */; };
 		D9C99F5FA0994BBFE0BD0DB5 /* BookParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D72F7704B8A034E5CC1CF8D2 /* BookParser.swift */; };
 		DA53C6993F4764F522EF04FF /* le-petit-prince.epub in Resources */ = {isa = PBXBuildFile; fileRef = 21B81C876FDD84E814F5A389 /* le-petit-prince.epub */; };
+		E6D38C57ACFC342FFCE57D67 /* card-logic.js in Resources */ = {isa = PBXBuildFile; fileRef = 25FF4AF8D9F7E63AB024811A /* card-logic.js */; };
 		EB23AA3BFD54DE2E2E8C7F47 /* BookParserEPUBTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49830F744711A2144EE7185B /* BookParserEPUBTests.swift */; };
 		F02FAA985CC67A6BEAE1E355 /* dorian-gray.epub in Resources */ = {isa = PBXBuildFile; fileRef = 9A79C980F9AD98BD101601E9 /* dorian-gray.epub */; };
+		F0AA0D272D88F462AF10C5A0 /* top-menu.js in Resources */ = {isa = PBXBuildFile; fileRef = 9BA157D7898D2DA526AFDCB1 /* top-menu.js */; };
+		7484628AC4F24FC3A62D0BEE /* session-stats.js in Resources */ = {isa = PBXBuildFile; fileRef = 459D5381A32D4A489B570713 /* session-stats.js */; };
+		F17FDA4E403CE54FAE123382 /* build_block_reels.sh in Resources */ = {isa = PBXBuildFile; fileRef = AE258A5A7FBD16C1374360DC /* build_block_reels.sh */; };
 		FF2BE8CECF7504888ABD0C9D /* TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D621B9E95F4CDC4E78C462C /* TestHelpers.swift */; };
 /* End PBXBuildFile section */
 
@@ -46,17 +71,32 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0629F99C39F502C163050F96 /* dom-utils.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "dom-utils.js"; sourceTree = "<group>"; };
+		0C6A095CCE50876F59118428 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		0EE8292651B5683F1566C909 /* dorian-gray.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "dorian-gray.json"; sourceTree = "<group>"; };
-		11C1E2D4B60A4E7E9B2A8A02 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
-		11C1E2D4B60A4E7E9B2A8A04 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		CB01F00000000000000000A1 /* card-builder-helpers.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "card-builder-helpers.js"; sourceTree = "<group>"; };
+		CB01F00000000000000000A2 /* card-metrics.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "card-metrics.js"; sourceTree = "<group>"; };
+		CB01F00000000000000000A3 /* card-mood.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "card-mood.js"; sourceTree = "<group>"; };
+		CB01F00000000000000000A4 /* card-timer.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "card-timer.js"; sourceTree = "<group>"; };
+		CB01F00000000000000000A5 /* card-stop.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "card-stop.js"; sourceTree = "<group>"; };
+		CB01F00000000000000000A6 /* card-stats.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "card-stats.js"; sourceTree = "<group>"; };
+		CB01F00000000000000000A7 /* card-builder.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "card-builder.js"; sourceTree = "<group>"; };
 		21B81C876FDD84E814F5A389 /* le-petit-prince.epub */ = {isa = PBXFileReference; lastKnownFileType = file; path = "le-petit-prince.epub"; sourceTree = "<group>"; };
+		25FF4AF8D9F7E63AB024811A /* card-logic.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "card-logic.js"; sourceTree = "<group>"; };
+		2AE21283A700ADC65F40A964 /* tracking.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = tracking.js; sourceTree = "<group>"; };
 		2BD4C6C201D9F5F16A434A29 /* EPUBParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EPUBParser.swift; sourceTree = "<group>"; };
 		31DB646D651FFA19E393C1F3 /* 1984.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = 1984.json; sourceTree = "<group>"; };
 		3511D2DC94E15A5FB361C282 /* MiniZIP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniZIP.swift; sourceTree = "<group>"; };
+		3E2D1A03E4BE037A0217B8E1 /* page-manager.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "page-manager.js"; sourceTree = "<group>"; };
+		426826A738B07C445AB3F826 /* constants.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = constants.js; sourceTree = "<group>"; };
 		42EA0EE9A5B088DE2E527697 /* 1984.epub */ = {isa = PBXFileReference; lastKnownFileType = file; path = 1984.epub; sourceTree = "<group>"; };
 		43A0650330F1551DE7DD9680 /* BookCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookCard.swift; sourceTree = "<group>"; };
+		47C612B0F7A1DCD29ADBEEF9 /* scroll-lock.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "scroll-lock.js"; sourceTree = "<group>"; };
 		49830F744711A2144EE7185B /* BookParserEPUBTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookParserEPUBTests.swift; sourceTree = "<group>"; };
 		4F8E5453518C42B23702CCBB /* StopScrollApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StopScrollApp.swift; sourceTree = "<group>"; };
+		5B8AD3F66D765FAD4883A275 /* nav-management.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "nav-management.js"; sourceTree = "<group>"; };
+		5C66F51A6E14B547DFE57A28 /* ad-detection.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "ad-detection.js"; sourceTree = "<group>"; };
+		6B73D89F1A2CA5F420AD4585 /* runtime-ui.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "runtime-ui.js"; sourceTree = "<group>"; };
 		7C3519B92634CB61271300F7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		7E5A34E345922B0FB77B065C /* BookReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookReaderView.swift; sourceTree = "<group>"; };
 		7EF2D7B2839CD4D31A83AA97 /* le-petit-prince.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "le-petit-prince.json"; sourceTree = "<group>"; };
@@ -64,17 +104,27 @@
 		8D621B9E95F4CDC4E78C462C /* TestHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestHelpers.swift; sourceTree = "<group>"; };
 		98D36FB79C7EDDFDA593A7C9 /* InstagramWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstagramWebView.swift; sourceTree = "<group>"; };
 		9A79C980F9AD98BD101601E9 /* dorian-gray.epub */ = {isa = PBXFileReference; lastKnownFileType = file; path = "dorian-gray.epub"; sourceTree = "<group>"; };
+		9BA157D7898D2DA526AFDCB1 /* top-menu.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "top-menu.js"; sourceTree = "<group>"; };
+		459D5381A32D4A489B570713 /* session-stats.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "session-stats.js"; sourceTree = "<group>"; };
+		AE258A5A7FBD16C1374360DC /* build_block_reels.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = build_block_reels.sh; sourceTree = "<group>"; };
 		C1396E0D9C909791D84E4FC3 /* StopScrollTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = StopScrollTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CAF2D46EF1C6E4B340BA1FC8 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		CBDA853E4D3537C6E8F986AC /* String+HTMLStripping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+HTMLStripping.swift"; sourceTree = "<group>"; };
 		CC266854481DCE0687F62A4A /* CardType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardType.swift; sourceTree = "<group>"; };
 		CF11588F033C75B560C0FFC8 /* ReadingMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingMode.swift; sourceTree = "<group>"; };
+		D2B9DF084BF8BB4FB369AC1C /* block_reels_entry.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = block_reels_entry.js; sourceTree = "<group>"; };
 		D72F7704B8A034E5CC1CF8D2 /* BookParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookParser.swift; sourceTree = "<group>"; };
 		DC4274BB75882A985CB5C0BE /* l-etranger.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "l-etranger.json"; sourceTree = "<group>"; };
 		E19848A043D0CF43AB8B195A /* l-etranger.epub */ = {isa = PBXFileReference; lastKnownFileType = file; path = "l-etranger.epub"; sourceTree = "<group>"; };
+		E2ECEDAD8271AE991EADE90C /* card-injection.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "card-injection.js"; sourceTree = "<group>"; };
+		E4CD51E6F16178205EDAB216 /* runtime-scan.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "runtime-scan.js"; sourceTree = "<group>"; };
 		E8B9D70AE41E090020003432 /* block_reels.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = block_reels.js; sourceTree = "<group>"; };
 		F1AFCEC8E424892E0BC875EC /* dynamic_feed_config.yaml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = dynamic_feed_config.yaml; sourceTree = "<group>"; };
+		F37A75B1FDB803D6858E0529 /* config.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = config.js; sourceTree = "<group>"; };
 		F5264B0892789360AAE52D0D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		F6C771D48DF469657B4736F9 /* build_block_reels.mjs */ = {isa = PBXFileReference; lastKnownFileType = text; path = build_block_reels.mjs; sourceTree = "<group>"; };
 		F7458C392340CA051B9872EA /* InstagramView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstagramView.swift; sourceTree = "<group>"; };
+		FCC3507A23B2C8EF5C9F1582 /* runtime-state.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "runtime-state.js"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -144,6 +194,16 @@
 			path = Reading;
 			sourceTree = "<group>";
 		};
+		5C4E127F66DBEA25FDCB0E34 /* runtime */ = {
+			isa = PBXGroup;
+			children = (
+				E4CD51E6F16178205EDAB216 /* runtime-scan.js */,
+				FCC3507A23B2C8EF5C9F1582 /* runtime-state.js */,
+				6B73D89F1A2CA5F420AD4585 /* runtime-ui.js */,
+			);
+			path = runtime;
+			sourceTree = "<group>";
+		};
 		60E01CD27F7F56974C67A460 /* EPUB */ = {
 			isa = PBXGroup;
 			children = (
@@ -185,8 +245,13 @@
 		7361DFA925892C916BCF5414 /* Scripts */ = {
 			isa = PBXGroup;
 			children = (
+				D2B9DF084BF8BB4FB369AC1C /* block_reels_entry.js */,
 				E8B9D70AE41E090020003432 /* block_reels.js */,
+				F6C771D48DF469657B4736F9 /* build_block_reels.mjs */,
+				AE258A5A7FBD16C1374360DC /* build_block_reels.sh */,
 				F1AFCEC8E424892E0BC875EC /* dynamic_feed_config.yaml */,
+				9978C351ACAEE57C6284633C /* modules */,
+				5C4E127F66DBEA25FDCB0E34 /* runtime */,
 			);
 			path = Scripts;
 			sourceTree = "<group>";
@@ -200,13 +265,47 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		CB01G00000000000000000A0 /* card-builder */ = {
+			isa = PBXGroup;
+			children = (
+				CB01F00000000000000000A1 /* card-builder-helpers.js */,
+				CB01F00000000000000000A2 /* card-metrics.js */,
+				CB01F00000000000000000A3 /* card-mood.js */,
+				CB01F00000000000000000A4 /* card-timer.js */,
+				CB01F00000000000000000A5 /* card-stop.js */,
+				CB01F00000000000000000A6 /* card-stats.js */,
+				CB01F00000000000000000A7 /* card-builder.js */,
+			);
+			path = "card-builder";
+			sourceTree = "<group>";
+		};
+		9978C351ACAEE57C6284633C /* modules */ = {
+			isa = PBXGroup;
+			children = (
+				5C66F51A6E14B547DFE57A28 /* ad-detection.js */,
+				CB01G00000000000000000A0 /* card-builder */,
+				E2ECEDAD8271AE991EADE90C /* card-injection.js */,
+				25FF4AF8D9F7E63AB024811A /* card-logic.js */,
+				F37A75B1FDB803D6858E0529 /* config.js */,
+				426826A738B07C445AB3F826 /* constants.js */,
+				0629F99C39F502C163050F96 /* dom-utils.js */,
+				5B8AD3F66D765FAD4883A275 /* nav-management.js */,
+				3E2D1A03E4BE037A0217B8E1 /* page-manager.js */,
+				47C612B0F7A1DCD29ADBEEF9 /* scroll-lock.js */,
+				9BA157D7898D2DA526AFDCB1 /* top-menu.js */,
+				459D5381A32D4A489B570713 /* session-stats.js */,
+				2AE21283A700ADC65F40A964 /* tracking.js */,
+			);
+			path = modules;
+			sourceTree = "<group>";
+		};
 		A9AA752D3FE8FA725F1FA8CB /* Views */ = {
 			isa = PBXGroup;
 			children = (
 				7E5A34E345922B0FB77B065C /* BookReaderView.swift */,
 				F7458C392340CA051B9872EA /* InstagramView.swift */,
-				11C1E2D4B60A4E7E9B2A8A04 /* SettingsView.swift */,
 				98D36FB79C7EDDFDA593A7C9 /* InstagramWebView.swift */,
+				CAF2D46EF1C6E4B340BA1FC8 /* SettingsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -231,8 +330,8 @@
 		D2FE0D65A435A8E992E4EC84 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				0C6A095CCE50876F59118428 /* AppSettings.swift */,
 				6AFF02DF949F413AE232B75E /* BookParsing */,
-				11C1E2D4B60A4E7E9B2A8A02 /* AppSettings.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -345,8 +444,33 @@
 			buildActionMask = 2147483647;
 			files = (
 				A31410EE5D6322D2100BC284 /* Assets.xcassets in Resources */,
+				AE82571374B15A67AD8769CF /* ad-detection.js in Resources */,
 				0E0A5E093DD39A3D6BA043CC /* block_reels.js in Resources */,
+				720A7F23F1DF3E1DB2B8AA31 /* block_reels_entry.js in Resources */,
+				87D5B5C7224D6580853F46AC /* build_block_reels.mjs in Resources */,
+				F17FDA4E403CE54FAE123382 /* build_block_reels.sh in Resources */,
+				CB01A00000000000000000A1 /* card-builder-helpers.js in Resources */,
+				CB01A00000000000000000A2 /* card-metrics.js in Resources */,
+				CB01A00000000000000000A3 /* card-mood.js in Resources */,
+				CB01A00000000000000000A4 /* card-timer.js in Resources */,
+				CB01A00000000000000000A5 /* card-stop.js in Resources */,
+				CB01A00000000000000000A6 /* card-stats.js in Resources */,
+				CB01A00000000000000000A7 /* card-builder.js in Resources */,
+				C8CD3BDC6ADADE184817FBB1 /* card-injection.js in Resources */,
+				E6D38C57ACFC342FFCE57D67 /* card-logic.js in Resources */,
+				CE148C2C2BC7651AE31FC005 /* config.js in Resources */,
+				26286AE36E3383D42914218D /* constants.js in Resources */,
+				B968E8762E78B55C46861445 /* dom-utils.js in Resources */,
 				24151CCC554C18A28694D3EC /* dynamic_feed_config.yaml in Resources */,
+				11757E0E955326E948703CF4 /* nav-management.js in Resources */,
+				A08075D69A4203AFCA89DB8D /* page-manager.js in Resources */,
+				60D2C4E49811A72D0BDC744D /* runtime-scan.js in Resources */,
+				9AEDCF87B455004504649DF7 /* runtime-state.js in Resources */,
+				072134CAB4546F774C9B15EF /* runtime-ui.js in Resources */,
+				81C4BF166B93D00B3D6765B9 /* scroll-lock.js in Resources */,
+				F0AA0D272D88F462AF10C5A0 /* top-menu.js in Resources */,
+				7484628AC4F24FC3A62D0BEE /* session-stats.js in Resources */,
+				2656A10B9F5D592B94197708 /* tracking.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -357,7 +481,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				11C1E2D4B60A4E7E9B2A8A01 /* AppSettings.swift in Sources */,
+				167E89196B678BCEBA68007A /* AppSettings.swift in Sources */,
 				596CA626D098C5B97511B1FA /* BookCard.swift in Sources */,
 				D9C99F5FA0994BBFE0BD0DB5 /* BookParser.swift in Sources */,
 				196B2146F76AB27B059B4958 /* BookReaderView.swift in Sources */,
@@ -367,7 +491,7 @@
 				83F82C06AE917D7565F44576 /* InstagramWebView.swift in Sources */,
 				4DE917A22D9B670A345EBF68 /* MiniZIP.swift in Sources */,
 				4730F705C47912493598425B /* ReadingMode.swift in Sources */,
-				11C1E2D4B60A4E7E9B2A8A03 /* SettingsView.swift in Sources */,
+				741C3867BFC8FD6966C495D0 /* SettingsView.swift in Sources */,
 				D4185F5DE07CEB7C876C81DB /* StopScrollApp.swift in Sources */,
 				D2A88B199E5AFA3204E3A400 /* String+HTMLStripping.swift in Sources */,
 			);

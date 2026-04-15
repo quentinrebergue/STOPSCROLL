@@ -4,15 +4,36 @@ feed_injection:
   max_dynamic_posts_per_session: 30
 
 cards:
+  every_n_opportunities: 8
   metrics:
     enabled: true
-    every_n_opportunities: 1
+    weight: 20
   mood:
     enabled: true
-    every_n_opportunities: 2
+    weight: 15
+  timer:
+    enabled: true
+    weight: 10
   stop:
     enabled: true
-    every_n_opportunities: 3
+    weight: 40
+  stats:
+    enabled: true
+    weight: 15
+
+# Motivational captions shown below each card (Instagram-style).
+# A random one is picked each time.
+captions:
+  - "Your time is the most valuable thing you own."
+  - "Every minute here is a minute not spent on what matters."
+  - "You don't need one more scroll. You need one deep breath."
+  - "The best version of you isn't on this app."
+  - "Scrolling never made anyone feel better after 10 minutes."
+  - "What would you do right now if your phone wasn't in your hand?"
+  - "This moment won't come back. Make it count."
+  - "Your brain deserves a break from the infinite feed."
+  - "Close the app. Open a possibility."
+  - "You've seen enough. Time to live a little."
 
 reload:
   floating_button_enabled: true
@@ -22,10 +43,22 @@ reload:
 card_templates:
   metrics_title: "Session snapshot"
   metrics_body: "You skipped {skipped} dopamine loops and protected {minutes} min of focus."
-  mood_title: "Mood check"
-  mood_prompt_1: "What do you want to feel after this session?"
-  mood_prompt_2: "What is one useful thing you can do in 10 minutes?"
-  mood_prompt_3: "Pause: are you scrolling by choice or habit?"
+  mood_title: "How do you feel right now?"
+  mood_a1: "I'm enjoying the scroll"
+  mood_r1: "Pleasure is valid — just stay aware of time."
+  mood_a2: "I feel a bit guilty about it"
+  mood_r2: "That awareness is already a superpower."
+  mood_a3: "I have things to do but I'm stuck"
+  mood_r3: "Your instincts are right. One small step counts."
+  mood_a4: "I had a rough day and needed this"
+  mood_r4: "Rest matters. Make sure this is rest, not avoidance."
+  mood_a5: "Something else"
+  mood_r5: "Whatever it is — you noticed. That's what counts."
+  mood_undo: "Undo"
+  timer_title: "Set a timer"
+  timer_body: "Choose when you'll take a break."
+  timer_set: "Timer set. Time for intentional focus."
+  timer_undo: "Change"
   stop_title: "Stop plan"
   stop_body: "Set a concrete stop point now and switch to intentional time."
 

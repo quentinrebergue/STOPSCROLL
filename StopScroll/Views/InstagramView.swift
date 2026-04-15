@@ -13,49 +13,11 @@ struct InstagramView: View {
             InstagramWebView(
                 isLoading: $isLoading,
                 showingReader: $showingReader,
+                showingSettings: $showingSettings,
                 reloadToken: $reloadToken,
                 labelsToken: $labelsToken
             )
             .ignoresSafeArea(edges: .bottom)
-
-            VStack {
-                HStack {
-                    // Fallback reload button (top-left). Hidden by JS once it injects
-                    // its own reload button into Instagram's native top nav bar.
-                    Button {
-                        reloadToken += 1
-                    } label: {
-                        Image(systemName: "arrow.clockwise")
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundColor(.white)
-                            .padding(10)
-                            .background(Color.black.opacity(0.55))
-                            .clipShape(Circle())
-                    }
-                    .padding(.leading, 12)
-                    .accessibilityLabel("Reload feed")
-
-                    Spacer()
-
-                    // StopScroll settings
-                    Button {
-                        showingSettings = true
-                    } label: {
-                        Image(systemName: "slider.horizontal.3")
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundColor(.white)
-                            .padding(10)
-                            .background(Color.black.opacity(0.55))
-                            .clipShape(Circle())
-                    }
-                    .padding(.trailing, 12)
-                    .accessibilityLabel("StopScroll settings")
-                }
-                .padding(.top, 8)
-                Spacer()
-            }
-            .opacity(showingReader ? 0 : 1)
-            .allowsHitTesting(!showingReader)
 
             BookReaderView(onDismiss: { showingReader = false })
                 .opacity(showingReader ? 1 : 0)
@@ -63,13 +25,12 @@ struct InstagramView: View {
                 .ignoresSafeArea(edges: .bottom)
 
             if isLoading {
-                Color.black
-                    .ignoresSafeArea()
-                    .overlay {
-                        ProgressView()
-                            .tint(.white)
-                            .scaleEffect(1.5)
-                    }
+                VStack(spacing: 0) {
+                    LoadingBar()
+                    Spacer()
+                }
+                .background(Color.black.ignoresSafeArea())
+                .transition(.opacity)
             }
         }
         .sheet(isPresented: $showingSettings) {
@@ -77,6 +38,38 @@ struct InstagramView: View {
                 showingSettings = false
                 labelsToken += 1  // triggers label re-injection into the live WebView
             })
+        }
+    }
+}
+
+// MARK: - Instagram-style loading bar
+
+private struct LoadingBar: View {
+    @State private var animating = false
+
+    var body: some View {
+        GeometryReader { geo in
+            LinearGradient(
+                colors: [
+                    Color(red: 0.94, green: 0.58, blue: 0.20),
+                    Color(red: 0.86, green: 0.15, blue: 0.26),
+                    Color(red: 0.74, green: 0.09, blue: 0.53),
+                ],
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+            .frame(width: geo.size.width * 0.35)
+            .offset(x: animating ? geo.size.width * 0.65 : 0)
+        }
+        .frame(height: 2)
+        .clipped()
+        .onAppear {
+            withAnimation(
+                .easeInOut(duration: 1.0)
+                .repeatForever(autoreverses: true)
+            ) {
+                animating = true
+            }
         }
     }
 }

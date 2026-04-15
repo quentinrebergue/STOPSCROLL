@@ -1,12 +1,42 @@
 import SwiftUI
 import WebKit
+import UserNotifications
 
 struct InstagramWebView: UIViewRepresentable {
     @Binding var isLoading: Bool
     @Binding var showingReader: Bool
+    @Binding var showingSettings: Bool
     @Binding var reloadToken: Int
     /// Incremented by InstagramView when AppSettings.adLabels changes; triggers re-injection.
     @Binding var labelsToken: Int
+
+    /// Module scripts injected in dependency order before the bootstrap.
+    private static let moduleScripts: [String] = [
+        "constants",
+        "config",
+        "dom-utils",
+        "scroll-lock",
+        "card-logic",
+        // card-builder sub-modules (helpers first, index last)
+        "card-builder-helpers",
+        "card-metrics",
+        "card-mood",
+        "card-timer",
+        "card-stop",
+        "card-stats",
+        "card-builder",
+        // remaining modules
+        "card-injection",
+        "ad-detection",
+        "page-manager",
+        "nav-management",
+        "top-menu",
+        "session-stats",
+        "tracking",
+        "runtime-state",
+        "runtime-ui",
+        "runtime-scan",
+    ]
 
     func makeCoordinator() -> Coordinator { Coordinator(self) }
 
@@ -23,10 +53,10 @@ struct InstagramWebView: UIViewRepresentable {
             ))
         }
 
-        if let scriptURL = Bundle.main.url(forResource: "block_reels", withExtension: "js"),
-           let scriptSource = try? String(contentsOf: scriptURL, encoding: .utf8) {
+        // Inject all module scripts in dependency order, then the bootstrap.
+        for script in Self.loadAllScripts() {
             config.userContentController.addUserScript(WKUserScript(
-                source: scriptSource,
+                source: script,
                 injectionTime: .atDocumentEnd,
                 forMainFrameOnly: true
             ))
@@ -89,6 +119,24 @@ struct InstagramWebView: UIViewRepresentable {
         return "window.__STOPSCROLL_DYNAMIC_YAML = `\(escaped)`;"
     }
 
+    /// Loads all module scripts + bootstrap in dependency order from the bundle.
+    private static func loadAllScripts() -> [String] {
+        var scripts: [String] = []
+        for name in moduleScripts {
+            if let url = Bundle.main.url(forResource: name, withExtension: "js"),
+               let src = try? String(contentsOf: url, encoding: .utf8) {
+                scripts.append(src)
+            }
+        }
+        // Bootstrap entry point – must come last.
+        if let url = Bundle.main.url(forResource: "block_reels", withExtension: "js"),
+           let src = try? String(contentsOf: url, encoding: .utf8) {
+            scripts.append(src)
+        }
+        return scripts
+    }
+
+
     // MARK: - Leak-safe message handler wrapper
 
     class LeakAvoider: NSObject, WKScriptMessageHandler {
@@ -130,12 +178,28 @@ struct InstagramWebView: UIViewRepresentable {
                 return
             }
             if let dict = body as? [String: Any],
-               let type = dict["type"] as? String,
-               type == "language",
-               let lang = dict["value"] as? String {
-                AppSettings.shared.seedLabels(forLanguage: lang)
-                DispatchQueue.main.async {
-                    self.webView?.evaluateJavaScript(self.parent.buildLabelsInjectionScript())
+               let type = dict["type"] as? String {
+                if type == "openSettings" {
+                    DispatchQueue.main.async { self.parent.showingSettings = true }
+                    return
+                }
+                if type == "setTimer",
+                   let minutes = dict["minutes"] as? Int {
+                    let label = dict["label"] as? String ?? "Time's up"
+                    scheduleTimerNotification(minutes: minutes, label: label)
+                    return
+                }
+                if type == "cancelTimer" {
+                    UNUserNotificationCenter.current()
+                        .removePendingNotificationRequests(withIdentifiers: ["stopscroll-timer"])
+                    return
+                }
+                if type == "language",
+                   let lang = dict["value"] as? String {
+                    AppSettings.shared.seedLabels(forLanguage: lang)
+                    DispatchQueue.main.async {
+                        self.webView?.evaluateJavaScript(self.parent.buildLabelsInjectionScript())
+                    }
                 }
             }
         }
@@ -146,12 +210,15 @@ struct InstagramWebView: UIViewRepresentable {
             }
             // Inject user label list (UserDefaults) so JS picks up any edits.
             webView.evaluateJavaScript(parent.buildLabelsInjectionScript())
-            // Re-inject the main script after each navigation (handles SPA route changes).
-            if let scriptURL = Bundle.main.url(forResource: "block_reels", withExtension: "js"),
-               let scriptSource = try? String(contentsOf: scriptURL, encoding: .utf8) {
-                webView.evaluateJavaScript(scriptSource)
+            // Re-inject all module scripts + bootstrap after each navigation.
+            for script in InstagramWebView.loadAllScripts() {
+                webView.evaluateJavaScript(script)
             }
-            DispatchQueue.main.async { self.parent.isLoading = false }
+            DispatchQueue.main.async {
+                withAnimation(.easeOut(duration: 0.3)) {
+                    self.parent.isLoading = false
+                }
+            }
         }
 
         func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction,
@@ -162,6 +229,34 @@ struct InstagramWebView: UIViewRepresentable {
                 if trimmed == "/reels" { decisionHandler(.cancel); return }
             }
             decisionHandler(.allow)
+        }
+
+        // MARK: - Timer
+
+        private func scheduleTimerNotification(minutes: Int, label: String) {
+            let center = UNUserNotificationCenter.current()
+            center.requestAuthorization(options: [.alert, .sound]) { granted, _ in
+                guard granted else { return }
+                let content = UNMutableNotificationContent()
+                content.title = "StopScroll"
+                content.body = "Timer done — \(label). Time to put the phone down."
+                content.sound = .default
+
+                let trigger = UNTimeIntervalNotificationTrigger(
+                    timeInterval: max(TimeInterval(minutes * 60), 1),
+                    repeats: false
+                )
+
+                // Remove any previous StopScroll timer before scheduling a new one
+                center.removePendingNotificationRequests(withIdentifiers: ["stopscroll-timer"])
+
+                let request = UNNotificationRequest(
+                    identifier: "stopscroll-timer",
+                    content: content,
+                    trigger: trigger
+                )
+                center.add(request)
+            }
         }
     }
 }

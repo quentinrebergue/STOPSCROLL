@@ -16,6 +16,8 @@ targets:
           - Tests/**
     resources:
       - path: StopScroll/Scripts/block_reels.js
+      - path: StopScroll/Scripts/modules
+      - path: StopScroll/Scripts/runtime
       - path: StopScroll/Scripts/dynamic_feed_config.yaml
       - path: StopScroll/Assets.xcassets
     settings:

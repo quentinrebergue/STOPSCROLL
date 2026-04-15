@@ -345,6 +345,18 @@ struct BookReaderView: View {
                 onBookmark: { toggleBookmark(card.id) },
                 highlightText: card.id == highlightCardId ? highlightSentence : nil
             )
+        case .timer:
+            VStack(spacing: 16) {
+                Text("⏱")
+                    .font(.system(size: 48))
+                Text("Set a timer")
+                    .font(.headline)
+                Text("Take a intentional break")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color(.systemBackground))
         }
     }
 
