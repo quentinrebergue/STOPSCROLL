@@ -256,11 +256,56 @@ struct InstagramWebView: UIViewRepresentable {
                    !text.isEmpty {
                     handleOpenArticle(title: title, text: text)
                 }
+                if type == "fetchArticle" {
+                    let lang = (dict["lang"] as? String) ?? "en"
+                    fetchWikipediaArticle(lang: lang)
+                }
             }
         }
 
         /// Save a Wikipedia article into BookStorage & library, then open the reader.
         private func handleOpenArticle(title: String, text: String) {
+
+        /// Fetch a random Wikipedia article natively (bypasses CSP) and inject it into JS.
+        private func fetchWikipediaArticle(lang: String) {
+            let safeLang = lang.prefix(5).filter { $0.isLetter }
+            let urlString = "https://\(safeLang).wikipedia.org/api/rest_v1/page/random/summary"
+            guard let url = URL(string: urlString) else { return }
+            URLSession.shared.dataTask(with: url) { [weak self] data, _, error in
+                guard let data = data, error == nil,
+                      let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return }
+                let title = (json["title"] as? String ?? "").replacingOccurrences(of: "'", with: "\\'")
+                let extract = (json["extract"] as? String ?? "").replacingOccurrences(of: "'", with: "\\'")
+                    .replacingOccurrences(of: "\n", with: "\\n")
+                let desc = (json["description"] as? String ?? "").replacingOccurrences(of: "'", with: "\\'")
+                let pageUrl: String
+                if let urls = json["content_urls"] as? [String: Any],
+                   let mobile = urls["mobile"] as? [String: Any],
+                   let page = mobile["page"] as? String {
+                    pageUrl = page.replacingOccurrences(of: "'", with: "\\'")
+                } else { pageUrl = "" }
+                let thumb: String
+                if let t = json["thumbnail"] as? [String: Any],
+                   let src = t["source"] as? String {
+                    thumb = src.replacingOccurrences(of: "'", with: "\\'")
+                } else { thumb = "" }
+                let js = """
+                (function(){
+                    var ns = window.StopScroll;
+                    if (ns && ns.wikipedia && ns.wikipedia._setFromNative) {
+                        ns.wikipedia._setFromNative({
+                            title:'\(title)',extract:'\(extract)',description:'\(desc)',
+                            pageUrl:'\(pageUrl)',thumbnail:'\(thumb)',lang:'\(safeLang)'
+                        });
+                    }
+                })();
+                """
+                DispatchQueue.main.async {
+                    self?.webView?.evaluateJavaScript(js)
+                }
+            }.resume()
+        }
+
             let bookId = UUID().uuidString
             let chapters: [(title: String, text: String)] = [(title, text)]
             BookStorage.save(chapters: chapters, bookId: bookId)

@@ -11,35 +11,28 @@
     return raw.split('-')[0].toLowerCase() || 'en';
   }
 
+  /** Ask the native Swift side to fetch a Wikipedia article (bypasses CSP). */
   function fetchArticle(callback) {
     if (_fetching) return;
     _fetching = true;
-    var lang = getLang();
-    var url = 'https://' + lang + '.wikipedia.org/api/rest_v1/page/random/summary';
+    _pendingCallback = callback || null;
+    ns.dom.postToBridge({ type: 'fetchArticle', lang: getLang() });
+    // Timeout: if Swift doesn't respond in 10s, allow retry
+    setTimeout(function () { _fetching = false; }, 10000);
+  }
 
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', url, true);
-    xhr.setRequestHeader('Accept', 'application/json');
-    xhr.onreadystatechange = function () {
-      if (xhr.readyState !== 4) return;
-      _fetching = false;
-      if (xhr.status !== 200) { if (callback) callback(null); return; }
-      try {
-        var data = JSON.parse(xhr.responseText);
-        _article = {
-          title: data.title || '',
-          extract: data.extract || '',
-          description: data.description || '',
-          pageUrl: (data.content_urls && data.content_urls.mobile && data.content_urls.mobile.page) || '',
-          thumbnail: (data.thumbnail && data.thumbnail.source) || '',
-          lang: lang
-        };
-        if (callback) callback(_article);
-      } catch (e) {
-        if (callback) callback(null);
-      }
-    };
-    xhr.send();
+  var _pendingCallback = null;
+
+  /** Called by Swift when the native fetch completes. */
+  function _setFromNative(article) {
+    _fetching = false;
+    if (article && article.extract) {
+      _article = article;
+    }
+    if (_pendingCallback) {
+      _pendingCallback(_article);
+      _pendingCallback = null;
+    }
   }
 
   /** Pre-fetch an article so it's ready when the card appears. */
@@ -63,6 +56,7 @@
     getCached: getCached,
     consume: consume,
     fetchArticle: fetchArticle,
-    getLang: getLang
+    getLang: getLang,
+    _setFromNative: _setFromNative
   };
 })(window);

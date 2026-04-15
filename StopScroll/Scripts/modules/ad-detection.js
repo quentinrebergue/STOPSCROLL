@@ -78,8 +78,6 @@
   }
 
   function scanForNewAds(state, callback) {
-    var cfg = state.config.feed_injection;
-    var maxCards = Number(cfg.max_dynamic_posts_per_session) || 0;
     var freq = Number(state.config.cards.every_n_opportunities) || 1;
     var replaceAll = freq === 1; // "Every post" mode: bypass ad/suggested check
     var posts = document.querySelectorAll('article');
@@ -90,7 +88,6 @@
       if (ns.sessionStats) ns.sessionStats.trackPost();
       if (!replaceAll && !shouldReplace(post, state.config)) continue;
       if (ns.sessionStats) ns.sessionStats.trackAd();
-      if (maxCards > 0 && state.shownCards >= maxCards) return;
       callback(post);
     }
   }

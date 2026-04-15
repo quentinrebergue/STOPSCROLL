@@ -28,8 +28,7 @@
             feed_injection: {
                 enabled: true,
                 ad_replacement: true,
-                replace_suggested: true,
-                max_dynamic_posts_per_session: 30
+                replace_suggested: true
             },
             cards: {
                 every_n_opportunities: 1,

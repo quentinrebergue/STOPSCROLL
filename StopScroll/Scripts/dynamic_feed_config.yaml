@@ -1,7 +1,6 @@
 feed_injection:
   enabled: true
   ad_replacement: true
-  max_dynamic_posts_per_session: 30
 
 cards:
   every_n_opportunities: 8
