@@ -4,6 +4,9 @@
 
 Reduire le scroll passif sur Instagram en rempla cant les points de friction par des micro-interventions utiles (prise de recul, timer, culture, lecture), tout en gardant une UX fluide.
 
+Spec concrete des prochaines features anti-procrastination:
+- voir `docs/ANTI_PROCRASTINATION_FEATURES.md`
+
 ## Now (0-4 semaines)
 
 1. Stabilite reader livre/article

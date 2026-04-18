@@ -19,6 +19,12 @@
 | SS-007 | P2 | Test | Guardian API mock | Eviter dependance reseau dans suite principale | Todo |
 | SS-008 | P2 | Improvement | Detection suggested locale | Couvrir plus de variantes linguistiques follow/suggested | Todo |
 | SS-009 | P3 | Improvement | Dashboard local usage | Stats hebdo locales: temps recupere, sessions reduites | Todo |
+| SS-010 | P1 | Improvement | Intention de session | Sheet pre-session (objectif, budget, sortie) avec persistance locale | Todo |
+| SS-011 | P1 | Improvement | Risk score JITAI | Moteur local de score risque + tiers low/mid/high | Todo |
+| SS-012 | P1 | Improvement | Friction graduelle | Interventions soft/hard selon risque avec cooldown | Todo |
+| SS-013 | P1 | Improvement | Alternatives immediates | Actions directes (reader/timer/quit) depuis friction cards | Todo |
+| SS-014 | P2 | Improvement | XP orientee outcomes | Bonus XP pour sorties reussies et respect budget | Todo |
+| SS-015 | P2 | Improvement | Review hebdo actionnable | Ecran hebdo local avec recommandations de regles | Todo |
 
 ## Idees d amelioration produit
 
