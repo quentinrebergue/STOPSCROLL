@@ -730,7 +730,10 @@ struct InstagramWebView: UIViewRepresentable {
                 UserDefaults.standard.set(next.currentArticleId, forKey: "currentArticleId")
                 UserDefaults.standard.set(next.currentArticleOpenToken, forKey: "currentArticleOpenToken")
 
-                self.parent.showingReader = true
+                // Present reader on next run loop so @AppStorage-backed values are visible on first open.
+                DispatchQueue.main.async {
+                    self.parent.showingReader = true
+                }
             }
         }
 

@@ -152,3 +152,7 @@ Destination de test recommandee dans ce repo:
 
 5. Diversite des cartes article:
 - la selection Wikipedia cote native evite le dernier titre injecte pour limiter les repetitions visibles.
+
+6. Ouverture article (premier clic):
+- ordre d execution renforce cote native: ecriture `currentArticleId` / `currentArticleOpenToken` avant presentation du reader
+- `BookReaderView` lit l ID article depuis `UserDefaults` au chargement pour eviter une ouverture vide liee a une propagation tardive de `@AppStorage`

@@ -147,6 +147,10 @@ struct BookReaderView: View {
         ReadingMode(rawValue: readingModeRaw) ?? .flow
     }
 
+    private var resolvedCurrentArticleId: String {
+        UserDefaults.standard.string(forKey: "currentArticleId") ?? currentArticleId
+    }
+
     private var totalPages: Int {
         cards.compactMap { card -> Int? in
             if case .text = card.type { return card.page }
@@ -206,7 +210,7 @@ struct BookReaderView: View {
             )
         }
         .onAppear {
-            if !currentArticleId.isEmpty {
+            if !resolvedCurrentArticleId.isEmpty {
                 loadCurrentArticle()
             } else {
                 loadLastBook()
@@ -214,7 +218,7 @@ struct BookReaderView: View {
             loadBookmarks()
         }
         .onChange(of: currentBookId) { _ in
-            if !currentArticleId.isEmpty {
+            if !resolvedCurrentArticleId.isEmpty {
                 loadCurrentArticle()
             } else {
                 loadLastBook()
@@ -229,7 +233,7 @@ struct BookReaderView: View {
             }
         }
         .onChange(of: currentArticleOpenToken) { _ in
-            guard !currentArticleId.isEmpty else { return }
+            guard !resolvedCurrentArticleId.isEmpty else { return }
             loadCurrentArticle()
         }
     }
@@ -969,7 +973,7 @@ struct BookReaderView: View {
     }
 
     private func loadCurrentArticle() {
-        let articleId = currentArticleId
+        let articleId = resolvedCurrentArticleId
         guard !articleId.isEmpty else { return }
         let library = loadLibrary()
         guard let book = library.first(where: { $0.id == articleId }) else { return }
