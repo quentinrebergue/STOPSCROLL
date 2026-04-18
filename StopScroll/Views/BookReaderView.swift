@@ -206,16 +206,27 @@ struct BookReaderView: View {
             )
         }
         .onAppear {
-            loadLastBook()
+            if !currentArticleId.isEmpty {
+                loadCurrentArticle()
+            } else {
+                loadLastBook()
+            }
             loadBookmarks()
         }
         .onChange(of: currentBookId) { _ in
-            loadLastBook()
+            if !currentArticleId.isEmpty {
+                loadCurrentArticle()
+            } else {
+                loadLastBook()
+            }
             loadBookmarks()
         }
         .onChange(of: currentArticleId) { newId in
-            guard !newId.isEmpty else { return }
-            loadCurrentArticle()
+            if newId.isEmpty {
+                loadLastBook()
+            } else {
+                loadCurrentArticle()
+            }
         }
         .onChange(of: currentArticleOpenToken) { _ in
             guard !currentArticleId.isEmpty else { return }

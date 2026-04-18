@@ -123,6 +123,16 @@ plusieurs fois et evite les races condition du premier clic.
 
 - `BookParserEPUBTests.swift`: validation des chapitres via fixtures/manifests
 - `GuardianAPITests.swift`: URL, mapping JSON, appels API live
+- `ArticleOpenWorkflowTests` (dans `GuardianAPITests.swift`):
+  - non-regression sur ouverture article (`currentArticleOpenToken`)
+  - non-regression sur `splitIntoChapters` (sections + filtres references)
+- `WikipediaArticleButtonWorkflowTests` (dans `GuardianAPITests.swift`):
+  - URL Wikipedia correctement construite pour le flux `openArticle`
+  - sanitation du lang
+  - encodage titre (accents, apostrophes, `&`)
+
+Destination de test recommandee dans ce repo:
+- `platform=iOS Simulator,name=iPhone 17`
 
 ## 7. Points de vigilance techniques
 

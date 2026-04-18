@@ -13,7 +13,7 @@
 | SS-001 | P0 | Bug | Ouverture article premier clic | Le reader peut afficher ancien contenu avant chargement article | Todo |
 | SS-002 | P0 | Bug | Doublons article en bibliotheque | Ouvrir plusieurs fois un article ne doit pas creer de copies | Todo |
 | SS-003 | P1 | Improvement | Retour auto article -> livre | A la fin d un article, revenir vers le livre courant de facon fiable | In Progress |
-| SS-004 | P1 | Test | Tests etat courant | Ajouter tests sur `currentBookId` / `currentArticleId` | Todo |
+| SS-004 | P1 | Test | Tests etat courant | Ajouter tests sur `currentBookId` / `currentArticleId` / `currentArticleOpenToken` | Done |
 | SS-005 | P1 | Improvement | UX completion card | Harmoniser coins/espacements/transition avec toutes cartes reader | In Progress |
 | SS-006 | P2 | TechDebt | Clefs UserDefaults | Centraliser les clefs dans une enum partagee | Todo |
 | SS-007 | P2 | Test | Guardian API mock | Eviter dependance reseau dans suite principale | Todo |

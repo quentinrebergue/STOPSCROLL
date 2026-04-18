@@ -204,6 +204,13 @@ struct InstagramWebView: UIViewRepresentable {
     // MARK: - Coordinator
 
     class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
+        struct ArticleOpenDefaults {
+            let savedCardIndex: Int
+            let savedBookTitle: String
+            let currentArticleId: String
+            let currentArticleOpenToken: Int
+        }
+
         var parent: InstagramWebView
         weak var webView: WKWebView?
         var lastReloadToken: Int
@@ -570,11 +577,7 @@ struct InstagramWebView: UIViewRepresentable {
 
         /// Fetch the full Wikipedia article text, split into sections, then open the reader.
         private func fetchFullArticleAndOpen(title: String, lang: String) {
-            let safeLang = String(lang.prefix(5).filter { $0.isLetter })
-            // URL-encode the title for the query
-            let encodedTitle = title.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? title
-            let urlString = "https://\(safeLang).wikipedia.org/w/api.php?action=query&prop=extracts&titles=\(encodedTitle)&explaintext=1&format=json&exlimit=1"
-            guard let url = URL(string: urlString) else { return }
+            guard let url = Self.makeWikipediaExtractURL(title: title, lang: lang) else { return }
 
             URLSession.shared.dataTask(with: url) { [weak self] data, _, error in
                 guard let data = data, error == nil,
@@ -597,7 +600,7 @@ struct InstagramWebView: UIViewRepresentable {
         }
 
         /// Split Wikipedia plain-text extract into (title, text) chapters by section headings.
-        private static func splitIntoChapters(title: String, fullText: String) -> [(title: String, text: String)] {
+        static func splitIntoChapters(title: String, fullText: String) -> [(title: String, text: String)] {
             let lines = fullText.components(separatedBy: "\n")
             var chapters: [(title: String, text: String)] = []
             var currentTitle = title
@@ -639,6 +642,32 @@ struct InstagramWebView: UIViewRepresentable {
             return chapters.isEmpty ? [(title, fullText)] : chapters
         }
 
+        static func makeArticleOpenDefaults(previousOpenToken: Int, articleId: String, title: String) -> ArticleOpenDefaults {
+            ArticleOpenDefaults(
+                savedCardIndex: 0,
+                savedBookTitle: title,
+                currentArticleId: articleId,
+                currentArticleOpenToken: previousOpenToken + 1
+            )
+        }
+
+        static func makeWikipediaExtractURL(title: String, lang: String) -> URL? {
+            let safeLang = String(lang.prefix(5).filter { $0.isLetter })
+            var components = URLComponents()
+            components.scheme = "https"
+            components.host = "\(safeLang).wikipedia.org"
+            components.path = "/w/api.php"
+            components.queryItems = [
+                URLQueryItem(name: "action", value: "query"),
+                URLQueryItem(name: "prop", value: "extracts"),
+                URLQueryItem(name: "titles", value: title),
+                URLQueryItem(name: "explaintext", value: "1"),
+                URLQueryItem(name: "format", value: "json"),
+                URLQueryItem(name: "exlimit", value: "1")
+            ]
+            return components.url
+        }
+
         /// Save a Wikipedia article into BookStorage & library, then open the reader.
         private func handleOpenArticle(title: String, chapters: [(title: String, text: String)]) {
             // ── Deduplicate: reuse existing article entry with the same title ──
@@ -672,14 +701,13 @@ struct InstagramWebView: UIViewRepresentable {
 
             // Update AppStorage keys — use "currentArticleId" (separate from books)
             DispatchQueue.main.async {
-                UserDefaults.standard.set(0, forKey: "savedCardIndex")
-                UserDefaults.standard.set(title, forKey: "savedBookTitle")
-                UserDefaults.standard.set(bookId, forKey: "currentArticleId")
-
-                // Deterministic trigger for BookReader article reload, even when
-                // the same article ID is opened repeatedly.
                 let openToken = UserDefaults.standard.integer(forKey: "currentArticleOpenToken")
-                UserDefaults.standard.set(openToken + 1, forKey: "currentArticleOpenToken")
+                let next = Self.makeArticleOpenDefaults(previousOpenToken: openToken, articleId: bookId, title: title)
+
+                UserDefaults.standard.set(next.savedCardIndex, forKey: "savedCardIndex")
+                UserDefaults.standard.set(next.savedBookTitle, forKey: "savedBookTitle")
+                UserDefaults.standard.set(next.currentArticleId, forKey: "currentArticleId")
+                UserDefaults.standard.set(next.currentArticleOpenToken, forKey: "currentArticleOpenToken")
 
                 self.parent.showingReader = true
             }

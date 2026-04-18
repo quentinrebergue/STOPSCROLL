@@ -213,3 +213,91 @@ final class GuardianAPITests: XCTestCase {
         XCTAssertGreaterThan(bodyText.count, 100, "bodyText should contain substantial content")
     }
 }
+
+final class ArticleOpenWorkflowTests: XCTestCase {
+
+    func testArticleOpenDefaultsIncrementsOpenTokenAndResetsCardIndex() {
+        let result = InstagramWebView.Coordinator.makeArticleOpenDefaults(
+            previousOpenToken: 41,
+            articleId: "article-123",
+            title: "Article test"
+        )
+
+        XCTAssertEqual(result.currentArticleOpenToken, 42)
+        XCTAssertEqual(result.savedCardIndex, 0)
+        XCTAssertEqual(result.currentArticleId, "article-123")
+        XCTAssertEqual(result.savedBookTitle, "Article test")
+    }
+
+    func testSplitIntoChaptersSplitsOnSectionHeadings() {
+        let text = """
+        Intro paragraph.
+
+        == History ==
+        A long history section.
+
+        == Legacy ==
+        Legacy section text.
+        """
+
+        let chapters = InstagramWebView.Coordinator.splitIntoChapters(title: "Root", fullText: text)
+
+        XCTAssertEqual(chapters.count, 3)
+        XCTAssertEqual(chapters[0].title, "Root")
+        XCTAssertEqual(chapters[1].title, "History")
+        XCTAssertEqual(chapters[2].title, "Legacy")
+    }
+
+    func testSplitIntoChaptersRemovesReferenceLikeSections() {
+        let text = """
+        Main body line.
+
+        == References ==
+        Reference 1
+
+        == External links ==
+        http://example.com
+        """
+
+        let chapters = InstagramWebView.Coordinator.splitIntoChapters(title: "Topic", fullText: text)
+
+        XCTAssertEqual(chapters.count, 1)
+        XCTAssertEqual(chapters[0].title, "Topic")
+        XCTAssertTrue(chapters[0].text.contains("Main body line"))
+    }
+}
+
+final class WikipediaArticleButtonWorkflowTests: XCTestCase {
+
+    func testMakeWikipediaExtractURLUsesProvidedLanguageDomain() {
+        let url = InstagramWebView.Coordinator.makeWikipediaExtractURL(
+            title: "Le Petit Prince",
+            lang: "fr"
+        )
+
+        XCTAssertNotNil(url)
+        XCTAssertTrue(url!.absoluteString.contains("https://fr.wikipedia.org/w/api.php"))
+    }
+
+    func testMakeWikipediaExtractURLSanitizesLanguageTag() {
+        let url = InstagramWebView.Coordinator.makeWikipediaExtractURL(
+            title: "Planets",
+            lang: "en-US<script>"
+        )
+
+        XCTAssertNotNil(url)
+        XCTAssertEqual(url!.host, "enUS.wikipedia.org")
+    }
+
+    func testMakeWikipediaExtractURLEncodesArticleTitle() {
+        let url = InstagramWebView.Coordinator.makeWikipediaExtractURL(
+            title: "L'étranger & société",
+            lang: "fr"
+        )
+
+        XCTAssertNotNil(url)
+        let components = URLComponents(url: url!, resolvingAgainstBaseURL: false)
+        let titlesValue = components?.queryItems?.first(where: { $0.name == "titles" })?.value
+        XCTAssertEqual(titlesValue, "L'étranger & société")
+    }
+}

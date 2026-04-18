@@ -29,7 +29,19 @@ xcodebuild -project StopScroll.xcodeproj -scheme StopScroll -configuration Debug
 ### 3) Tests
 
 ```bash
-xcodebuild -project StopScroll.xcodeproj -scheme StopScroll -destination 'platform=iOS Simulator,name=iPhone 15' test
+xcodebuild -project StopScroll.xcodeproj -scheme StopScroll -destination 'platform=iOS Simulator,name=iPhone 17' test
+```
+
+Test cible workflow article:
+
+```bash
+xcodebuild -project StopScroll.xcodeproj -scheme StopScroll -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:StopScrollTests/ArticleOpenWorkflowTests test
+```
+
+Test cible bouton article Wikipedia:
+
+```bash
+xcodebuild -project StopScroll.xcodeproj -scheme StopScroll -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:StopScrollTests/WikipediaArticleButtonWorkflowTests test
 ```
 
 ## Structure du repo
