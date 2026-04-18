@@ -132,6 +132,8 @@ plusieurs fois et evite les races condition du premier clic.
   - encodage titre (accents, apostrophes, `&`)
 - `WikipediaArticleSelectionTests` (dans `GuardianAPITests.swift`):
   - evite de reservir le meme titre Wikipedia consecutivement quand une alternative existe
+- `ArticleFirstClickTimingTests` (dans `GuardianAPITests.swift`):
+  - valide le fallback `UserDefaults` -> `BookReaderView` quand `@AppStorage` est encore vide au premier affichage
 
 Destination de test recommandee dans ce repo:
 - `platform=iOS Simulator,name=iPhone 17`

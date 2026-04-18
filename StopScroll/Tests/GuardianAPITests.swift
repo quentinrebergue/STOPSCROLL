@@ -323,3 +323,24 @@ final class WikipediaArticleSelectionTests: XCTestCase {
         XCTAssertNil(picked)
     }
 }
+
+final class ArticleFirstClickTimingTests: XCTestCase {
+
+    func testResolveCurrentArticleIdUsesUserDefaultsWhenAppStorageStillEmpty() {
+        let resolved = BookReaderView.resolveCurrentArticleId(
+            appStorageValue: "",
+            userDefaultsValue: "article-42"
+        )
+
+        XCTAssertEqual(resolved, "article-42")
+    }
+
+    func testResolveCurrentArticleIdFallsBackToAppStorageWhenDefaultsMissing() {
+        let resolved = BookReaderView.resolveCurrentArticleId(
+            appStorageValue: "article-7",
+            userDefaultsValue: nil
+        )
+
+        XCTAssertEqual(resolved, "article-7")
+    }
+}

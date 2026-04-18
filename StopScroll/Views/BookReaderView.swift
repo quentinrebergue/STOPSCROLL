@@ -148,7 +148,16 @@ struct BookReaderView: View {
     }
 
     private var resolvedCurrentArticleId: String {
-        UserDefaults.standard.string(forKey: "currentArticleId") ?? currentArticleId
+        Self.resolveCurrentArticleId(
+            appStorageValue: currentArticleId,
+            userDefaultsValue: UserDefaults.standard.string(forKey: "currentArticleId")
+        )
+    }
+
+    static func resolveCurrentArticleId(appStorageValue: String, userDefaultsValue: String?) -> String {
+        let fromDefaults = userDefaultsValue?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        if !fromDefaults.isEmpty { return fromDefaults }
+        return appStorageValue
     }
 
     private var totalPages: Int {
