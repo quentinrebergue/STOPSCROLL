@@ -75,6 +75,29 @@ Format bridge v1 (enveloppe unifiee):
 - Persist: `BookStorage` + UserDefaults (`library`, IDs courants, progression)
 - UI: `BookReaderView`
 
+#### Workflow bouton "Lire l article" (card culture)
+
+1. Le bouton de la card culture (`card-culture.js`) envoie un message bridge:
+- Wikipedia: `type: openArticle`, payload `{ title, lang }`
+- Guardian: `type: openGuardianArticle`, payload `{ url, title }`
+
+2. Le bridge JS (`dom-utils.js`) enveloppe le message en format v1:
+- `{ v, id, type, payload, ts }`
+
+3. Cote Swift (`InstagramWebView.Coordinator`), `dispatchBridgeAction` route vers:
+- `fetchFullArticleAndOpen(...)` (Wikipedia)
+- `fetchGuardianFullArticleAndOpen(...)` (Guardian)
+
+4. Une fois le texte recupere, `handleOpenArticle(...)`:
+- deduplique dans `library`
+- sauvegarde les chapitres (si nouvel article)
+- met a jour `savedCardIndex` / `savedBookTitle`
+- active le reader
+
+5. Pour garantir le rechargement meme si c est le meme article (meme ID),
+`currentArticleId` est force en deux etapes: `""` puis `bookId` au tick suivant.
+Cela force le `onChange(of: currentArticleId)` dans `BookReaderView`.
+
 ## 5. Persistance
 
 ## 5.1 UserDefaults

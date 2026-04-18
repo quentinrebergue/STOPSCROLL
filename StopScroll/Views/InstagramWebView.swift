@@ -672,10 +672,15 @@ struct InstagramWebView: UIViewRepresentable {
 
             // Update AppStorage keys — use "currentArticleId" (separate from books)
             DispatchQueue.main.async {
-                UserDefaults.standard.set(bookId, forKey: "currentArticleId")
+                // Force a value transition so BookReaderView.onChange(of: currentArticleId)
+                // triggers even when reopening the exact same article.
+                UserDefaults.standard.set("", forKey: "currentArticleId")
                 UserDefaults.standard.set(0, forKey: "savedCardIndex")
                 UserDefaults.standard.set(title, forKey: "savedBookTitle")
                 self.parent.showingReader = true
+                DispatchQueue.main.async {
+                    UserDefaults.standard.set(bookId, forKey: "currentArticleId")
+                }
             }
         }
 
