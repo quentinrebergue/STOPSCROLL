@@ -301,3 +301,25 @@ final class WikipediaArticleButtonWorkflowTests: XCTestCase {
         XCTAssertEqual(titlesValue, "L'étranger & société")
     }
 }
+
+final class WikipediaArticleSelectionTests: XCTestCase {
+
+    func testPickWikipediaArticleAvoidsPreviousTitleWhenAlternativeExists() {
+        let articles: [[String: Any]] = [
+            ["title": "Same", "extract": "A"],
+            ["title": "Different", "extract": "B"]
+        ]
+
+        let picked = InstagramWebView.Coordinator.pickWikipediaArticle(from: articles, avoidingTitle: "Same")
+        XCTAssertEqual(picked?["title"] as? String, "Different")
+    }
+
+    func testPickWikipediaArticleReturnsNilWhenOnlySameTitleAvailable() {
+        let articles: [[String: Any]] = [
+            ["title": "Same", "extract": "A"]
+        ]
+
+        let picked = InstagramWebView.Coordinator.pickWikipediaArticle(from: articles, avoidingTitle: "Same")
+        XCTAssertNil(picked)
+    }
+}

@@ -130,6 +130,8 @@ plusieurs fois et evite les races condition du premier clic.
   - URL Wikipedia correctement construite pour le flux `openArticle`
   - sanitation du lang
   - encodage titre (accents, apostrophes, `&`)
+- `WikipediaArticleSelectionTests` (dans `GuardianAPITests.swift`):
+  - evite de reservir le meme titre Wikipedia consecutivement quand une alternative existe
 
 Destination de test recommandee dans ce repo:
 - `platform=iOS Simulator,name=iPhone 17`
@@ -147,3 +149,6 @@ Destination de test recommandee dans ce repo:
 
 4. Performance scan:
 - garder des scans legers, eviter observers redondants et mutations inutiles.
+
+5. Diversite des cartes article:
+- la selection Wikipedia cote native evite le dernier titre injecte pour limiter les repetitions visibles.

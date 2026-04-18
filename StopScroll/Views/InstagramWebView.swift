@@ -215,11 +215,13 @@ struct InstagramWebView: UIViewRepresentable {
         weak var webView: WKWebView?
         var lastReloadToken: Int
         var lastLabelsToken: Int
+        var lastWikipediaTitle: String
 
         init(_ parent: InstagramWebView) {
             self.parent = parent
             self.lastReloadToken = parent.reloadToken
             self.lastLabelsToken = parent.labelsToken
+            self.lastWikipediaTitle = ""
         }
 
         func userContentController(_ controller: WKUserContentController, didReceive message: WKScriptMessage) {
@@ -389,14 +391,12 @@ struct InstagramWebView: UIViewRepresentable {
                             && !desc.contains("wikimedia")
                             && !desc.contains("wikipedia")
                     }
-                    if !good.isEmpty {
-                        picked = good[Int.random(in: 0..<min(good.count, 10))]
-                    }
+                    picked = Self.pickWikipediaArticle(from: good, avoidingTitle: self?.lastWikipediaTitle)
                 }
 
                 // 2. Fallback: today's featured article
                 if picked == nil, let tfa = json["tfa"] as? [String: Any] {
-                    picked = tfa
+                    picked = Self.pickWikipediaArticle(from: [tfa], avoidingTitle: self?.lastWikipediaTitle)
                 }
 
                 // 3. Fallback: on-this-day person/event
@@ -404,12 +404,16 @@ struct InstagramWebView: UIViewRepresentable {
                    let first = otd.first,
                    let pages = first["pages"] as? [[String: Any]],
                    let page = pages.first {
-                    picked = page
+                    picked = Self.pickWikipediaArticle(from: [page], avoidingTitle: self?.lastWikipediaTitle)
                 }
 
                 guard let article = picked else {
                     self?.fetchRandomWikipediaArticle(lang: safeLang)
                     return
+                }
+
+                if let title = article["title"] as? String {
+                    self?.lastWikipediaTitle = title
                 }
 
                 self?.injectArticleToJS(article: article, lang: safeLang)
@@ -666,6 +670,23 @@ struct InstagramWebView: UIViewRepresentable {
                 URLQueryItem(name: "exlimit", value: "1")
             ]
             return components.url
+        }
+
+        static func pickWikipediaArticle(from articles: [[String: Any]], avoidingTitle: String?) -> [String: Any]? {
+            guard !articles.isEmpty else { return nil }
+            guard let avoidingTitle, !avoidingTitle.isEmpty else {
+                return articles.randomElement()
+            }
+
+            let normalizedAvoiding = avoidingTitle.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+            let filtered = articles.filter { article in
+                let title = (article["title"] as? String ?? "")
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+                    .lowercased()
+                return title != normalizedAvoiding
+            }
+
+            return filtered.randomElement()
         }
 
         /// Save a Wikipedia article into BookStorage & library, then open the reader.
