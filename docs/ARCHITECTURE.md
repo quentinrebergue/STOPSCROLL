@@ -172,6 +172,7 @@ Destination de test recommandee dans ce repo:
 - compact island reduite (empreinte visuelle plus faible)
 - timeline UX en 2 temps: `+XP` rapide, puis ratio `xpCourante / xpNiveau`
 - progression bar: l island affiche d abord l etat courant du niveau (sans partir de 0), puis anime uniquement le gain XP jusqu a l etat cible
+- demarrage de l animation de barre volontairement retarde pour laisser le temps de lire l etat instantane avant progression
 
 8. Dashboard natif (SwiftUI)
 - entree principale depuis la ligne StopScroll injectee dans la section utilisateur Instagram (action bridge `openDashboard`)

@@ -116,6 +116,8 @@ struct InstagramView: View {
     }
 
     private func grantXP(amount: Int, source: String) {
+        let progressStartDelayWhenVisible = 0.16
+        let progressStartDelayOnAppear = 0.22
         let safeAmount = min(max(amount, 1), 200)
         let previousTotal = totalXP
         totalXP += safeAmount
@@ -143,7 +145,7 @@ struct InstagramView: View {
                 }
             }
             xpProgressWorkItem = progressItem
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.08, execute: progressItem)
+            DispatchQueue.main.asyncAfter(deadline: .now() + progressStartDelayWhenVisible, execute: progressItem)
         } else {
             // Show the current ratio immediately, then animate only the gained progression.
             xpDisplayedProgress = XPProgress.progress(for: previousTotal)
@@ -157,7 +159,7 @@ struct InstagramView: View {
                 }
             }
             xpProgressWorkItem = progressItem
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.12, execute: progressItem)
+            DispatchQueue.main.asyncAfter(deadline: .now() + progressStartDelayOnAppear, execute: progressItem)
         }
 
         // Minimal timeline: quick gain text, then current/required XP ratio.
