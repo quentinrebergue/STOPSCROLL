@@ -5,6 +5,157 @@
   const ns = (global.StopScroll = global.StopScroll || {});
   const dom = ns.dom;
   const constants = ns.constants;
+  const HIDE_NAV_ATTR = 'data-ss-hidden-native-nav';
+
+  let lastSentTab = '';
+  let lastSentMessageBadge = -1;
+
+  function normalizePath(path) {
+    if (!path) return '/';
+    const noQuery = path.split('?')[0].split('#')[0];
+    if (noQuery.length > 1 && noQuery.endsWith('/')) return noQuery.slice(0, -1);
+    return noQuery || '/';
+  }
+
+  function pathFromHref(href) {
+    try {
+      return normalizePath(new URL(href, global.location.origin).pathname);
+    } catch (_) {
+      return '';
+    }
+  }
+
+  function isProfilePath(path) {
+    if (!path || path === '/') return false;
+    const normalized = normalizePath(path);
+    const blockedPrefixes = [
+      '/explore', '/reels', '/direct', '/accounts', '/p/', '/stories', '/challenge', '/about', '/developer', '/legal'
+    ];
+    for (let i = 0; i < blockedPrefixes.length; i++) {
+      if (normalized === blockedPrefixes[i] || normalized.startsWith(blockedPrefixes[i])) {
+        return false;
+      }
+    }
+    return /^\/[a-zA-Z0-9._]+$/.test(normalized);
+  }
+
+  function detectCurrentTab() {
+    const path = normalizePath(global.location.pathname);
+    if (path === '/') return 'home';
+    if (path.startsWith('/explore')) return 'search';
+    if (path.startsWith('/direct')) return 'messages';
+    if (path.startsWith('/accounts/activity')) return 'activity';
+    if (isProfilePath(path)) return 'profile';
+    return 'home';
+  }
+
+  function getNavLinks() {
+    return Array.from(document.querySelectorAll('nav a[href]'));
+  }
+
+  function findTabLink(tab) {
+    const links = getNavLinks();
+    const tabPaths = {
+      home: ['/', ''],
+      search: ['/explore', '/explore/'],
+      messages: ['/direct', '/direct/', '/direct/inbox', '/direct/inbox/'],
+      activity: ['/accounts/activity', '/accounts/activity/']
+    };
+
+    for (let i = 0; i < links.length; i++) {
+      const link = links[i];
+      const path = pathFromHref(link.getAttribute('href') || link.href || '');
+
+      if (tab === 'profile' && isProfilePath(path)) return link;
+
+      const paths = tabPaths[tab] || [];
+      for (let k = 0; k < paths.length; k++) {
+        if (normalizePath(paths[k]) === normalizePath(path)) {
+          return link;
+        }
+      }
+    }
+    return null;
+  }
+
+  function extractInt(text) {
+    const match = String(text || '').match(/\d+/);
+    return match ? parseInt(match[0], 10) : 0;
+  }
+
+  function readMessageBadge() {
+    const messageLink = findTabLink('messages')
+      || document.querySelector('a[href^="/direct"], a[href*="/direct/"]');
+    if (!messageLink) return 0;
+
+    const aria = messageLink.getAttribute('aria-label') || '';
+    const ariaCount = extractInt(aria);
+    if (ariaCount > 0) return ariaCount;
+
+    const badgeNodes = messageLink.querySelectorAll('span, div');
+    for (let i = 0; i < badgeNodes.length; i++) {
+      const text = (badgeNodes[i].textContent || '').trim();
+      if (!text || text.length > 4) continue;
+      const value = extractInt(text);
+      if (value > 0) return value;
+    }
+    return 0;
+  }
+
+  function syncNativeNavState() {
+    const tab = detectCurrentTab();
+    const badge = readMessageBadge();
+    if (tab === lastSentTab && badge === lastSentMessageBadge) return;
+
+    lastSentTab = tab;
+    lastSentMessageBadge = badge;
+    dom.postToBridge({ type: 'nativeNavState', tab: tab, messageBadge: badge });
+  }
+
+  function nativeNavigateToTab(tab) {
+    if (!tab) return false;
+
+    const link = findTabLink(tab);
+    if (link) {
+      link.click();
+      return true;
+    }
+
+    const fallbackPaths = {
+      home: '/',
+      search: '/explore/',
+      messages: '/direct/inbox/',
+      activity: '/accounts/activity/',
+      profile: '/accounts/edit/'
+    };
+    const fallback = fallbackPaths[tab];
+    if (fallback) {
+      global.location.href = fallback;
+      return true;
+    }
+    return false;
+  }
+
+  function hideInstagramNativeNav() {
+    const navs = document.querySelectorAll('nav');
+    navs.forEach(function (nav) {
+      const links = nav.querySelectorAll('a[href]');
+      let score = 0;
+      links.forEach(function (link) {
+        const path = pathFromHref(link.getAttribute('href') || link.href || '');
+        if (path === '/' || path.startsWith('/explore') || path.startsWith('/direct') || path.startsWith('/accounts/activity') || isProfilePath(path)) {
+          score += 1;
+        }
+      });
+
+      if (score >= 3) {
+        nav.setAttribute(HIDE_NAV_ATTR, '1');
+        nav.style.setProperty('display', 'none', 'important');
+        nav.style.setProperty('visibility', 'hidden', 'important');
+        nav.style.setProperty('pointer-events', 'none', 'important');
+      }
+    });
+  }
 
   function transformReelsToBook(link) {
     link.setAttribute('data-ss-book', '1');
@@ -53,6 +204,9 @@
   ns.nav = {
     transformReelsToBook: transformReelsToBook,
     cleanReels: cleanReels,
-    cleanLegacyReloadButton: cleanLegacyReloadButton
+    cleanLegacyReloadButton: cleanLegacyReloadButton,
+    syncNativeNavState: syncNativeNavState,
+    nativeNavigateToTab: nativeNavigateToTab,
+    hideInstagramNativeNav: hideInstagramNativeNav
   };
 })(window);

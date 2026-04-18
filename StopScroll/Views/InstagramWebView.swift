@@ -10,6 +10,9 @@ struct InstagramWebView: UIViewRepresentable {
     @Binding var reloadToken: Int
     /// Incremented by InstagramView when AppSettings.adLabels changes; triggers re-injection.
     @Binding var labelsToken: Int
+    @Binding var selectedNativeTab: String
+    @Binding var nativeMessageBadgeCount: Int
+    @Binding var nativeNavCommandToken: Int
     var onGrantXP: (Int, String) -> Void = { _, _ in }
 
     /// Module scripts injected in dependency order before the bootstrap.
@@ -126,6 +129,14 @@ struct InstagramWebView: UIViewRepresentable {
             """
             uiView.evaluateJavaScript(reloadScript)
         }
+        if context.coordinator.lastNativeNavCommandToken != nativeNavCommandToken {
+            context.coordinator.lastNativeNavCommandToken = nativeNavCommandToken
+            let tab = selectedNativeTab
+                .replacingOccurrences(of: "\\", with: "\\\\")
+                .replacingOccurrences(of: "'", with: "\\'")
+            let script = "(function(){var ns=window.StopScroll;if(ns&&ns.nav&&ns.nav.nativeNavigateToTab){ns.nav.nativeNavigateToTab('\(tab)');}})();"
+            uiView.evaluateJavaScript(script)
+        }
     }
 
     // MARK: - Script builders
@@ -218,12 +229,14 @@ struct InstagramWebView: UIViewRepresentable {
         var lastReloadToken: Int
         var lastLabelsToken: Int
         var lastWikipediaTitle: String
+        var lastNativeNavCommandToken: Int
 
         init(_ parent: InstagramWebView) {
             self.parent = parent
             self.lastReloadToken = parent.reloadToken
             self.lastLabelsToken = parent.labelsToken
             self.lastWikipediaTitle = ""
+            self.lastNativeNavCommandToken = parent.nativeNavCommandToken
         }
 
         func userContentController(_ controller: WKUserContentController, didReceive message: WKScriptMessage) {
@@ -321,6 +334,15 @@ struct InstagramWebView: UIViewRepresentable {
                 let source = (payload["source"] as? String) ?? "action"
                 DispatchQueue.main.async {
                     self.parent.onGrantXP(amount, source)
+                }
+                return true
+            }
+            if type == "nativeNavState" {
+                let tab = (payload["tab"] as? String) ?? "home"
+                let badgeCount = Self.parseXPAmount(payload["messageBadge"])
+                DispatchQueue.main.async {
+                    self.parent.selectedNativeTab = tab
+                    self.parent.nativeMessageBadgeCount = max(0, badgeCount)
                 }
                 return true
             }

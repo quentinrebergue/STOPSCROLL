@@ -25,6 +25,7 @@ Spec concrete des prochaines features anti-procrastination:
 
 4. UX anti-procrastination concretes
 - dashboard natif deja livre (entree section utilisateur + fallback settings)
+- navbar native synchronisee deja livree (onglets + badge messages + sync webview)
 - cohabitation livre/article: finaliser switcher explicite dans le reader
 
 ## Next (1-2 mois)

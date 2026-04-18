@@ -182,3 +182,11 @@ Destination de test recommandee dans ce repo:
 9. Settings reader (bibliotheque)
 - tap direct sur un livre/article pour ouvrir immediatement dans le reader
 - swipe gauche natif iOS sur chaque item pour actions rapides: delete, reset, rename
+
+10. Navbar native synchronisee Instagram
+- une barre native SwiftUI overlay remplace visuellement la barre Instagram
+- le runtime JS masque la navbar Instagram detectee dans le DOM
+- synchronisation etat onglet actif -> natif via bridge (`nativeNavState`)
+- synchronisation badge messages -> natif via bridge (`messageBadge`)
+- navigation natif -> WebView via commande JS `nativeNavigateToTab(...)`
+- sections supportees en V1: home, search, messages, activity, profile

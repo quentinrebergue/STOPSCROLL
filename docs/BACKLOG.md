@@ -28,6 +28,7 @@
 | SS-016 | P1 | Improvement | Dashboard natif StopScroll | Vue SwiftUI active (objectifs, usage, XP) + entree section utilisateur + entree secondaire settings | Done |
 | SS-017 | P1 | Improvement | Cohabitation livre/article reader | Switcher explicite Livre/Article + reprise de contexte sans friction | In Progress |
 | SS-018 | P2 | Improvement | Actions rapides bibliotheque reader | Tap direct pour ouvrir + swipe natif delete/reset/rename dans Settings reader | Done |
+| SS-019 | P1 | Improvement | Navbar native synchronisee | Barre native, badge messages, masquage navbar Instagram, navigation onglets vers WebView | Done |
 
 ## Idees d amelioration produit
 
