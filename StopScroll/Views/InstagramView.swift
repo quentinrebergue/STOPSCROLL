@@ -30,9 +30,12 @@ struct InstagramView: View {
     @AppStorage("ss_xp_total") private var totalXP = 0
     @State private var xpIslandVisible = false
     @State private var xpLastGain = 0
-    @State private var xpSourceLabel = "Action"
     @State private var xpHideWorkItem: DispatchWorkItem?
+    @State private var xpProgressWorkItem: DispatchWorkItem?
+    @State private var xpInfoWorkItem: DispatchWorkItem?
     @State private var xpIslandNudge: CGFloat = 0
+    @State private var xpDisplayedProgress: Double = 0
+    @State private var xpInfoPhase: XPInfoPhase = .gain
 
     var body: some View {
         ZStack {
@@ -65,16 +68,18 @@ struct InstagramView: View {
             if xpIslandVisible {
                 GeometryReader { geo in
                     let cutoutStyle = XPCutoutStyle.from(topInset: geo.safeAreaInsets.top)
+                    let cutoutTopOffset: CGFloat = cutoutStyle == .dynamicIsland ? 4 : 6
 
                     VStack(spacing: 0) {
                         XPCutoutAnchorView(style: cutoutStyle)
 
                         XPDynamicIslandView(
                             gain: xpLastGain,
-                            sourceLabel: xpSourceLabel,
                             level: XPProgress.level(for: totalXP),
-                            progress: XPProgress.progress(for: totalXP),
-                            remainingToNextLevel: XPProgress.remainingToNextLevel(for: totalXP)
+                            progress: xpDisplayedProgress,
+                            currentXPInLevel: XPProgress.xpInCurrentLevel(for: totalXP),
+                            xpPerLevel: XPProgress.xpPerLevel,
+                            infoPhase: xpInfoPhase
                         )
                         .padding(.top, 2)
                         .scaleEffect(1 + xpIslandNudge, anchor: .top)
@@ -82,9 +87,11 @@ struct InstagramView: View {
 
                         Spacer(minLength: 0)
                     }
-                    .padding(.top, max(geo.safeAreaInsets.top - 6, 0))
-                    .frame(maxWidth: .infinity)
+                    .padding(.top, cutoutTopOffset)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                    .compositingGroup()
                 }
+                .ignoresSafeArea(edges: .top)
                 .transition(.xpIslandOrganic)
                 .zIndex(20)
                 .allowsHitTesting(false)
@@ -100,11 +107,16 @@ struct InstagramView: View {
 
     private func grantXP(amount: Int, source: String) {
         let safeAmount = min(max(amount, 1), 200)
+        let previousTotal = totalXP
         totalXP += safeAmount
+        let targetProgress = XPProgress.progress(for: totalXP)
         xpLastGain = safeAmount
-        xpSourceLabel = source == "card_button" ? "Interaction" : "Action"
+        _ = source // reserved for future reward categories
+        xpInfoPhase = .gain
 
         xpHideWorkItem?.cancel()
+        xpProgressWorkItem?.cancel()
+        xpInfoWorkItem?.cancel()
 
         if xpIslandVisible {
             withAnimation(.interactiveSpring(response: 0.32, dampingFraction: 0.74, blendDuration: 0.16)) {
@@ -113,11 +125,39 @@ struct InstagramView: View {
             withAnimation(.easeOut(duration: 0.28).delay(0.05)) {
                 xpIslandNudge = 0
             }
+            // Island already visible: animate from previous level ratio to target ratio.
+            xpDisplayedProgress = XPProgress.progress(for: previousTotal)
+            let progressItem = DispatchWorkItem {
+                withAnimation(.easeOut(duration: 0.42)) {
+                    xpDisplayedProgress = targetProgress
+                }
+            }
+            xpProgressWorkItem = progressItem
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.08, execute: progressItem)
         } else {
+            // Two-step behavior: first island appears, then bar fills.
+            xpDisplayedProgress = 0
             withAnimation(.interactiveSpring(response: 0.56, dampingFraction: 0.82, blendDuration: 0.2)) {
                 xpIslandVisible = true
             }
+
+            let progressItem = DispatchWorkItem {
+                withAnimation(.easeOut(duration: 0.48)) {
+                    xpDisplayedProgress = targetProgress
+                }
+            }
+            xpProgressWorkItem = progressItem
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.34, execute: progressItem)
         }
+
+        // Minimal timeline: quick gain text, then current/required XP ratio.
+        let infoItem = DispatchWorkItem {
+            withAnimation(.easeOut(duration: 0.2)) {
+                xpInfoPhase = .progress
+            }
+        }
+        xpInfoWorkItem = infoItem
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.72, execute: infoItem)
 
         let workItem = DispatchWorkItem {
             withAnimation(.easeOut(duration: 0.34)) {
@@ -163,23 +203,27 @@ private struct LoadingBar: View {
 
 private struct XPDynamicIslandView: View {
     let gain: Int
-    let sourceLabel: String
     let level: Int
     let progress: Double
-    let remainingToNextLevel: Int
+    let currentXPInLevel: Int
+    let xpPerLevel: Int
+    let infoPhase: XPInfoPhase
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 5) {
+        VStack(alignment: .leading, spacing: 4) {
             HStack(alignment: .firstTextBaseline, spacing: 8) {
-                Text("+\(gain) XP")
-                    .font(.system(size: 14, weight: .bold, design: .rounded))
+                Group {
+                    if infoPhase == .gain {
+                        Text("+\(gain) XP")
+                    } else {
+                        Text("\(currentXPInLevel) / \(xpPerLevel) XP")
+                    }
+                }
+                    .font(.system(size: 12, weight: .bold, design: .rounded))
                     .foregroundColor(.white)
-                Text(sourceLabel)
-                    .font(.system(size: 11, weight: .semibold, design: .rounded))
-                    .foregroundColor(Color.white.opacity(0.72))
                 Spacer(minLength: 6)
                 Text("Lv \(level)")
-                    .font(.system(size: 11, weight: .semibold, design: .rounded))
+                    .font(.system(size: 10, weight: .bold, design: .rounded))
                     .foregroundColor(Color(red: 0.53, green: 0.88, blue: 1.0))
             }
 
@@ -192,8 +236,8 @@ private struct XPDynamicIslandView: View {
                         .fill(
                             LinearGradient(
                                 colors: [
-                                    Color(red: 0.40, green: 0.87, blue: 1.0),
-                                    Color(red: 0.53, green: 1.0, blue: 0.68)
+                                    Color(red: 0.20, green: 1.0, blue: 0.24),
+                                    Color(red: 0.36, green: 1.0, blue: 0.42)
                                 ],
                                 startPoint: .leading,
                                 endPoint: .trailing
@@ -203,24 +247,25 @@ private struct XPDynamicIslandView: View {
                 }
             }
             .frame(height: 6)
-
-            Text("\(remainingToNextLevel) XP")
-                .font(.system(size: 10, weight: .medium, design: .rounded))
-                .foregroundColor(Color.white.opacity(0.62))
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 10)
-        .frame(width: 186)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
+        .frame(width: 164)
         .background(
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .fill(Color.black.opacity(0.88))
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .stroke(Color.white.opacity(0.08), lineWidth: 1)
         )
         .shadow(color: Color.black.opacity(0.45), radius: 20, y: 6)
     }
+}
+
+private enum XPInfoPhase {
+    case gain
+    case progress
 }
 
 private enum XPCutoutStyle {
@@ -240,19 +285,14 @@ private struct XPCutoutAnchorView: View {
             if style == .dynamicIsland {
                 Capsule(style: .continuous)
                     .fill(Color.black)
-                    .frame(width: 126, height: 36)
+                    .frame(width: 126, height: 35)
             } else {
                 RoundedRectangle(cornerRadius: 13, style: .continuous)
                     .fill(Color.black)
-                    .frame(width: 168, height: 30)
+                    .frame(width: 170, height: 28)
             }
         }
-        .overlay(
-            Rectangle()
-                .fill(Color.black)
-                .frame(width: style == .dynamicIsland ? 126 : 168, height: 14)
-                .offset(y: -14)
-        )
+        .shadow(color: Color.black.opacity(0.3), radius: 2, y: 1)
     }
 }
 
@@ -260,14 +300,12 @@ private struct XPIslandTransitionModifier: ViewModifier {
     let opacity: Double
     let scale: CGFloat
     let yOffset: CGFloat
-    let blur: CGFloat
 
     func body(content: Content) -> some View {
         content
             .opacity(opacity)
             .scaleEffect(scale, anchor: .top)
             .offset(y: yOffset)
-            .blur(radius: blur)
     }
 }
 
@@ -275,12 +313,12 @@ private extension AnyTransition {
     static var xpIslandOrganic: AnyTransition {
         .asymmetric(
             insertion: .modifier(
-                active: XPIslandTransitionModifier(opacity: 0, scale: 0.78, yOffset: -26, blur: 9),
-                identity: XPIslandTransitionModifier(opacity: 1, scale: 1, yOffset: 0, blur: 0)
+                active: XPIslandTransitionModifier(opacity: 0, scale: 0.82, yOffset: -20),
+                identity: XPIslandTransitionModifier(opacity: 1, scale: 1, yOffset: 0)
             ),
             removal: .modifier(
-                active: XPIslandTransitionModifier(opacity: 0, scale: 0.93, yOffset: -12, blur: 6),
-                identity: XPIslandTransitionModifier(opacity: 1, scale: 1, yOffset: 0, blur: 0)
+                active: XPIslandTransitionModifier(opacity: 0, scale: 0.96, yOffset: -8),
+                identity: XPIslandTransitionModifier(opacity: 1, scale: 1, yOffset: 0)
             )
         )
     }

@@ -14,6 +14,27 @@
     bookmark: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>'
   };
 
+  function claimCardXP(originEl, amount, source) {
+    if (!(ns.dom && ns.dom.postToBridge)) return false;
+
+    var cardEl = originEl && originEl.closest
+      ? originEl.closest('[data-ss-xp-card]')
+      : null;
+
+    if (!cardEl) {
+      ns.dom.postToBridge({ type: 'grantXP', amount: amount || 12, source: source || 'card_button' });
+      return true;
+    }
+
+    if (cardEl.getAttribute('data-ss-xp-claimed') === '1') {
+      return false;
+    }
+
+    cardEl.setAttribute('data-ss-xp-claimed', '1');
+    ns.dom.postToBridge({ type: 'grantXP', amount: amount || 12, source: source || 'card_button' });
+    return true;
+  }
+
   function makeButton(label, background, handler) {
     var btn = document.createElement('button');
     btn.type = 'button';
@@ -35,9 +56,7 @@
     btn.addEventListener('click', function (event) {
       event.preventDefault();
       event.stopPropagation();
-      if (ns.dom && ns.dom.postToBridge) {
-        ns.dom.postToBridge({ type: 'grantXP', amount: 12, source: 'card_button' });
-      }
+      claimCardXP(btn, 12, 'card_button');
       handler(event);
     });
     return btn;
@@ -53,6 +72,7 @@
 
   function createCardContainer(title, body, accent) {
     var post = document.createElement('div');
+    post.setAttribute('data-ss-xp-card', '1');
     post.style.cssText = [
       'display:flex', 'flex-direction:column', 'width:100%', 'height:100%',
       'background:#1a1a22', 'color:#f4f6fa',
@@ -222,5 +242,6 @@
   cb.makeButton = makeButton;
   cb.makeIconBtn = makeIconBtn;
   cb.createCardContainer = createCardContainer;
+  cb.claimCardXP = claimCardXP;
   cb.burstParticles = burstParticles;
 })(window);

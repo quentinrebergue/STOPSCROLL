@@ -79,6 +79,7 @@
     var timerRunning = activeTimer && activeTimer.end > Date.now();
 
     var post = document.createElement('div');
+    post.setAttribute('data-ss-xp-card', '1');
     post.style.cssText = [
       'display:flex', 'flex-direction:column', 'width:100%', 'height:100%',
       'background:#1a1a22', 'color:#f4f6fa',
@@ -235,8 +236,8 @@
       btn.addEventListener('click', function (event) {
         event.preventDefault();
         event.stopPropagation();
-        if (postToBridge) {
-          postToBridge({ type: 'grantXP', amount: 12, source: 'card_button' });
+        if (cb.claimCardXP) {
+          cb.claimCardXP(btn, 12, 'card_button');
         }
         activateTimer(time, hhmm(time), btn);
       });
@@ -247,8 +248,8 @@
     undoBtn.addEventListener('click', function (event) {
       event.preventDefault();
       event.stopPropagation();
-      if (postToBridge) {
-        postToBridge({ type: 'grantXP', amount: 12, source: 'card_button' });
+      if (cb.claimCardXP) {
+        cb.claimCardXP(undoBtn, 12, 'card_button');
       }
       window.__STOPSCROLL_TIMER = null;
       if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }

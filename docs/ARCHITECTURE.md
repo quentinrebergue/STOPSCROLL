@@ -164,5 +164,10 @@ Destination de test recommandee dans ce repo:
 - un nouveau message bridge `grantXP` remonte les interactions boutons des cartes injectees
 - persistance locale `ss_xp_total` + progression par niveau (100 XP / niveau)
 - couverture etendue: tous les boutons des cards injectees (metrics, book, culture, mood, timer, stop, fallback legacy) donnent `+12 XP`
-- animation organique type "Apple-like": transition asymetrique (scale/offset/blur) + spring d apparition + disparition douce
+- anti re-trigger: une card ne peut donner l XP qu une seule fois (meme si plusieurs taps sur ses boutons)
+- animation organique type "Apple-like": transition asymetrique (scale/offset) + spring d apparition + disparition douce
 - mode compact uniquement avec illusion "sort du cutout": ancrage visuel noir adapte notch/dynamic island selon `safeAreaInsets.top`
+- ajustement visuel: ancrage place au bord haut de l ecran (overlay `ignoresSafeArea(.top)`) pour eviter l effet de decalage sous la barre Instagram
+- mitigation glitch animation: suppression du blur pendant transition + rendu compose (`compositingGroup`) pour limiter le scintillement sur les contours
+- compact island reduite (empreinte visuelle plus faible)
+- timeline UX en 2 temps: `+XP` rapide, puis ratio `xpCourante / xpNiveau`; la barre (vert flashy) commence a se remplir apres l apparition de l island
