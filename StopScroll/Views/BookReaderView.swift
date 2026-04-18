@@ -137,6 +137,7 @@ struct BookReaderView: View {
     @State private var pageProgressResetStart: Date? = nil
     @AppStorage("currentBookId") private var currentBookId: String = ""
     @AppStorage("currentArticleId") private var currentArticleId: String = ""
+    @AppStorage("currentArticleOpenToken") private var currentArticleOpenToken: Int = 0
 
     @AppStorage("savedCardIndex") private var savedCardIndex: Int = 0
     @AppStorage("savedBookTitle") private var savedBookTitle: String = ""
@@ -214,6 +215,10 @@ struct BookReaderView: View {
         }
         .onChange(of: currentArticleId) { newId in
             guard !newId.isEmpty else { return }
+            loadCurrentArticle()
+        }
+        .onChange(of: currentArticleOpenToken) { _ in
+            guard !currentArticleId.isEmpty else { return }
             loadCurrentArticle()
         }
     }

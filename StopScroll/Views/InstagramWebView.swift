@@ -674,20 +674,14 @@ struct InstagramWebView: UIViewRepresentable {
             DispatchQueue.main.async {
                 UserDefaults.standard.set(0, forKey: "savedCardIndex")
                 UserDefaults.standard.set(title, forKey: "savedBookTitle")
-                let previousArticleId = UserDefaults.standard.string(forKey: "currentArticleId") ?? ""
+                UserDefaults.standard.set(bookId, forKey: "currentArticleId")
 
-                // Reopening the same article needs an explicit value transition to
-                // retrigger BookReaderView.onChange(of: currentArticleId).
-                if previousArticleId == bookId {
-                    UserDefaults.standard.set("", forKey: "currentArticleId")
-                    DispatchQueue.main.async {
-                        UserDefaults.standard.set(bookId, forKey: "currentArticleId")
-                        self.parent.showingReader = true
-                    }
-                } else {
-                    UserDefaults.standard.set(bookId, forKey: "currentArticleId")
-                    self.parent.showingReader = true
-                }
+                // Deterministic trigger for BookReader article reload, even when
+                // the same article ID is opened repeatedly.
+                let openToken = UserDefaults.standard.integer(forKey: "currentArticleOpenToken")
+                UserDefaults.standard.set(openToken + 1, forKey: "currentArticleOpenToken")
+
+                self.parent.showingReader = true
             }
         }
 
