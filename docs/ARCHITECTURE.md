@@ -164,3 +164,4 @@ Destination de test recommandee dans ce repo:
 - un nouveau message bridge `grantXP` remonte les interactions boutons des cartes injectees
 - persistance locale `ss_xp_total` + progression par niveau (100 XP / niveau)
 - couverture etendue: tous les boutons des cards injectees (metrics, book, culture, mood, timer, stop, fallback legacy) donnent `+12 XP`
+- animation organique type "Apple-like": transition asymetrique (scale/offset/blur) + spring d apparition + disparition douce

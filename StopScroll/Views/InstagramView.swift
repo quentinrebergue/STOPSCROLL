@@ -32,6 +32,7 @@ struct InstagramView: View {
     @State private var xpLastGain = 0
     @State private var xpSourceLabel = "Action"
     @State private var xpHideWorkItem: DispatchWorkItem?
+    @State private var xpIslandNudge: CGFloat = 0
 
     var body: some View {
         ZStack {
@@ -71,10 +72,12 @@ struct InstagramView: View {
                         remainingToNextLevel: XPProgress.remainingToNextLevel(for: totalXP)
                     )
                     .padding(.top, 8)
+                    .scaleEffect(1 + xpIslandNudge, anchor: .top)
+                    .offset(y: xpIslandNudge * -4)
 
                     Spacer()
                 }
-                .transition(.move(edge: .top).combined(with: .opacity))
+                .transition(.xpIslandOrganic)
                 .zIndex(20)
             }
         }
@@ -93,17 +96,26 @@ struct InstagramView: View {
         xpSourceLabel = source == "card_button" ? "Interaction" : "Action"
 
         xpHideWorkItem?.cancel()
-        withAnimation(.spring(response: 0.35, dampingFraction: 0.82)) {
-            xpIslandVisible = true
+        if xpIslandVisible {
+            withAnimation(.interactiveSpring(response: 0.32, dampingFraction: 0.74, blendDuration: 0.16)) {
+                xpIslandNudge = 0.045
+            }
+            withAnimation(.easeOut(duration: 0.28).delay(0.05)) {
+                xpIslandNudge = 0
+            }
+        } else {
+            withAnimation(.interactiveSpring(response: 0.56, dampingFraction: 0.82, blendDuration: 0.2)) {
+                xpIslandVisible = true
+            }
         }
 
         let workItem = DispatchWorkItem {
-            withAnimation(.easeInOut(duration: 0.22)) {
+            withAnimation(.easeOut(duration: 0.34)) {
                 xpIslandVisible = false
             }
         }
         xpHideWorkItem = workItem
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.1, execute: workItem)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.35, execute: workItem)
     }
 }
 
@@ -198,5 +210,35 @@ private struct XPDynamicIslandView: View {
                 .stroke(Color.white.opacity(0.08), lineWidth: 1)
         )
         .shadow(color: Color.black.opacity(0.45), radius: 20, y: 6)
+    }
+}
+
+private struct XPIslandTransitionModifier: ViewModifier {
+    let opacity: Double
+    let scale: CGFloat
+    let yOffset: CGFloat
+    let blur: CGFloat
+
+    func body(content: Content) -> some View {
+        content
+            .opacity(opacity)
+            .scaleEffect(scale, anchor: .top)
+            .offset(y: yOffset)
+            .blur(radius: blur)
+    }
+}
+
+private extension AnyTransition {
+    static var xpIslandOrganic: AnyTransition {
+        .asymmetric(
+            insertion: .modifier(
+                active: XPIslandTransitionModifier(opacity: 0, scale: 0.78, yOffset: -26, blur: 9),
+                identity: XPIslandTransitionModifier(opacity: 1, scale: 1, yOffset: 0, blur: 0)
+            ),
+            removal: .modifier(
+                active: XPIslandTransitionModifier(opacity: 0, scale: 0.93, yOffset: -12, blur: 6),
+                identity: XPIslandTransitionModifier(opacity: 1, scale: 1, yOffset: 0, blur: 0)
+            )
+        )
     }
 }
