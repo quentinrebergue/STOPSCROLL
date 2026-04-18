@@ -92,11 +92,12 @@ Format bridge v1 (enveloppe unifiee):
 - deduplique dans `library`
 - sauvegarde les chapitres (si nouvel article)
 - met a jour `savedCardIndex` / `savedBookTitle`
-- active le reader
+- met a jour `currentArticleId` puis active le reader
 
 5. Pour garantir le rechargement meme si c est le meme article (meme ID),
-`currentArticleId` est force en deux etapes: `""` puis `bookId` au tick suivant.
-Cela force le `onChange(of: currentArticleId)` dans `BookReaderView`.
+`currentArticleId` est force en deux etapes (`""` puis `bookId`) uniquement
+si on rouvre le meme article. Si c est un nouvel article, `bookId` est pose
+directement avant `showingReader = true` pour eviter le bug du premier clic.
 
 ## 5. Persistance
 
