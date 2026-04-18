@@ -222,3 +222,102 @@ Pour chaque feature ajoutee:
 3. clefs UserDefaults ajoutees
 4. tests unitaires/regression associes
 5. doc `ARCHITECTURE.md` + `BACKLOG.md` + commit dedie
+
+## 9. Decisions UI/UX concretes (questions ouvertes)
+
+### Q1. Ou placer le dashboard dans une app qui tourne sur Instagram ?
+
+Decision:
+1. dashboard principal en natif SwiftUI (pas injecte dans Instagram)
+2. point d entree principal depuis la section utilisateur Instagram via la ligne StopScroll deja injectee
+3. point d entree secondaire depuis `SettingsView` (bouton "Dashboard")
+
+Pourquoi:
+1. robustesse: UI native moins fragile que le DOM Instagram
+2. confidentialite/stockage local plus simple
+3. meilleure fluidite pour graphs et historiques
+
+Integration:
+1. nouveau `StopScroll/Views/DashboardView.swift`
+2. nouveau flag d etat dans `InstagramView`:
+- `@State private var showingDashboard = false`
+3. bridge JS -> Swift:
+- nouveau type `openDashboard`
+4. route actuelle:
+- la ligne StopScroll (top-menu) envoie `openSettings`; dans Sprint Dashboard, elle enverra `openDashboard`
+- fallback: garder `openSettings` si feature flag off
+
+Structure Dashboard (tabs internes):
+1. Objectifs (intentions, budget)
+2. Usage (temps, sessions, risques)
+3. Progression (XP, niveaux, streak)
+
+### Q2. Cohabitation article / livre dans BookReader
+
+Decision:
+1. ne plus avoir un seul contexte "courant" implicite
+2. introduire un switcher explicite en haut du reader
+3. conserver progression separee article vs livre
+
+UX proposee:
+1. segmented control fixe:
+- "Livre"
+- "Article"
+2. sous le segment actif, mini liste recente:
+- dernier livre lu
+- dernier article ouvert
+3. bouton rapide "Retour au livre" depuis un article
+
+Integration:
+1. nouveau modele d etat:
+- `reader_mode = book|article`
+- `lastBookId`
+- `lastArticleId`
+2. evolutions `BookReaderView`:
+- composant `ReaderContextSwitcher`
+- chargement direct selon mode
+3. compat backward:
+- conserver `currentBookId` et `currentArticleId`, mais ajouter couche d orchestration mode
+
+Tests a ajouter:
+1. switch article -> livre conserve index livre
+2. switch livre -> article conserve article courant
+3. fermeture/reouverture reader conserve dernier mode
+
+### Q3. Vrai dashboard (objectifs + usage + XP)
+
+Decision:
+1. dashboard natif unique avec 3 blocs persistants
+2. metrics locales uniquement (MVP sans backend)
+
+Bloc A - Objectifs:
+1. objectif actif du jour
+2. budget de session restant
+3. adherence (respect/non respect)
+
+Bloc B - Usage:
+1. sessions du jour/semaine
+2. temps total et median session
+3. pics de risque (mid/high)
+
+Bloc C - Progression:
+1. niveau actuel
+2. XP totale + progression niveau
+3. streak "sorties reussies"
+
+Integration technique:
+1. events locaux deja prevus dans section 5
+2. nouveau service `DashboardAggregator` (Swift)
+3. calculs en lecture seule a partir de `ss_events` + `ss_xp_total`
+4. refresh au `onAppear` + pull-to-refresh local
+
+MVP visualisation:
+1. cartes KPI (valeur + variation 7 jours)
+2. mini sparkline locale (Swift Charts)
+3. 1 recommandation actionnable en bas de page
+
+## 10. Sprint UX prioritaire recommande
+
+1. Sprint UX-1: Dashboard natif + point entree utilisateur
+2. Sprint UX-2: ReaderContextSwitcher article/livre
+3. Sprint UX-3: Dashboard complet objectifs/usage/XP + recommandations

@@ -25,6 +25,8 @@
 | SS-013 | P1 | Improvement | Alternatives immediates | Actions directes (reader/timer/quit) depuis friction cards | Todo |
 | SS-014 | P2 | Improvement | XP orientee outcomes | Bonus XP pour sorties reussies et respect budget | Todo |
 | SS-015 | P2 | Improvement | Review hebdo actionnable | Ecran hebdo local avec recommandations de regles | Todo |
+| SS-016 | P1 | Improvement | Dashboard natif StopScroll | Vue SwiftUI dedicatee (objectifs, usage, XP) avec entree depuis section utilisateur | Todo |
+| SS-017 | P1 | Improvement | Cohabitation livre/article reader | Switcher explicite Livre/Article + reprise de contexte sans friction | Todo |
 
 ## Idees d amelioration produit
 

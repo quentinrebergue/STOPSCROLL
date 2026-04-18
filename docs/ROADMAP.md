@@ -23,6 +23,10 @@ Spec concrete des prochaines features anti-procrastination:
 - Ajouter logs de debug ciblees (dev mode uniquement)
 - Ajouter compteur local des echecs de fetch article
 
+4. UX anti-procrastination concretes
+- dashboard natif accessible depuis la section utilisateur
+- cohabitation livre/article via switcher explicite dans le reader
+
 ## Next (1-2 mois)
 
 1. Experience lecture
