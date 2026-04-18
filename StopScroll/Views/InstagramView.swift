@@ -29,12 +29,9 @@ struct InstagramView: View {
     @State private var labelsToken = 0
     @AppStorage("ss_xp_total") private var totalXP = 0
     @State private var xpIslandVisible = false
-    @State private var xpIslandPhase: XPIslandPhase = .compact
     @State private var xpLastGain = 0
     @State private var xpSourceLabel = "Action"
     @State private var xpHideWorkItem: DispatchWorkItem?
-    @State private var xpExpandWorkItem: DispatchWorkItem?
-    @State private var xpCompactWorkItem: DispatchWorkItem?
     @State private var xpIslandNudge: CGFloat = 0
 
     var body: some View {
@@ -66,23 +63,31 @@ struct InstagramView: View {
             }
 
             if xpIslandVisible {
-                VStack {
-                    XPDynamicIslandView(
-                        gain: xpLastGain,
-                        sourceLabel: xpSourceLabel,
-                        level: XPProgress.level(for: totalXP),
-                        progress: XPProgress.progress(for: totalXP),
-                        remainingToNextLevel: XPProgress.remainingToNextLevel(for: totalXP),
-                        phase: xpIslandPhase
-                    )
-                    .padding(.top, 8)
-                    .scaleEffect(1 + xpIslandNudge, anchor: .top)
-                    .offset(y: xpIslandNudge * -4)
+                GeometryReader { geo in
+                    let cutoutStyle = XPCutoutStyle.from(topInset: geo.safeAreaInsets.top)
 
-                    Spacer()
+                    VStack(spacing: 0) {
+                        XPCutoutAnchorView(style: cutoutStyle)
+
+                        XPDynamicIslandView(
+                            gain: xpLastGain,
+                            sourceLabel: xpSourceLabel,
+                            level: XPProgress.level(for: totalXP),
+                            progress: XPProgress.progress(for: totalXP),
+                            remainingToNextLevel: XPProgress.remainingToNextLevel(for: totalXP)
+                        )
+                        .padding(.top, 2)
+                        .scaleEffect(1 + xpIslandNudge, anchor: .top)
+                        .offset(y: xpIslandNudge * -3)
+
+                        Spacer(minLength: 0)
+                    }
+                    .padding(.top, max(geo.safeAreaInsets.top - 6, 0))
+                    .frame(maxWidth: .infinity)
                 }
                 .transition(.xpIslandOrganic)
                 .zIndex(20)
+                .allowsHitTesting(false)
             }
         }
         .sheet(isPresented: $showingSettings) {
@@ -100,39 +105,19 @@ struct InstagramView: View {
         xpSourceLabel = source == "card_button" ? "Interaction" : "Action"
 
         xpHideWorkItem?.cancel()
-        xpExpandWorkItem?.cancel()
-        xpCompactWorkItem?.cancel()
 
         if xpIslandVisible {
             withAnimation(.interactiveSpring(response: 0.32, dampingFraction: 0.74, blendDuration: 0.16)) {
-                xpIslandPhase = .expanded
                 xpIslandNudge = 0.045
             }
             withAnimation(.easeOut(duration: 0.28).delay(0.05)) {
                 xpIslandNudge = 0
             }
         } else {
-            xpIslandPhase = .compact
             withAnimation(.interactiveSpring(response: 0.56, dampingFraction: 0.82, blendDuration: 0.2)) {
                 xpIslandVisible = true
             }
         }
-
-        let expandItem = DispatchWorkItem {
-            withAnimation(.interactiveSpring(response: 0.5, dampingFraction: 0.84, blendDuration: 0.2)) {
-                xpIslandPhase = .expanded
-            }
-        }
-        xpExpandWorkItem = expandItem
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: expandItem)
-
-        let compactItem = DispatchWorkItem {
-            withAnimation(.interactiveSpring(response: 0.42, dampingFraction: 0.9, blendDuration: 0.16)) {
-                xpIslandPhase = .compact
-            }
-        }
-        xpCompactWorkItem = compactItem
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.72, execute: compactItem)
 
         let workItem = DispatchWorkItem {
             withAnimation(.easeOut(duration: 0.34)) {
@@ -140,7 +125,7 @@ struct InstagramView: View {
             }
         }
         xpHideWorkItem = workItem
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5, execute: workItem)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.15, execute: workItem)
     }
 }
 
@@ -182,24 +167,19 @@ private struct XPDynamicIslandView: View {
     let level: Int
     let progress: Double
     let remainingToNextLevel: Int
-    let phase: XPIslandPhase
 
     var body: some View {
-        let isExpanded = phase == .expanded
-
-        return VStack(alignment: .leading, spacing: isExpanded ? 8 : 5) {
+        VStack(alignment: .leading, spacing: 5) {
             HStack(alignment: .firstTextBaseline, spacing: 8) {
                 Text("+\(gain) XP")
-                    .font(.system(size: isExpanded ? 16 : 14, weight: .bold, design: .rounded))
+                    .font(.system(size: 14, weight: .bold, design: .rounded))
                     .foregroundColor(.white)
-                if isExpanded {
-                    Text(sourceLabel)
-                        .font(.system(size: 12, weight: .semibold, design: .rounded))
-                        .foregroundColor(Color.white.opacity(0.72))
-                }
+                Text(sourceLabel)
+                    .font(.system(size: 11, weight: .semibold, design: .rounded))
+                    .foregroundColor(Color.white.opacity(0.72))
                 Spacer(minLength: 6)
                 Text("Lv \(level)")
-                    .font(.system(size: isExpanded ? 12 : 11, weight: .semibold, design: .rounded))
+                    .font(.system(size: 11, weight: .semibold, design: .rounded))
                     .foregroundColor(Color(red: 0.53, green: 0.88, blue: 1.0))
             }
 
@@ -222,32 +202,58 @@ private struct XPDynamicIslandView: View {
                         .frame(width: geo.size.width * clamped)
                 }
             }
-            .frame(height: isExpanded ? 8 : 6)
+            .frame(height: 6)
 
-            if isExpanded {
-                Text("\(remainingToNextLevel) XP before next level")
-                    .font(.system(size: 11, weight: .medium, design: .rounded))
-                    .foregroundColor(Color.white.opacity(0.62))
-            }
+            Text("\(remainingToNextLevel) XP")
+                .font(.system(size: 10, weight: .medium, design: .rounded))
+                .foregroundColor(Color.white.opacity(0.62))
         }
-        .padding(.horizontal, isExpanded ? 16 : 14)
-        .padding(.vertical, isExpanded ? 12 : 10)
-        .frame(width: isExpanded ? 320 : 178)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .frame(width: 186)
         .background(
-            RoundedRectangle(cornerRadius: isExpanded ? 24 : 20, style: .continuous)
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
                 .fill(Color.black.opacity(0.88))
         )
         .overlay(
-            RoundedRectangle(cornerRadius: isExpanded ? 24 : 20, style: .continuous)
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
                 .stroke(Color.white.opacity(0.08), lineWidth: 1)
         )
         .shadow(color: Color.black.opacity(0.45), radius: 20, y: 6)
     }
 }
 
-private enum XPIslandPhase {
-    case compact
-    case expanded
+private enum XPCutoutStyle {
+    case dynamicIsland
+    case notch
+
+    static func from(topInset: CGFloat) -> XPCutoutStyle {
+        topInset >= 55 ? .dynamicIsland : .notch
+    }
+}
+
+private struct XPCutoutAnchorView: View {
+    let style: XPCutoutStyle
+
+    var body: some View {
+        Group {
+            if style == .dynamicIsland {
+                Capsule(style: .continuous)
+                    .fill(Color.black)
+                    .frame(width: 126, height: 36)
+            } else {
+                RoundedRectangle(cornerRadius: 13, style: .continuous)
+                    .fill(Color.black)
+                    .frame(width: 168, height: 30)
+            }
+        }
+        .overlay(
+            Rectangle()
+                .fill(Color.black)
+                .frame(width: style == .dynamicIsland ? 126 : 168, height: 14)
+                .offset(y: -14)
+        )
+    }
 }
 
 private struct XPIslandTransitionModifier: ViewModifier {
