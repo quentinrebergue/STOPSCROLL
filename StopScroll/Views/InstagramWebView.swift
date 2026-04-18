@@ -131,6 +131,9 @@ struct InstagramWebView: UIViewRepresentable {
         }
         if context.coordinator.lastNativeNavCommandToken != nativeNavCommandToken {
             context.coordinator.lastNativeNavCommandToken = nativeNavCommandToken
+            guard selectedNativeTab != "book", selectedNativeTab != "dashboard" else {
+                return
+            }
             let tab = selectedNativeTab
                 .replacingOccurrences(of: "\\", with: "\\\\")
                 .replacingOccurrences(of: "'", with: "\\'")

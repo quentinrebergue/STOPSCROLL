@@ -40,6 +40,7 @@ struct InstagramView: View {
     @State private var nativeSelectedTab: String = "home"
     @State private var nativeMessageBadgeCount: Int = 0
     @State private var nativeNavCommandToken: Int = 0
+    @State private var showControlCenterChooser = false
 
     var body: some View {
         ZStack {
@@ -112,6 +113,14 @@ struct InstagramView: View {
                         selectedTab: nativeSelectedTab,
                         messageBadgeCount: nativeMessageBadgeCount,
                         onSelectTab: { tab in
+                            if tab == "book" {
+                                showingReader = true
+                                return
+                            }
+                            if tab == "dashboard" {
+                                showControlCenterChooser = true
+                                return
+                            }
                             nativeSelectedTab = tab
                             nativeNavCommandToken += 1
                         }
@@ -134,6 +143,15 @@ struct InstagramView: View {
             DashboardView(onDismiss: {
                 showingDashboard = false
             })
+        }
+        .confirmationDialog("StopScroll", isPresented: $showControlCenterChooser, titleVisibility: .visible) {
+            Button("Dashboard") {
+                showingDashboard = true
+            }
+            Button("Parametres") {
+                showingSettings = true
+            }
+            Button("Cancel", role: .cancel) {}
         }
     }
 
@@ -212,7 +230,9 @@ private struct NativeInstagramTabBar: View {
         HStack(spacing: 2) {
             tabButton(id: "home", icon: "house")
             tabButton(id: "search", icon: "magnifyingglass")
+            tabButton(id: "book", icon: "book.closed")
             tabButton(id: "messages", icon: "paperplane", badge: messageBadgeCount)
+            tabButton(id: "dashboard", icon: "square.grid.2x2")
             tabButton(id: "activity", icon: "heart")
             tabButton(id: "profile", icon: "person.crop.circle")
         }

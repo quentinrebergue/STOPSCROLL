@@ -6,6 +6,8 @@
   const dom = ns.dom;
   const constants = ns.constants;
   const HIDE_NAV_ATTR = 'data-ss-hidden-native-nav';
+  const HIDE_NAV_PARENT_ATTR = 'data-ss-hidden-native-nav-parent';
+  const STYLE_ID = 'ss-native-nav-hide-style';
 
   let lastSentTab = '';
   let lastSentMessageBadge = -1;
@@ -66,7 +68,10 @@
       const link = links[i];
       const path = pathFromHref(link.getAttribute('href') || link.href || '');
 
-      if (tab === 'profile' && isProfilePath(path)) return link;
+      if (tab === 'profile') {
+        if (link.querySelector('img')) return link;
+        if (isProfilePath(path)) return link;
+      }
 
       const paths = tabPaths[tab] || [];
       for (let k = 0; k < paths.length; k++) {
@@ -126,17 +131,39 @@
       search: '/explore/',
       messages: '/direct/inbox/',
       activity: '/accounts/activity/',
-      profile: '/accounts/edit/'
+      profile: null
     };
     const fallback = fallbackPaths[tab];
     if (fallback) {
       global.location.href = fallback;
       return true;
     }
+
+    if (tab === 'profile') {
+      // Last-resort profile fallback: try to infer username from current path.
+      const path = normalizePath(global.location.pathname);
+      if (isProfilePath(path)) {
+        global.location.href = path + '/';
+        return true;
+      }
+    }
+
     return false;
   }
 
+  function ensureHideStyle() {
+    if (document.getElementById(STYLE_ID)) return;
+    const style = document.createElement('style');
+    style.id = STYLE_ID;
+    style.textContent = [
+      'nav[' + HIDE_NAV_ATTR + '="1"]{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important;}',
+      '[' + HIDE_NAV_PARENT_ATTR + '="1"]{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important;}'
+    ].join('\n');
+    (document.head || document.documentElement).appendChild(style);
+  }
+
   function hideInstagramNativeNav() {
+    ensureHideStyle();
     const navs = document.querySelectorAll('nav');
     navs.forEach(function (nav) {
       const links = nav.querySelectorAll('a[href]');
@@ -153,6 +180,20 @@
         nav.style.setProperty('display', 'none', 'important');
         nav.style.setProperty('visibility', 'hidden', 'important');
         nav.style.setProperty('pointer-events', 'none', 'important');
+
+        let parent = nav.parentElement;
+        let depth = 0;
+        while (parent && depth < 4) {
+          const isFixed = global.getComputedStyle(parent).position === 'fixed';
+          if (isFixed || parent.tagName === 'FOOTER') {
+            parent.setAttribute(HIDE_NAV_PARENT_ATTR, '1');
+            parent.style.setProperty('display', 'none', 'important');
+            parent.style.setProperty('visibility', 'hidden', 'important');
+            parent.style.setProperty('pointer-events', 'none', 'important');
+          }
+          parent = parent.parentElement;
+          depth += 1;
+        }
       }
     });
   }
