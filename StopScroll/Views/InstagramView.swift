@@ -1,5 +1,25 @@
 import SwiftUI
 
+enum XPProgress {
+    static let xpPerLevel = 100
+
+    static func level(for totalXP: Int) -> Int {
+        max(1, (max(totalXP, 0) / xpPerLevel) + 1)
+    }
+
+    static func xpInCurrentLevel(for totalXP: Int) -> Int {
+        max(totalXP, 0) % xpPerLevel
+    }
+
+    static func progress(for totalXP: Int) -> Double {
+        Double(xpInCurrentLevel(for: totalXP)) / Double(xpPerLevel)
+    }
+
+    static func remainingToNextLevel(for totalXP: Int) -> Int {
+        xpPerLevel - xpInCurrentLevel(for: totalXP)
+    }
+}
+
 struct InstagramView: View {
     @State private var isLoading = true
     @State private var showingReader = false
@@ -7,6 +27,11 @@ struct InstagramView: View {
     @State private var showingSettings = false
     /// Incremented when the user closes Settings so the WebView re-injects the updated label list.
     @State private var labelsToken = 0
+    @AppStorage("ss_xp_total") private var totalXP = 0
+    @State private var xpIslandVisible = false
+    @State private var xpLastGain = 0
+    @State private var xpSourceLabel = "Action"
+    @State private var xpHideWorkItem: DispatchWorkItem?
 
     var body: some View {
         ZStack {
@@ -15,7 +40,10 @@ struct InstagramView: View {
                 showingReader: $showingReader,
                 showingSettings: $showingSettings,
                 reloadToken: $reloadToken,
-                labelsToken: $labelsToken
+                labelsToken: $labelsToken,
+                onGrantXP: { amount, source in
+                    grantXP(amount: amount, source: source)
+                }
             )
             .ignoresSafeArea(edges: .bottom)
 
@@ -32,6 +60,23 @@ struct InstagramView: View {
                 .background(Color.black.ignoresSafeArea())
                 .transition(.opacity)
             }
+
+            if xpIslandVisible {
+                VStack {
+                    XPDynamicIslandView(
+                        gain: xpLastGain,
+                        sourceLabel: xpSourceLabel,
+                        level: XPProgress.level(for: totalXP),
+                        progress: XPProgress.progress(for: totalXP),
+                        remainingToNextLevel: XPProgress.remainingToNextLevel(for: totalXP)
+                    )
+                    .padding(.top, 8)
+
+                    Spacer()
+                }
+                .transition(.move(edge: .top).combined(with: .opacity))
+                .zIndex(20)
+            }
         }
         .sheet(isPresented: $showingSettings) {
             SettingsView(onDismiss: {
@@ -39,6 +84,26 @@ struct InstagramView: View {
                 labelsToken += 1  // triggers label re-injection into the live WebView
             })
         }
+    }
+
+    private func grantXP(amount: Int, source: String) {
+        let safeAmount = min(max(amount, 1), 200)
+        totalXP += safeAmount
+        xpLastGain = safeAmount
+        xpSourceLabel = source == "card_button" ? "Interaction" : "Action"
+
+        xpHideWorkItem?.cancel()
+        withAnimation(.spring(response: 0.35, dampingFraction: 0.82)) {
+            xpIslandVisible = true
+        }
+
+        let workItem = DispatchWorkItem {
+            withAnimation(.easeInOut(duration: 0.22)) {
+                xpIslandVisible = false
+            }
+        }
+        xpHideWorkItem = workItem
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.1, execute: workItem)
     }
 }
 
@@ -71,5 +136,67 @@ private struct LoadingBar: View {
                 animating = true
             }
         }
+    }
+}
+
+private struct XPDynamicIslandView: View {
+    let gain: Int
+    let sourceLabel: String
+    let level: Int
+    let progress: Double
+    let remainingToNextLevel: Int
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                Text("+\(gain) XP")
+                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                    .foregroundColor(.white)
+                Text(sourceLabel)
+                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .foregroundColor(Color.white.opacity(0.72))
+                Spacer(minLength: 6)
+                Text("Lv \(level)")
+                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .foregroundColor(Color(red: 0.53, green: 0.88, blue: 1.0))
+            }
+
+            GeometryReader { geo in
+                let clamped = max(0.0, min(1.0, progress))
+                ZStack(alignment: .leading) {
+                    Capsule()
+                        .fill(Color.white.opacity(0.14))
+                    Capsule()
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    Color(red: 0.40, green: 0.87, blue: 1.0),
+                                    Color(red: 0.53, green: 1.0, blue: 0.68)
+                                ],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .frame(width: geo.size.width * clamped)
+                }
+            }
+            .frame(height: 8)
+
+            Text("\(remainingToNextLevel) XP before next level")
+                .font(.system(size: 11, weight: .medium, design: .rounded))
+                .foregroundColor(Color.white.opacity(0.62))
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .frame(maxWidth: 320)
+        .background(
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .fill(Color.black.opacity(0.88))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .stroke(Color.white.opacity(0.08), lineWidth: 1)
+        )
+        .shadow(color: Color.black.opacity(0.45), radius: 20, y: 6)
     }
 }

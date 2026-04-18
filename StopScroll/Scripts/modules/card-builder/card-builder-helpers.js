@@ -35,6 +35,9 @@
     btn.addEventListener('click', function (event) {
       event.preventDefault();
       event.stopPropagation();
+      if (ns.dom && ns.dom.postToBridge) {
+        ns.dom.postToBridge({ type: 'grantXP', amount: 12, source: 'card_button' });
+      }
       handler(event);
     });
     return btn;

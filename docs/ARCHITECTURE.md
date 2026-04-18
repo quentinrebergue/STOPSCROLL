@@ -158,3 +158,9 @@ Destination de test recommandee dans ce repo:
 6. Ouverture article (premier clic):
 - ordre d execution renforce cote native: ecriture `currentArticleId` / `currentArticleOpenToken` avant presentation du reader
 - `BookReaderView` lit l ID article depuis `UserDefaults` au chargement pour eviter une ouverture vide liee a une propagation tardive de `@AppStorage`
+
+7. Dynamic Island XP (natif app):
+- affichage SwiftUI overlay dans `InstagramView` (pas injecte dans le DOM Instagram)
+- un nouveau message bridge `grantXP` remonte les interactions boutons des cartes injectees
+- persistance locale `ss_xp_total` + progression par niveau (100 XP / niveau)
+- premiere integration: tap sur bouton de carte injectee => `+12 XP` + barre de progression

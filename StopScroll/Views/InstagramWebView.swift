@@ -9,6 +9,7 @@ struct InstagramWebView: UIViewRepresentable {
     @Binding var reloadToken: Int
     /// Incremented by InstagramView when AppSettings.adLabels changes; triggers re-injection.
     @Binding var labelsToken: Int
+    var onGrantXP: (Int, String) -> Void = { _, _ in }
 
     /// Module scripts injected in dependency order before the bootstrap.
     private static let moduleScripts: [String] = [
@@ -310,6 +311,14 @@ struct InstagramWebView: UIViewRepresentable {
                 fetchGuardianArticle()
                 return true
             }
+            if type == "grantXP" {
+                let amount = Self.parseXPAmount(payload["amount"])
+                let source = (payload["source"] as? String) ?? "action"
+                DispatchQueue.main.async {
+                    self.parent.onGrantXP(amount, source)
+                }
+                return true
+            }
             if type == "openGuardianArticle",
                let urlString = payload["url"] as? String,
                let title = payload["title"] as? String {
@@ -317,6 +326,13 @@ struct InstagramWebView: UIViewRepresentable {
                 return true
             }
             return false
+        }
+
+        static func parseXPAmount(_ value: Any?) -> Int {
+            if let intValue = value as? Int { return intValue }
+            if let doubleValue = value as? Double { return Int(doubleValue.rounded()) }
+            if let stringValue = value as? String, let intValue = Int(stringValue) { return intValue }
+            return 10
         }
 
         private func bridgeResponse(

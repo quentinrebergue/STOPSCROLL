@@ -344,3 +344,22 @@ final class ArticleFirstClickTimingTests: XCTestCase {
         XCTAssertEqual(resolved, "article-7")
     }
 }
+
+final class XPProgressTests: XCTestCase {
+
+    func testXPProgressLevelAndRemainder() {
+        XCTAssertEqual(XPProgress.level(for: 0), 1)
+        XCTAssertEqual(XPProgress.level(for: 99), 1)
+        XCTAssertEqual(XPProgress.level(for: 100), 2)
+
+        XCTAssertEqual(XPProgress.xpInCurrentLevel(for: 142), 42)
+        XCTAssertEqual(XPProgress.remainingToNextLevel(for: 142), 58)
+    }
+
+    func testParseXPAmountSupportsCommonPayloadTypes() {
+        XCTAssertEqual(InstagramWebView.Coordinator.parseXPAmount(15), 15)
+        XCTAssertEqual(InstagramWebView.Coordinator.parseXPAmount(12.6), 13)
+        XCTAssertEqual(InstagramWebView.Coordinator.parseXPAmount("9"), 9)
+        XCTAssertEqual(InstagramWebView.Coordinator.parseXPAmount(nil), 10)
+    }
+}
