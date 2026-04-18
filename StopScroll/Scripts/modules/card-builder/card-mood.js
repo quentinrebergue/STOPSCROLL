@@ -5,6 +5,7 @@
   var ns = (global.StopScroll = global.StopScroll || {});
   var cb = ns.cardBuilder;
   var FONT = cb.FONT;
+  var postToBridge = ns.dom && ns.dom.postToBridge;
 
   function buildMoodCard(config) {
     var t       = config.card_templates || {};
@@ -133,6 +134,9 @@
       btn.addEventListener('click', function (event) {
         event.preventDefault();
         event.stopPropagation();
+        if (postToBridge) {
+          postToBridge({ type: 'grantXP', amount: 12, source: 'card_button' });
+        }
         cb.burstParticles(btn);
         setTimeout(function () {
           selectedLabel.textContent  = answer.text;
@@ -148,6 +152,9 @@
     undoBtn.addEventListener('click', function (event) {
       event.preventDefault();
       event.stopPropagation();
+      if (postToBridge) {
+        postToBridge({ type: 'grantXP', amount: 12, source: 'card_button' });
+      }
       resultView.style.display  = 'none';
       answersView.style.display = 'flex';
     });

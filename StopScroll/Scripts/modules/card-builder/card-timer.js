@@ -235,6 +235,9 @@
       btn.addEventListener('click', function (event) {
         event.preventDefault();
         event.stopPropagation();
+        if (postToBridge) {
+          postToBridge({ type: 'grantXP', amount: 12, source: 'card_button' });
+        }
         activateTimer(time, hhmm(time), btn);
       });
 
@@ -244,6 +247,9 @@
     undoBtn.addEventListener('click', function (event) {
       event.preventDefault();
       event.stopPropagation();
+      if (postToBridge) {
+        postToBridge({ type: 'grantXP', amount: 12, source: 'card_button' });
+      }
       window.__STOPSCROLL_TIMER = null;
       if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
       titleEl.textContent = t.timer_title || 'Set a timer';

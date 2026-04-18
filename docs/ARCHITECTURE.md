@@ -163,4 +163,4 @@ Destination de test recommandee dans ce repo:
 - affichage SwiftUI overlay dans `InstagramView` (pas injecte dans le DOM Instagram)
 - un nouveau message bridge `grantXP` remonte les interactions boutons des cartes injectees
 - persistance locale `ss_xp_total` + progression par niveau (100 XP / niveau)
-- premiere integration: tap sur bouton de carte injectee => `+12 XP` + barre de progression
+- couverture etendue: tous les boutons des cards injectees (metrics, book, culture, mood, timer, stop, fallback legacy) donnent `+12 XP`
