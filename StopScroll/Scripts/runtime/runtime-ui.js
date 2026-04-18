@@ -8,7 +8,6 @@
     ns.nav.cleanReels();
     ns.topMenu.injectTopMenu();
     ns.nav.cleanLegacyReloadButton();
-    ns.nav.hideInstagramNativeNav();
     ns.nav.syncNativeNavState();
   }
 

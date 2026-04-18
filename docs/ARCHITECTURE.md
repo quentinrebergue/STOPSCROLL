@@ -185,14 +185,14 @@ Destination de test recommandee dans ce repo:
 
 10. Navbar native synchronisee Instagram
 - une barre native SwiftUI overlay remplace visuellement la barre Instagram
-- le runtime JS masque la navbar Instagram detectee dans le DOM
 - synchronisation etat onglet actif -> natif via bridge (`nativeNavState`)
 - synchronisation badge messages -> natif via bridge (`messageBadge`)
-- navigation natif -> WebView via commande JS `nativeNavigateToTab(...)`
+- navigation natif -> WebView via trigger des boutons Instagram (dispatch events DOM sur les liens de nav)
 - sections supportees en V1: home, search, messages, activity, profile
 
 11. Ajustements UX navbar native
 - icone livre restauree dans la barre native (ouvre `BookReaderView` en natif)
 - icone dashboard ajoutee dans la barre native avec acces Dashboard + Parametres app
 - correction routage profil: priorite au lien avatar/profil Instagram (evite redirection vers edit settings)
-- masquage Instagram renforce: cache nav + conteneurs fixes parents pour eviter la barre visible en arriere-plan
+- sans injection CSS de masquage: la webview est etendue vers le bas pour sortir la navbar Instagram de la zone visible
+- icone coeur retiree de la barre native

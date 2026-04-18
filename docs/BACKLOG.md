@@ -30,6 +30,7 @@
 | SS-018 | P2 | Improvement | Actions rapides bibliotheque reader | Tap direct pour ouvrir + swipe natif delete/reset/rename dans Settings reader | Done |
 | SS-019 | P1 | Improvement | Navbar native synchronisee | Barre native, badge messages, masquage navbar Instagram, navigation onglets vers WebView | Done |
 | SS-020 | P1 | Improvement | Navbar native polish UX | Restauration icone livre, hub dashboard/settings, profil corrige, masquage nav Instagram renforce | Done |
+| SS-021 | P1 | Improvement | Navbar native strategy shift | Trigger boutons Instagram (pas de page forcee), hide nav via layout WebView, suppression icone coeur | Done |
 
 ## Idees d amelioration produit
 

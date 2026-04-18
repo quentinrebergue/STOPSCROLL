@@ -58,6 +58,9 @@ struct InstagramView: View {
                     grantXP(amount: amount, source: source)
                 }
             )
+            // Extend the webview below the bottom edge so Instagram's bottom nav
+            // stays outside of the visible area behind our native bar.
+            .padding(.bottom, -76)
             .ignoresSafeArea(edges: .bottom)
 
             BookReaderView(onDismiss: { showingReader = false })
@@ -233,7 +236,6 @@ private struct NativeInstagramTabBar: View {
             tabButton(id: "book", icon: "book.closed")
             tabButton(id: "messages", icon: "paperplane", badge: messageBadgeCount)
             tabButton(id: "dashboard", icon: "square.grid.2x2")
-            tabButton(id: "activity", icon: "heart")
             tabButton(id: "profile", icon: "person.crop.circle")
         }
         .padding(.horizontal, 10)
