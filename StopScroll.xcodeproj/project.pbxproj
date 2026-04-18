@@ -27,6 +27,7 @@
 		26286AE36E3383D42914218D /* constants.js in Resources */ = {isa = PBXBuildFile; fileRef = 426826A738B07C445AB3F826 /* constants.js */; };
 		2656A10B9F5D592B94197708 /* tracking.js in Resources */ = {isa = PBXBuildFile; fileRef = 2AE21283A700ADC65F40A964 /* tracking.js */; };
 		WK01A000000000000000B001 /* wikipedia.js in Resources */ = {isa = PBXBuildFile; fileRef = WK01F000000000000000B001 /* wikipedia.js */; };
+		GD01A000000000000000C001 /* guardian.js in Resources */ = {isa = PBXBuildFile; fileRef = GD01F000000000000000C001 /* guardian.js */; };
 		3DFB4A28B148B1DFFC2C66EA /* EPUBParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BD4C6C201D9F5F16A434A29 /* EPUBParser.swift */; };
 		4730F705C47912493598425B /* ReadingMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF11588F033C75B560C0FFC8 /* ReadingMode.swift */; };
 		4DE917A22D9B670A345EBF68 /* MiniZIP.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3511D2DC94E15A5FB361C282 /* MiniZIP.swift */; };
@@ -56,6 +57,7 @@
 		DA53C6993F4764F522EF04FF /* le-petit-prince.epub in Resources */ = {isa = PBXBuildFile; fileRef = 21B81C876FDD84E814F5A389 /* le-petit-prince.epub */; };
 		E6D38C57ACFC342FFCE57D67 /* card-logic.js in Resources */ = {isa = PBXBuildFile; fileRef = 25FF4AF8D9F7E63AB024811A /* card-logic.js */; };
 		EB23AA3BFD54DE2E2E8C7F47 /* BookParserEPUBTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49830F744711A2144EE7185B /* BookParserEPUBTests.swift */; };
+		GA01B000000000000000C001 /* GuardianAPITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = GA01F000000000000000C001 /* GuardianAPITests.swift */; };
 		F02FAA985CC67A6BEAE1E355 /* dorian-gray.epub in Resources */ = {isa = PBXBuildFile; fileRef = 9A79C980F9AD98BD101601E9 /* dorian-gray.epub */; };
 		F0AA0D272D88F462AF10C5A0 /* top-menu.js in Resources */ = {isa = PBXBuildFile; fileRef = 9BA157D7898D2DA526AFDCB1 /* top-menu.js */; };
 		7484628AC4F24FC3A62D0BEE /* session-stats.js in Resources */ = {isa = PBXBuildFile; fileRef = 459D5381A32D4A489B570713 /* session-stats.js */; };
@@ -90,6 +92,7 @@
 		25FF4AF8D9F7E63AB024811A /* card-logic.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "card-logic.js"; sourceTree = "<group>"; };
 		2AE21283A700ADC65F40A964 /* tracking.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = tracking.js; sourceTree = "<group>"; };
 		WK01F000000000000000B001 /* wikipedia.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "wikipedia.js"; sourceTree = "<group>"; };
+		GD01F000000000000000C001 /* guardian.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "guardian.js"; sourceTree = "<group>"; };
 		2BD4C6C201D9F5F16A434A29 /* EPUBParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EPUBParser.swift; sourceTree = "<group>"; };
 		31DB646D651FFA19E393C1F3 /* 1984.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = 1984.json; sourceTree = "<group>"; };
 		3511D2DC94E15A5FB361C282 /* MiniZIP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniZIP.swift; sourceTree = "<group>"; };
@@ -99,6 +102,7 @@
 		43A0650330F1551DE7DD9680 /* BookCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookCard.swift; sourceTree = "<group>"; };
 		47C612B0F7A1DCD29ADBEEF9 /* scroll-lock.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "scroll-lock.js"; sourceTree = "<group>"; };
 		49830F744711A2144EE7185B /* BookParserEPUBTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookParserEPUBTests.swift; sourceTree = "<group>"; };
+		GA01F000000000000000C001 /* GuardianAPITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuardianAPITests.swift; sourceTree = "<group>"; };
 		4F8E5453518C42B23702CCBB /* StopScrollApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StopScrollApp.swift; sourceTree = "<group>"; };
 		5B8AD3F66D765FAD4883A275 /* nav-management.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "nav-management.js"; sourceTree = "<group>"; };
 		5C66F51A6E14B547DFE57A28 /* ad-detection.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "ad-detection.js"; sourceTree = "<group>"; };
@@ -177,6 +181,7 @@
 			isa = PBXGroup;
 			children = (
 				49830F744711A2144EE7185B /* BookParserEPUBTests.swift */,
+				GA01F000000000000000C001 /* GuardianAPITests.swift */,
 				8D621B9E95F4CDC4E78C462C /* TestHelpers.swift */,
 				002F22D747E63E13E20EF310 /* Fixtures */,
 			);
@@ -304,6 +309,7 @@
 				459D5381A32D4A489B570713 /* session-stats.js */,
 				2AE21283A700ADC65F40A964 /* tracking.js */,
 				WK01F000000000000000B001 /* wikipedia.js */,
+				GD01F000000000000000C001 /* guardian.js */,
 			);
 			path = modules;
 			sourceTree = "<group>";
@@ -483,6 +489,7 @@
 				7484628AC4F24FC3A62D0BEE /* session-stats.js in Resources */,
 				2656A10B9F5D592B94197708 /* tracking.js in Resources */,
 				WK01A000000000000000B001 /* wikipedia.js in Resources */,
+				GD01A000000000000000C001 /* guardian.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -514,6 +521,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EB23AA3BFD54DE2E2E8C7F47 /* BookParserEPUBTests.swift in Sources */,
+				GA01B000000000000000C001 /* GuardianAPITests.swift in Sources */,
 				FF2BE8CECF7504888ABD0C9D /* TestHelpers.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

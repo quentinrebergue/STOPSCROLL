@@ -18,6 +18,7 @@ struct InstagramWebView: UIViewRepresentable {
         "scroll-lock",
         "card-logic",
         "wikipedia",
+        "guardian",
         // card-builder sub-modules (helpers first, index last)
         "card-builder-helpers",
         "card-metrics",
@@ -133,7 +134,11 @@ struct InstagramWebView: UIViewRepresentable {
         let jsonData = (try? JSONSerialization.data(withJSONObject: labels)) ?? Data()
         let json = String(data: jsonData, encoding: .utf8) ?? "[]"
         let freq = AppSettings.shared.injectionFrequency
-        return "window.__STOPSCROLL_AD_LABELS = \(json); window.__STOPSCROLL_FREQUENCY = \(freq);"
+        let sources = Array(AppSettings.shared.articleSources)
+        let srcData = (try? JSONSerialization.data(withJSONObject: sources)) ?? Data()
+        let srcJson = String(data: srcData, encoding: .utf8) ?? "[]"
+        let devMode = AppSettings.shared.devMode ? "true" : "false"
+        return "window.__STOPSCROLL_AD_LABELS = \(json); window.__STOPSCROLL_FREQUENCY = \(freq); window.__STOPSCROLL_ARTICLE_SOURCES = \(srcJson); window.__STOPSCROLL_DEV_MODE = \(devMode);"
     }
 
     private func buildYAMLInjectionScript() -> String? {
@@ -222,117 +227,452 @@ struct InstagramWebView: UIViewRepresentable {
         }
 
         private func handleBridgeMessage(_ body: Any) {
-            if let action = body as? String, action == "reloadFeed" {
-                DispatchQueue.main.async { self.webView?.reload() }
+            if let action = body as? String {
+                let handled = dispatchBridgeAction(type: action, payload: [:])
+                if !handled {
+                    print("[StopScroll] Unknown bridge action: \(action)")
+                }
                 return
             }
-            if let dict = body as? [String: Any],
-               let type = dict["type"] as? String {
-                if type == "openSettings" {
-                    DispatchQueue.main.async { self.parent.showingSettings = true }
+
+            guard let dict = body as? [String: Any],
+                  let type = dict["type"] as? String else {
+                print("[StopScroll] Invalid bridge message payload")
+                return
+            }
+
+            let requestId = dict["id"] as? String
+            let payload = (dict["payload"] as? [String: Any]) ?? dict
+            let handled = dispatchBridgeAction(type: type, payload: payload)
+
+            if handled {
+                bridgeResponse(ok: true, requestId: requestId, type: type)
+            } else {
+                bridgeResponse(
+                    ok: false,
+                    requestId: requestId,
+                    type: type,
+                    code: "unknown_action",
+                    message: "Unknown bridge action \(type)"
+                )
+            }
+        }
+
+        private func dispatchBridgeAction(type: String, payload: [String: Any]) -> Bool {
+            if type == "reloadFeed" {
+                DispatchQueue.main.async { self.webView?.reload() }
+                return true
+            }
+            if type == "openSettings" {
+                DispatchQueue.main.async { self.parent.showingSettings = true }
+                return true
+            }
+            if type == "setTimer",
+               let minutes = payload["minutes"] as? Int {
+                let label = payload["label"] as? String ?? "Time's up"
+                scheduleTimerNotification(minutes: minutes, label: label)
+                return true
+            }
+            if type == "cancelTimer" {
+                UNUserNotificationCenter.current()
+                    .removePendingNotificationRequests(withIdentifiers: ["stopscroll-timer"])
+                return true
+            }
+            if type == "language",
+               let lang = payload["value"] as? String {
+                AppSettings.shared.seedLabels(forLanguage: lang)
+                DispatchQueue.main.async {
+                    self.webView?.evaluateJavaScript(self.parent.buildLabelsInjectionScript())
+                }
+                return true
+            }
+            if type == "openArticle",
+               let title = payload["title"] as? String {
+                let lang = (payload["lang"] as? String) ?? "en"
+                fetchFullArticleAndOpen(title: title, lang: lang)
+                return true
+            }
+            if type == "fetchArticle" {
+                let lang = (payload["lang"] as? String) ?? "en"
+                fetchWikipediaArticle(lang: lang)
+                return true
+            }
+            if type == "fetchGuardianArticle" {
+                fetchGuardianArticle()
+                return true
+            }
+            if type == "openGuardianArticle",
+               let urlString = payload["url"] as? String,
+               let title = payload["title"] as? String {
+                fetchGuardianFullArticleAndOpen(urlString: urlString, title: title)
+                return true
+            }
+            return false
+        }
+
+        private func bridgeResponse(
+            ok: Bool,
+            requestId: String?,
+            type: String,
+            code: String? = nil,
+            message: String? = nil
+        ) {
+            guard let requestId, !requestId.isEmpty else { return }
+
+            var payload: [String: Any] = [
+                "ok": ok,
+                "requestId": requestId,
+                "type": type,
+                "ts": Int(Date().timeIntervalSince1970 * 1000)
+            ]
+            if let code { payload["code"] = code }
+            if let message { payload["message"] = message }
+
+            guard let data = try? JSONSerialization.data(withJSONObject: payload),
+                  let json = String(data: data, encoding: .utf8) else { return }
+
+            let escaped = json
+                .replacingOccurrences(of: "\\", with: "\\\\")
+                .replacingOccurrences(of: "'", with: "\\'")
+            let js = "(function(){var ns=window.StopScroll;if(ns&&ns.dom&&ns.dom._onNativeBridgeResult){ns.dom._onNativeBridgeResult(JSON.parse('\\(escaped)'));}})();"
+
+            DispatchQueue.main.async {
+                self.webView?.evaluateJavaScript(js)
+            }
+        }
+
+        /// Fetch a curated Wikipedia article (featured or "on this day") and inject it into JS.
+        private func fetchWikipediaArticle(lang: String) {
+            let safeLang = String(lang.prefix(5).filter { $0.isLetter })
+
+            // Use the "featured" endpoint which returns the daily featured article,
+            // most-read articles, and "on this day" — all editorially curated.
+            let now = Date()
+            let cal = Calendar.current
+            let y = cal.component(.year, from: now)
+            let m = String(format: "%02d", cal.component(.month, from: now))
+            let d = String(format: "%02d", cal.component(.day, from: now))
+            let urlString = "https://\(safeLang).wikipedia.org/api/rest_v1/feed/featured/\(y)/\(m)/\(d)"
+            guard let url = URL(string: urlString) else {
+                // Fallback to random summary
+                fetchRandomWikipediaArticle(lang: safeLang)
+                return
+            }
+
+            URLSession.shared.dataTask(with: url) { [weak self] data, _, error in
+                guard let data = data, error == nil,
+                      let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+                    // Fallback to random summary
+                    self?.fetchRandomWikipediaArticle(lang: safeLang)
                     return
                 }
-                if type == "setTimer",
-                   let minutes = dict["minutes"] as? Int {
-                    let label = dict["label"] as? String ?? "Time's up"
-                    scheduleTimerNotification(minutes: minutes, label: label)
-                    return
-                }
-                if type == "cancelTimer" {
-                    UNUserNotificationCenter.current()
-                        .removePendingNotificationRequests(withIdentifiers: ["stopscroll-timer"])
-                    return
-                }
-                if type == "language",
-                   let lang = dict["value"] as? String {
-                    AppSettings.shared.seedLabels(forLanguage: lang)
-                    DispatchQueue.main.async {
-                        self.webView?.evaluateJavaScript(self.parent.buildLabelsInjectionScript())
+
+                // Strategy: pick from most-read articles (more variety than the single featured article)
+                var picked: [String: Any]? = nil
+
+                // 1. Try most-read articles (top 15, pick a random one that looks interesting)
+                if let mostRead = json["mostread"] as? [String: Any],
+                   let articles = mostRead["articles"] as? [[String: Any]] {
+                    // Filter out very short extracts and disambiguation pages
+                    let good = articles.filter { art in
+                        let ext = art["extract"] as? String ?? ""
+                        let desc = (art["description"] as? String ?? "").lowercased()
+                        return ext.count > 80
+                            && !desc.contains("disambiguation")
+                            && !desc.contains("wikimedia")
+                            && !desc.contains("wikipedia")
+                    }
+                    if !good.isEmpty {
+                        picked = good[Int.random(in: 0..<min(good.count, 10))]
                     }
                 }
-                if type == "openArticle",
-                   let title = dict["title"] as? String,
-                   let text = dict["text"] as? String,
-                   !text.isEmpty {
-                    handleOpenArticle(title: title, text: text)
+
+                // 2. Fallback: today's featured article
+                if picked == nil, let tfa = json["tfa"] as? [String: Any] {
+                    picked = tfa
                 }
-                if type == "fetchArticle" {
-                    let lang = (dict["lang"] as? String) ?? "en"
-                    fetchWikipediaArticle(lang: lang)
+
+                // 3. Fallback: on-this-day person/event
+                if picked == nil, let otd = json["onthisday"] as? [[String: Any]],
+                   let first = otd.first,
+                   let pages = first["pages"] as? [[String: Any]],
+                   let page = pages.first {
+                    picked = page
+                }
+
+                guard let article = picked else {
+                    self?.fetchRandomWikipediaArticle(lang: safeLang)
+                    return
+                }
+
+                self?.injectArticleToJS(article: article, lang: safeLang)
+            }.resume()
+        }
+
+        /// Fallback: fetch a random Wikipedia summary (for languages without featured feed).
+        private func fetchRandomWikipediaArticle(lang: String) {
+            let urlString = "https://\(lang).wikipedia.org/api/rest_v1/page/random/summary"
+            guard let url = URL(string: urlString) else { return }
+            URLSession.shared.dataTask(with: url) { [weak self] data, _, error in
+                guard let data = data, error == nil,
+                      let article = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return }
+                self?.injectArticleToJS(article: article, lang: lang)
+            }.resume()
+        }
+
+        /// Inject an article object (from any Wikipedia API) into the JS runtime.
+        private func injectArticleToJS(article: [String: Any], lang: String) {
+            let title = (article["title"] as? String ?? "").replacingOccurrences(of: "'", with: "\\'")
+            let extract = (article["extract"] as? String ?? "").replacingOccurrences(of: "'", with: "\\'")
+                .replacingOccurrences(of: "\n", with: "\\n")
+            let desc = (article["description"] as? String ?? "").replacingOccurrences(of: "'", with: "\\'")
+            let pageUrl: String
+            if let urls = article["content_urls"] as? [String: Any],
+               let mobile = urls["mobile"] as? [String: Any],
+               let page = mobile["page"] as? String {
+                pageUrl = page.replacingOccurrences(of: "'", with: "\\'")
+            } else { pageUrl = "" }
+            let thumb: String
+            if let t = article["thumbnail"] as? [String: Any],
+               let src = t["source"] as? String {
+                thumb = src.replacingOccurrences(of: "'", with: "\\'")
+            } else { thumb = "" }
+            let js = """
+            (function(){
+                var ns = window.StopScroll;
+                if (ns && ns.wikipedia && ns.wikipedia._setFromNative) {
+                    ns.wikipedia._setFromNative({
+                        title:'\(title)',extract:'\(extract)',description:'\(desc)',
+                        pageUrl:'\(pageUrl)',thumbnail:'\(thumb)',lang:'\(lang)'
+                    });
+                }
+            })();
+            """
+            DispatchQueue.main.async {
+                self.webView?.evaluateJavaScript(js)
+            }
+        }
+
+        // MARK: - The Guardian
+
+        /// Fetch a random article from The Guardian API (editorially curated, top stories).
+        private func fetchGuardianArticle() {
+            let apiKey = "test" // The Guardian's open API key; replace with your own for production
+            var components = URLComponents(string: "https://content.guardianapis.com/search")!
+            components.queryItems = [
+                URLQueryItem(name: "section", value: "world|science|technology|books|culture|environment"),
+                URLQueryItem(name: "show-fields", value: "trailText,thumbnail"),
+                URLQueryItem(name: "page-size", value: "20"),
+                URLQueryItem(name: "order-by", value: "newest"),
+                URLQueryItem(name: "api-key", value: apiKey)
+            ]
+            guard let url = components.url else {
+                print("[StopScroll] Guardian: failed to build URL")
+                injectGuardianError("bad_url")
+                return
+            }
+
+            URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
+                if let error = error {
+                    print("[StopScroll] Guardian fetch error: \(error.localizedDescription)")
+                    self?.injectGuardianError("network")
+                    return
+                }
+                guard let data = data else {
+                    print("[StopScroll] Guardian: no data")
+                    self?.injectGuardianError("no_data")
+                    return
+                }
+                guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                      let resp = json["response"] as? [String: Any],
+                      let results = resp["results"] as? [[String: Any]],
+                      !results.isEmpty else {
+                    let preview = String(data: data.prefix(500), encoding: .utf8) ?? "<binary>"
+                    print("[StopScroll] Guardian: unexpected response – \(preview)")
+                    self?.injectGuardianError("parse")
+                    return
+                }
+
+                // Pick a random article from the results
+                let article = results[Int.random(in: 0..<results.count)]
+                self?.injectGuardianArticleToJS(article: article)
+            }.resume()
+        }
+
+        /// Notify JS that Guardian fetch failed so it can retry.
+        private func injectGuardianError(_ reason: String) {
+            let js = "(function(){var ns=window.StopScroll;if(ns&&ns.guardian&&ns.guardian._setFromNative){ns.guardian._setFromNative(null);}})();"
+            DispatchQueue.main.async {
+                self.webView?.evaluateJavaScript(js)
+            }
+        }
+
+        /// Inject a Guardian article into the JS runtime using safe JSON serialization.
+        private func injectGuardianArticleToJS(article: [String: Any]) {
+            let title = article["webTitle"] as? String ?? ""
+            let webUrl = article["webUrl"] as? String ?? ""
+            let sectionName = article["sectionName"] as? String ?? ""
+            let fields = article["fields"] as? [String: Any] ?? [:]
+            let rawTrailText = fields["trailText"] as? String ?? ""
+            // Strip HTML tags from trailText
+            let extract = rawTrailText.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression)
+            let thumbnail = fields["thumbnail"] as? String ?? ""
+
+            // Use JSON serialization to safely pass article data (handles all escaping)
+            let articleDict: [String: String] = [
+                "title": title,
+                "extract": extract.isEmpty ? sectionName : extract,
+                "description": sectionName,
+                "webUrl": webUrl,
+                "thumbnail": thumbnail
+            ]
+            guard let jsonData = try? JSONSerialization.data(withJSONObject: articleDict),
+                  let jsonString = String(data: jsonData, encoding: .utf8) else {
+                print("[StopScroll] Guardian: failed to serialize article JSON")
+                injectGuardianError("json")
+                return
+            }
+
+            let js = "(function(){var ns=window.StopScroll;if(ns&&ns.guardian&&ns.guardian._setFromNative){ns.guardian._setFromNative(JSON.parse('\(jsonString.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "'", with: "\\'"))'));}})();"
+            DispatchQueue.main.async {
+                self.webView?.evaluateJavaScript(js) { _, error in
+                    if let error = error {
+                        print("[StopScroll] Guardian JS injection error: \(error)")
+                    }
                 }
             }
         }
 
-        /// Fetch a random Wikipedia article natively (bypasses CSP) and inject it into JS.
-        private func fetchWikipediaArticle(lang: String) {
-            let safeLang = lang.prefix(5).filter { $0.isLetter }
-            let urlString = "https://\(safeLang).wikipedia.org/api/rest_v1/page/random/summary"
-            guard let url = URL(string: urlString) else { return }
+        /// Fetch Guardian article full text and open in reader.
+        private func fetchGuardianFullArticleAndOpen(urlString: String, title: String) {
+            let apiKey = "test"
+            // Convert web URL to API URL
+            let articlePath = urlString
+                .replacingOccurrences(of: "https://www.theguardian.com/", with: "")
+            let apiUrlString = "https://content.guardianapis.com/\(articlePath)?show-fields=bodyText&api-key=\(apiKey)"
+            guard let url = URL(string: apiUrlString) else { return }
+
             URLSession.shared.dataTask(with: url) { [weak self] data, _, error in
                 guard let data = data, error == nil,
-                      let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return }
-                let title = (json["title"] as? String ?? "").replacingOccurrences(of: "'", with: "\\'")
-                let extract = (json["extract"] as? String ?? "").replacingOccurrences(of: "'", with: "\\'")
-                    .replacingOccurrences(of: "\n", with: "\\n")
-                let desc = (json["description"] as? String ?? "").replacingOccurrences(of: "'", with: "\\'")
-                let pageUrl: String
-                if let urls = json["content_urls"] as? [String: Any],
-                   let mobile = urls["mobile"] as? [String: Any],
-                   let page = mobile["page"] as? String {
-                    pageUrl = page.replacingOccurrences(of: "'", with: "\\'")
-                } else { pageUrl = "" }
-                let thumb: String
-                if let t = json["thumbnail"] as? [String: Any],
-                   let src = t["source"] as? String {
-                    thumb = src.replacingOccurrences(of: "'", with: "\\'")
-                } else { thumb = "" }
-                let js = """
-                (function(){
-                    var ns = window.StopScroll;
-                    if (ns && ns.wikipedia && ns.wikipedia._setFromNative) {
-                        ns.wikipedia._setFromNative({
-                            title:'\(title)',extract:'\(extract)',description:'\(desc)',
-                            pageUrl:'\(pageUrl)',thumbnail:'\(thumb)',lang:'\(safeLang)'
-                        });
-                    }
-                })();
-                """
+                      let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                      let response = json["response"] as? [String: Any],
+                      let content = response["content"] as? [String: Any],
+                      let fields = content["fields"] as? [String: Any],
+                      let bodyText = fields["bodyText"] as? String,
+                      !bodyText.isEmpty else { return }
+
+                let chapters = [(title: title, text: bodyText)]
                 DispatchQueue.main.async {
-                    self?.webView?.evaluateJavaScript(js)
+                    self?.handleOpenArticle(title: title, chapters: chapters)
                 }
             }.resume()
         }
 
+        /// Fetch the full Wikipedia article text, split into sections, then open the reader.
+        private func fetchFullArticleAndOpen(title: String, lang: String) {
+            let safeLang = String(lang.prefix(5).filter { $0.isLetter })
+            // URL-encode the title for the query
+            let encodedTitle = title.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? title
+            let urlString = "https://\(safeLang).wikipedia.org/w/api.php?action=query&prop=extracts&titles=\(encodedTitle)&explaintext=1&format=json&exlimit=1"
+            guard let url = URL(string: urlString) else { return }
+
+            URLSession.shared.dataTask(with: url) { [weak self] data, _, error in
+                guard let data = data, error == nil,
+                      let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                      let query = json["query"] as? [String: Any],
+                      let pages = query["pages"] as? [String: Any] else { return }
+
+                // The API returns pages keyed by page ID; grab the first (only) one
+                guard let pageObj = pages.values.first as? [String: Any],
+                      let fullText = pageObj["extract"] as? String,
+                      !fullText.isEmpty else { return }
+
+                // Split into sections on == Heading == patterns
+                let chapters = Self.splitIntoChapters(title: title, fullText: fullText)
+
+                DispatchQueue.main.async {
+                    self?.handleOpenArticle(title: title, chapters: chapters)
+                }
+            }.resume()
+        }
+
+        /// Split Wikipedia plain-text extract into (title, text) chapters by section headings.
+        private static func splitIntoChapters(title: String, fullText: String) -> [(title: String, text: String)] {
+            let lines = fullText.components(separatedBy: "\n")
+            var chapters: [(title: String, text: String)] = []
+            var currentTitle = title
+            var currentLines: [String] = []
+
+            for line in lines {
+                let trimmed = line.trimmingCharacters(in: .whitespaces)
+                // Detect == Section == headings (any level: ==, ===, ====)
+                if trimmed.hasPrefix("==") && trimmed.hasSuffix("==") {
+                    // Flush previous section
+                    let text = currentLines.joined(separator: "\n").trimmingCharacters(in: .whitespacesAndNewlines)
+                    if !text.isEmpty {
+                        chapters.append((currentTitle, text))
+                    }
+                    // Extract heading text (strip = signs and whitespace)
+                    currentTitle = trimmed
+                        .replacingOccurrences(of: "=", with: "")
+                        .trimmingCharacters(in: .whitespaces)
+                    currentLines = []
+                } else {
+                    currentLines.append(line)
+                }
+            }
+            // Flush last section
+            let lastText = currentLines.joined(separator: "\n").trimmingCharacters(in: .whitespacesAndNewlines)
+            if !lastText.isEmpty {
+                chapters.append((currentTitle, lastText))
+            }
+
+            // Filter out very short "See also", "References", "External links" sections
+            let skipSections: Set<String> = ["see also", "references", "external links", "further reading",
+                                              "notes", "bibliography", "sources",
+                                              "voir aussi", "références", "liens externes", "notes et références",
+                                              "bibliographie", "annexes"]
+            chapters = chapters.filter { ch in
+                !skipSections.contains(ch.title.lowercased())
+            }
+
+            return chapters.isEmpty ? [(title, fullText)] : chapters
+        }
+
         /// Save a Wikipedia article into BookStorage & library, then open the reader.
-        private func handleOpenArticle(title: String, text: String) {
-            let bookId = UUID().uuidString
-            let chapters: [(title: String, text: String)] = [(title, text)]
-            BookStorage.save(chapters: chapters, bookId: bookId)
-
-            // Build cards to get totalCards / totalPages
-            let cards = BookParser.makeCards(from: chapters, mode: .flow)
-            let textCards = cards.filter { if case .text = $0.type { return true }; return false }
-            let totalPages = textCards.isEmpty ? 0 : textCards.last!.page
-
-            // Add to library
+        private func handleOpenArticle(title: String, chapters: [(title: String, text: String)]) {
+            // ── Deduplicate: reuse existing article entry with the same title ──
             var library: [LibraryBook] = []
             if let data = UserDefaults.standard.data(forKey: "library"),
                let lib = try? JSONDecoder().decode([LibraryBook].self, from: data) {
                 library = lib
             }
-            library.append(LibraryBook(
-                id: bookId, title: title,
-                savedCardIndex: 0, totalCards: cards.count,
-                currentChapter: 1, totalPages: totalPages,
-                readingMode: ReadingMode.flow.rawValue, isArticle: true
-            ))
-            if let encoded = try? JSONEncoder().encode(library) {
-                UserDefaults.standard.set(encoded, forKey: "library")
+
+            let existingId = library.first(where: { $0.isArticle && $0.title == title })?.id
+            let bookId = existingId ?? UUID().uuidString
+
+            if existingId == nil {
+                // New article — save chapters and add library entry
+                BookStorage.save(chapters: chapters, bookId: bookId)
+
+                let cards = BookParser.makeCards(from: chapters, mode: .flow)
+                let textCards = cards.filter { if case .text = $0.type { return true }; return false }
+                let totalPages = textCards.isEmpty ? 0 : textCards.last!.page
+
+                library.append(LibraryBook(
+                    id: bookId, title: title,
+                    savedCardIndex: 0, totalCards: cards.count,
+                    currentChapter: 1, totalPages: totalPages,
+                    readingMode: ReadingMode.flow.rawValue, isArticle: true
+                ))
+                if let encoded = try? JSONEncoder().encode(library) {
+                    UserDefaults.standard.set(encoded, forKey: "library")
+                }
             }
 
-            // Update AppStorage keys so BookReaderView picks it up
+            // Update AppStorage keys — use "currentArticleId" (separate from books)
             DispatchQueue.main.async {
-                UserDefaults.standard.set(bookId, forKey: "currentBookId")
+                UserDefaults.standard.set(bookId, forKey: "currentArticleId")
                 UserDefaults.standard.set(0, forKey: "savedCardIndex")
                 UserDefaults.standard.set(title, forKey: "savedBookTitle")
                 self.parent.showingReader = true

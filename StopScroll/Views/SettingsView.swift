@@ -70,6 +70,24 @@ struct SettingsView: View {
                     .padding(.vertical, 4)
                 }
 
+                // Article source
+                Section(header: Text("Article sources")) {
+                    Toggle("Wikipedia", isOn: Binding(
+                        get: { settings.articleSources.contains("wikipedia") },
+                        set: { enabled in
+                            if enabled { settings.articleSources.insert("wikipedia") }
+                            else { settings.articleSources.remove("wikipedia") }
+                        }
+                    ))
+                    Toggle("The Guardian", isOn: Binding(
+                        get: { settings.articleSources.contains("guardian") },
+                        set: { enabled in
+                            if enabled { settings.articleSources.insert("guardian") }
+                            else { settings.articleSources.remove("guardian") }
+                        }
+                    ))
+                }
+
                 // Current labels (swipe to delete)
                 Section(header: Text("Active labels")) {
                     if settings.adLabels.isEmpty {
@@ -104,6 +122,11 @@ struct SettingsView: View {
                         showResetAlert = true
                     }
                     .foregroundColor(.orange)
+                }
+
+                // Developer
+                Section(header: Text("Developer")) {
+                    Toggle("Dev mode", isOn: $settings.devMode)
                 }
             }
             .navigationTitle("StopScroll Settings")

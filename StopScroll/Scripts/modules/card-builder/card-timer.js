@@ -171,6 +171,11 @@
         remainingLabel.textContent = t.timer_done || 'Time is up!';
         selectedLabel.textContent = '✓';
         if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
+        // ── Trigger expired-mode for next 10 posts ──
+        if (timer && !timer._expiredTriggered) {
+          timer._expiredTriggered = true;
+          window.__STOPSCROLL_TIMER_EXPIRED = { remaining: 10 };
+        }
         return;
       }
       var left = Math.max(0, Math.ceil((timer.end - Date.now()) / 1000));
@@ -222,9 +227,10 @@
         'background:rgba(255,255,255,0.05)',
         'font-family:' + FONT,
         'text-align:center',
-        'transition:background 0.15s,border-color 0.15s,transform 0.1s',
+        'transition:background 0.6s,border-color 0.6s,transform 0.1s',
         'width:100%'
       ].join(';');
+      btn.setAttribute('data-ss-glass-btn', '1');
 
       btn.addEventListener('click', function (event) {
         event.preventDefault();

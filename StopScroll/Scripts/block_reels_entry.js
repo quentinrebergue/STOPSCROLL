@@ -35,6 +35,7 @@ import './runtime/runtime-scan.js';
 
     var ns = window.StopScroll;
     var state = ns.runtimeState.createRuntimeState();
+    ns._state = state; // Expose to native Swift for live config reloads
     var scheduleScan = ns.runtimeScan.createScheduleScan(
         state,
         ns.runtimeUI.applyNavInjections,

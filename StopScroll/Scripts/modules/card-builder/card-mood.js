@@ -125,9 +125,10 @@
         'background:rgba(255,255,255,0.05)',
         'font-family:' + FONT,
         'text-align:left',
-        'transition:background 0.15s,border-color 0.15s',
+        'transition:background 0.6s,border-color 0.6s',
         'width:100%'
       ].join(';');
+      btn.setAttribute('data-ss-glass-btn', '1');
 
       btn.addEventListener('click', function (event) {
         event.preventDefault();

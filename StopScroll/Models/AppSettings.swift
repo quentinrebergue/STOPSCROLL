@@ -17,6 +17,16 @@ final class AppSettings: ObservableObject {
         didSet { UserDefaults.standard.set(injectionFrequency, forKey: Keys.injectionFrequency) }
     }
 
+    /// Enabled article sources for culture cards (e.g. "wikipedia", "guardian").
+    @Published var articleSources: Set<String> {
+        didSet { UserDefaults.standard.set(Array(articleSources), forKey: Keys.articleSources) }
+    }
+
+    /// Developer mode: shows debug info in cards when something fails.
+    @Published var devMode: Bool {
+        didSet { UserDefaults.standard.set(devMode, forKey: Keys.devMode) }
+    }
+
     /// Most recent Instagram UI language reported by the WebView (BCP-47, e.g. "fr", "en-US").
     @Published private(set) var detectedLanguage: String = ""
 
@@ -45,6 +55,12 @@ final class AppSettings: ObservableObject {
         }
         let savedFreq = UserDefaults.standard.object(forKey: Keys.injectionFrequency)
         injectionFrequency = (savedFreq as? Int) ?? 1
+        if let savedSources = UserDefaults.standard.array(forKey: Keys.articleSources) as? [String] {
+            articleSources = Set(savedSources)
+        } else {
+            articleSources = ["wikipedia"]
+        }
+        devMode = UserDefaults.standard.bool(forKey: Keys.devMode)
     }
 
     // MARK: - Language seeding
@@ -82,5 +98,7 @@ final class AppSettings: ObservableObject {
     private enum Keys {
         static let adLabels = "ss_ad_labels"
         static let injectionFrequency = "ss_injection_frequency"
+        static let articleSources = "ss_article_sources"
+        static let devMode = "ss_dev_mode"
     }
 }

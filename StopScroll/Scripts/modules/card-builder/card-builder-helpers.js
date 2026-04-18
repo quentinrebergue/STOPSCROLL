@@ -18,12 +18,20 @@
     var btn = document.createElement('button');
     btn.type = 'button';
     btn.textContent = label;
+    // Start grey; real color applied on scroll-into-view via IntersectionObserver
+    btn.setAttribute('data-ss-btn-color', background);
     btn.style.cssText = [
       'appearance:none', 'border:none', 'border-radius:999px',
-      'padding:9px 20px', 'font-size:13px', 'font-weight:700',
-      'cursor:pointer', 'color:#0a0a12', 'background:' + background,
-      'font-family:' + FONT, 'flex-shrink:0', 'white-space:nowrap'
+      'padding:12px 26px', 'font-size:14px', 'font-weight:700',
+      'cursor:pointer', 'color:#0a0a12', 'background:#8e8e93',
+      'font-family:' + FONT, 'flex-shrink:0', 'white-space:nowrap',
+      'transition:transform 0.12s ease,filter 0.12s ease,background 0.6s ease',
+      'transform:scale(1)',
+      'filter:brightness(1)'
     ].join(';');
+    btn.addEventListener('pointerdown', function () { btn.style.transform = 'scale(0.95)'; btn.style.filter = 'brightness(0.92)'; });
+    btn.addEventListener('pointerup',   function () { btn.style.transform = 'scale(1)'; btn.style.filter = 'brightness(1)'; });
+    btn.addEventListener('pointerleave',function () { btn.style.transform = 'scale(1)'; btn.style.filter = 'brightness(1)'; });
     btn.addEventListener('click', function (event) {
       event.preventDefault();
       event.stopPropagation();

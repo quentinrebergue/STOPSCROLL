@@ -142,7 +142,7 @@ struct BookParser {
         }
 
         let total = cards.count
-        return cards.map {
+        var finalCards = cards.map {
             BookCard(
                 id: $0.id,
                 text: $0.text,
@@ -156,6 +156,22 @@ struct BookParser {
                 isBookmarked: $0.isBookmarked
             )
         }
+
+        // Append completion card as the final swipeable card
+        let completionId = finalCards.count
+        finalCards.append(BookCard(
+            id: completionId,
+            text: "",
+            cardNumber: completionId + 1,
+            totalCards: completionId + 1,
+            page: 0,
+            chapter: 0,
+            type: .completion(isArticle: false), // isArticle set by caller via BookReaderView
+            chapterTitle: "",
+            cardIndexInPage: 0
+        ))
+
+        return finalCards
     }
 
     private static func splitAtSentences(text: String, charLimit: Int) -> [String] {

@@ -1,22 +1,18 @@
-// Wikipedia random article fetcher — attaches to window.StopScroll.wikipedia.
+// The Guardian article fetcher — attaches to window.StopScroll.guardian.
 (function (global) {
   'use strict';
 
   var ns = (global.StopScroll = global.StopScroll || {});
   var _article = null;
   var _fetching = false;
+  var _pendingCallback = null;
 
-  function getLang() {
-    var raw = document.documentElement.lang || navigator.language || 'en';
-    return raw.split('-')[0].toLowerCase() || 'en';
-  }
-
-  /** Ask the native Swift side to fetch a Wikipedia article (bypasses CSP). */
+  /** Ask the native Swift side to fetch a Guardian article (bypasses CSP). */
   function fetchArticle(callback) {
     if (_fetching) return;
     _fetching = true;
     _pendingCallback = callback || null;
-    ns.dom.postToBridgeWithCallback({ type: 'fetchArticle', lang: getLang() }, function (result) {
+    ns.dom.postToBridgeWithCallback({ type: 'fetchGuardianArticle' }, function (result) {
       if (!result || result.ok !== false) return;
       _fetching = false;
       if (_pendingCallback) {
@@ -27,8 +23,6 @@
     // Timeout: if Swift doesn't respond in 10s, allow retry
     setTimeout(function () { _fetching = false; }, 10000);
   }
-
-  var _pendingCallback = null;
 
   /** Called by Swift when the native fetch completes. */
   function _setFromNative(article) {
@@ -58,12 +52,11 @@
     return a;
   }
 
-  ns.wikipedia = {
+  ns.guardian = {
     prefetch: prefetch,
     getCached: getCached,
     consume: consume,
     fetchArticle: fetchArticle,
-    getLang: getLang,
     _setFromNative: _setFromNative
   };
 })(window);

@@ -6,6 +6,20 @@
 
   function scanNewPosts(state) {
     var cfg = state.config.feed_injection;
+
+    // ── Timer-expired mode: replace ALL posts, even non-ads ──
+    var expired = window.__STOPSCROLL_TIMER_EXPIRED;
+    if (expired) {
+      var allPosts = document.querySelectorAll('article:not([data-ss-replaced])');
+      for (var k = 0; k < allPosts.length; k++) {
+        var p = allPosts[k];
+        if (state.seenPosts.has(p)) continue;
+        state.seenPosts.add(p);
+        ns.cardInjection.injectTimerExpiredCard(p);
+      }
+      return;
+    }
+
     if (!ns.pageManager.isMainFeedPage() || !ns.pageManager.feedInjectingEnabled(state.config) || cfg.ad_replacement === false) {
       return;
     }

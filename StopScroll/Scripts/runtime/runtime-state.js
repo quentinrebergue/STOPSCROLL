@@ -11,8 +11,16 @@
   function initializeRuntimeState(state) {
     state.config = ns.config.loadConfig();
     ns.dom.detectLanguage();
-    // Pre-fetch a Wikipedia article so the culture card has content ready
-    if (ns.wikipedia && ns.wikipedia.prefetch) ns.wikipedia.prefetch();
+    // Pre-fetch articles from all enabled sources
+    var sources = global.__STOPSCROLL_ARTICLE_SOURCES || ['wikipedia'];
+    for (var i = 0; i < sources.length; i++) {
+      if (sources[i] === 'guardian' && ns.guardian && ns.guardian.prefetch) {
+        ns.guardian.prefetch();
+      }
+      if (sources[i] === 'wikipedia' && ns.wikipedia && ns.wikipedia.prefetch) {
+        ns.wikipedia.prefetch();
+      }
+    }
   }
 
   ns.runtimeState = {
