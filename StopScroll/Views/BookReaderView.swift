@@ -1076,9 +1076,10 @@ struct SettingsSheet: View {
     let bookTitle: String
     let allBookmarkedCards: [BookCard]
 
-    @State private var selectedBook: LibraryBook?
     @State private var library: [LibraryBook] = []
     @State private var showImportFileImporter = false
+    @State private var renameTarget: LibraryBook?
+    @State private var renameText: String = ""
     @Environment(\.dismiss) private var dismiss
 
     private func exportDataAsJSON() -> Data? {
@@ -1224,7 +1225,7 @@ struct SettingsSheet: View {
 
                     ForEach(library.filter { !$0.isArticle }) { book in
                         Button {
-                            selectedBook = book
+                            onSwitchBook(book.id)
                         } label: {
                             HStack {
                                 BookCoverThumbnail(bookId: book.id)
@@ -1257,6 +1258,30 @@ struct SettingsSheet: View {
                                     .foregroundColor(Color(white: 0.3))
                             }
                         }
+                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                            Button(role: .destructive) {
+                                onDeleteBook(book.id)
+                                reloadLibrary()
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+
+                            Button {
+                                onResetBook(book.id)
+                                reloadLibrary()
+                            } label: {
+                                Label("Reset", systemImage: "arrow.counterclockwise")
+                            }
+                            .tint(.orange)
+
+                            Button {
+                                renameTarget = book
+                                renameText = book.title
+                            } label: {
+                                Label("Rename", systemImage: "pencil")
+                            }
+                            .tint(.blue)
+                        }
                     }
                 }
 
@@ -1265,7 +1290,7 @@ struct SettingsSheet: View {
                     Section("Articles") {
                         ForEach(articles) { article in
                             Button {
-                                selectedBook = article
+                                onSwitchBook(article.id)
                             } label: {
                                 HStack {
                                     Image(systemName: "doc.text")
@@ -1300,6 +1325,30 @@ struct SettingsSheet: View {
                                         .font(.caption)
                                         .foregroundColor(Color(white: 0.3))
                                 }
+                            }
+                            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                Button(role: .destructive) {
+                                    onDeleteBook(article.id)
+                                    reloadLibrary()
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
+
+                                Button {
+                                    onResetBook(article.id)
+                                    reloadLibrary()
+                                } label: {
+                                    Label("Reset", systemImage: "arrow.counterclockwise")
+                                }
+                                .tint(.orange)
+
+                                Button {
+                                    renameTarget = article
+                                    renameText = article.title
+                                } label: {
+                                    Label("Rename", systemImage: "pencil")
+                                }
+                                .tint(.blue)
                             }
                         }
                     }
@@ -1360,32 +1409,30 @@ struct SettingsSheet: View {
                     Button("Done") { dismiss() }
                 }
             }
-            .sheet(item: $selectedBook) { book in
-                BookDetailSheet(
-                    book: book,
-                    isCurrent: book.id == currentBookId,
-                    onOpen: {
-                        selectedBook = nil
-                        onSwitchBook(book.id)
-                    },
-                    onDelete: {
-                        selectedBook = nil
-                        onDeleteBook(book.id)
-                        reloadLibrary()
-                    },
-                    onRename: { newTitle in
-                        onRenameBook(book.id, newTitle)
-                        reloadLibrary()
-                    },
-                    onReset: {
-                        selectedBook = nil
-                        onResetBook(book.id)
-                        reloadLibrary()
-                    }
-                )
-            }
             .onAppear {
                 reloadLibrary()
+            }
+            .alert("Rename Item", isPresented: Binding(
+                get: { renameTarget != nil },
+                set: { isPresented in
+                    if !isPresented { renameTarget = nil }
+                }
+            )) {
+                TextField("Title", text: $renameText)
+                Button("Save") {
+                    guard let target = renameTarget else { return }
+                    let trimmed = renameText.trimmingCharacters(in: .whitespacesAndNewlines)
+                    if !trimmed.isEmpty {
+                        onRenameBook(target.id, trimmed)
+                        reloadLibrary()
+                    }
+                    renameTarget = nil
+                }
+                Button("Cancel", role: .cancel) {
+                    renameTarget = nil
+                }
+            } message: {
+                Text("Choose a new title")
             }
             .fileImporter(
                 isPresented: $showImportFileImporter,

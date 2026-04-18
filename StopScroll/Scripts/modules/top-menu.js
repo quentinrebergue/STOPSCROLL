@@ -137,7 +137,7 @@
     row.appendChild(label);
     row.appendChild(chevron);
     row.addEventListener('click', function () {
-      dom.postToBridge({ type: 'openSettings' });
+      dom.postToBridge({ type: 'openDashboard' });
     });
 
     if (anchor) {

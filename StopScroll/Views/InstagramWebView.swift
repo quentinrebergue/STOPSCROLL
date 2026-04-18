@@ -6,6 +6,7 @@ struct InstagramWebView: UIViewRepresentable {
     @Binding var isLoading: Bool
     @Binding var showingReader: Bool
     @Binding var showingSettings: Bool
+    @Binding var showingDashboard: Bool
     @Binding var reloadToken: Int
     /// Incremented by InstagramView when AppSettings.adLabels changes; triggers re-injection.
     @Binding var labelsToken: Int
@@ -275,6 +276,10 @@ struct InstagramWebView: UIViewRepresentable {
             }
             if type == "openSettings" {
                 DispatchQueue.main.async { self.parent.showingSettings = true }
+                return true
+            }
+            if type == "openDashboard" {
+                DispatchQueue.main.async { self.parent.showingDashboard = true }
                 return true
             }
             if type == "setTimer",

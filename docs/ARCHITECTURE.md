@@ -14,7 +14,7 @@ StopScroll combine 2 couches:
 - detecte les posts remplacables
 - choisit un type de carte
 - injecte visuellement la carte dans le feed
-- pilote des interactions (timer, open article, open settings)
+- pilote des interactions (timer, open article, open settings, open dashboard)
 
 ## 2. Flux principal
 
@@ -30,7 +30,7 @@ StopScroll combine 2 couches:
 ### JS -> Swift
 
 - Handler `openBookReader`: ouvre le lecteur
-- Handler `stopScrollBridge`: messages structures (`openArticle`, `fetchGuardianArticle`, `setTimer`, `openSettings`, etc.)
+- Handler `stopScrollBridge`: messages structures (`openArticle`, `fetchGuardianArticle`, `setTimer`, `openSettings`, `openDashboard`, etc.)
 
 Format bridge v1 (enveloppe unifiee):
 - `{ v: 1, id: string, type: string, payload: object, ts: number }`
@@ -170,4 +170,14 @@ Destination de test recommandee dans ce repo:
 - ajustement visuel: ancrage place au bord haut de l ecran (overlay `ignoresSafeArea(.top)`) pour eviter l effet de decalage sous la barre Instagram
 - mitigation glitch animation: suppression du blur pendant transition + rendu compose (`compositingGroup`) pour limiter le scintillement sur les contours
 - compact island reduite (empreinte visuelle plus faible)
-- timeline UX en 2 temps: `+XP` rapide, puis ratio `xpCourante / xpNiveau`; la barre (vert flashy) commence a se remplir apres l apparition de l island
+- timeline UX en 2 temps: `+XP` rapide, puis ratio `xpCourante / xpNiveau`
+- progression bar: l island affiche d abord l etat courant du niveau (sans partir de 0), puis anime uniquement le gain XP jusqu a l etat cible
+
+8. Dashboard natif (SwiftUI)
+- entree principale depuis la ligne StopScroll injectee dans la section utilisateur Instagram (action bridge `openDashboard`)
+- entree secondaire depuis `SettingsView` (bouton "Open Dashboard")
+- `DashboardView` affiche 3 blocs persistants: objectifs, usage du jour, progression XP
+
+9. Settings reader (bibliotheque)
+- tap direct sur un livre/article pour ouvrir immediatement dans le reader
+- swipe gauche natif iOS sur chaque item pour actions rapides: delete, reset, rename

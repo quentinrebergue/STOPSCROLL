@@ -24,8 +24,8 @@ Spec concrete des prochaines features anti-procrastination:
 - Ajouter compteur local des echecs de fetch article
 
 4. UX anti-procrastination concretes
-- dashboard natif accessible depuis la section utilisateur
-- cohabitation livre/article via switcher explicite dans le reader
+- dashboard natif deja livre (entree section utilisateur + fallback settings)
+- cohabitation livre/article: finaliser switcher explicite dans le reader
 
 ## Next (1-2 mois)
 

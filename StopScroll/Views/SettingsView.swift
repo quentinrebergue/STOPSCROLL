@@ -5,6 +5,7 @@ struct SettingsView: View {
     @State private var newLabel = ""
     @State private var showResetAlert = false
     let onDismiss: () -> Void
+    var onOpenDashboard: (() -> Void)? = nil
 
     /// Discrete frequency steps mapped to slider positions.
     /// 0 = off (no cards injected).
@@ -47,6 +48,15 @@ struct SettingsView: View {
                         }
                     }
                     .padding(.vertical, 4)
+
+                    if let onOpenDashboard {
+                        Button {
+                            onOpenDashboard()
+                        } label: {
+                            Label("Open Dashboard", systemImage: "chart.bar.xaxis")
+                                .foregroundColor(.blue)
+                        }
+                    }
                 }
 
                 // Card injection frequency
