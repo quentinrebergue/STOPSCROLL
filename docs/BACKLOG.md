@@ -39,6 +39,7 @@
 | SS-027 | P1 | Improvement | Profil onboarding + nav secondaire | Prompt pseudo Instagram si vide + routing search/profile/messages via WebView secondaire legere | Done |
 | SS-028 | P0 | Bug | Routage navigation entre surfaces | Forcer toutes les actions insta sur WebView 2 et desactiver la nav insta sur WebView 1 | Done |
 | SS-029 | P0 | Bug | Navigation surfaces bloquee | Routage URL deterministe sur WebView 2 + tests unitaires mapping pour prevenir regressions | Done |
+| SS-030 | P1 | Improvement | Reader UI cleanup | Retirer la bottom bar du reader pour aligner avec la navbar native globale | Done |
 | SS-023 | P0 | Bug | Navigation native sans reload | Simuler interaction SPA sur boutons tab Instagram et fallback history local sans hard reload | Done |
 
 ## Idees d amelioration produit

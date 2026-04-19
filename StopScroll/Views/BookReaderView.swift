@@ -180,7 +180,6 @@ struct BookReaderView: View {
                 } else {
                     readerContent
                 }
-                bottomBar
             }
         }
         .background(Color.black)

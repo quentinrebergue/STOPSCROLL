@@ -198,6 +198,7 @@ Destination de test recommandee dans ce repo:
 - correction routage profil: priorite au lien avatar/profil Instagram (evite redirection vers edit settings)
 - sans injection CSS de masquage: la webview est etendue vers le bas pour sortir la navbar Instagram de la zone visible
 - icone coeur retiree de la barre native
+- reader: suppression de la bottom bar interne pour eviter une double navigation visuelle
 
 12. Strategie 2 WebView (main + messages)
 - deux surfaces `WKWebView` sont maintenues: principale (`/`) et messages (`/direct/inbox/`)
