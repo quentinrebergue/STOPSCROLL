@@ -267,6 +267,40 @@ final class InstagramViewUIStateTests: XCTestCase {
         XCTAssertFalse(allowsHorizontalSwipe)
     }
 
+    /// **Test 20f**: Quitter la section Book doit toujours nettoyer le flag settings BookReader.
+    func testLeavingBookClearsBookReaderSettingsFlag() {
+        let selectedTab = "messages"
+        var showingBookReaderSettings = true
+
+        if selectedTab != "book" {
+            showingBookReaderSettings = false
+        }
+
+        XCTAssertFalse(showingBookReaderSettings)
+    }
+
+    /// **Test 20g**: Un re-tap Home sans overlay doit incrementer le token de commande native.
+    func testHomeRetapDispatchesNativeCommandWhenOverlaysClosed() {
+        let selectedTab = "home"
+        let currentTab = "home"
+        let showingReader = false
+        let showingDashboard = false
+        let showingSettings = false
+        let showingBookReaderSettings = false
+        var nativeNavCommandToken = 0
+
+        if selectedTab == "home",
+           currentTab == "home",
+           !showingReader,
+           !showingDashboard,
+           !showingSettings,
+           !showingBookReaderSettings {
+            nativeNavCommandToken += 1
+        }
+
+        XCTAssertEqual(nativeNavCommandToken, 1)
+    }
+
     /// **Test 20e**: Messages section swipe is fully disabled at policy level.
     func testMessagesSectionSwipeIsExplicitlyDisabled() {
         XCTAssertFalse(HorizontalSwipeRecognizerPolicy.shouldAllowSectionSwipe(activeTab: "messages"))

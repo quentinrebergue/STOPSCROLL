@@ -144,6 +144,49 @@ final class InjectedCardJavaScriptTests: XCTestCase {
         XCTAssertEqual(lockEvents, "remove")
     }
 
+    func testDomUtils_isDirectPathMatchesDirectRoutes() throws {
+        let context = try makeJSContext()
+        context.evaluateScript("window.location.pathname = '/direct/inbox/';")
+
+        try evaluateScript(atRelativePath: "StopScroll/Scripts/modules/core/dom-utils.js", in: context)
+        let directResult = context.evaluateScript("window.StopScroll.dom.isDirectPath()")?.toBool() ?? false
+
+        context.evaluateScript("window.location.pathname = '/explore/';")
+        let nonDirectResult = context.evaluateScript("window.StopScroll.dom.isDirectPath()")?.toBool() ?? true
+
+        XCTAssertTrue(directResult)
+        XCTAssertFalse(nonDirectResult)
+    }
+
+    func testPageManager_appliesReelLockOutsideDirectPath() throws {
+        let context = try makeJSContext()
+        context.evaluateScript("""
+        window.__lockEvents = [];
+        window.__debugEvents = [];
+        window.StopScroll = {
+          dom: {
+            isReelsTab: function(){ return false; },
+            isDirectPath: function(){ return false; },
+            isReelPage: function(){ return true; },
+            isSingleContentPage: function(){ return false; },
+            postToBridge: function(payload){ if (payload && payload.message) { window.__debugEvents.push(payload.message); } }
+          },
+          scrollLock: {
+            applyScrollLock: function(){ window.__lockEvents.push('apply'); },
+            removeScrollLock: function(){ window.__lockEvents.push('remove'); }
+          }
+        };
+        """)
+
+        try evaluateScript(atRelativePath: "StopScroll/Scripts/modules/navigation/page-manager.js", in: context)
+        context.evaluateScript("window.StopScroll.pageManager.manageReelPageRestrictions({});")
+
+        let lockEvents = context.evaluateScript("window.__lockEvents.join(',')")?.toString()
+        let debugEvents = context.evaluateScript("window.__debugEvents.join(',')")?.toString()
+        XCTAssertEqual(lockEvents, "apply")
+        XCTAssertEqual(debugEvents, "apply_reel_lock")
+    }
+
     private func makeJSContext() throws -> JSContext {
         guard let context = JSContext() else {
             throw NSError(domain: "InjectedCardJavaScriptTests", code: 1)
@@ -159,6 +202,8 @@ final class InjectedCardJavaScriptTests: XCTestCase {
         var global = this;
         if (!window.addEventListener) { window.addEventListener = function(){}; }
         if (!window.dispatchEvent) { window.dispatchEvent = function(){}; }
+        if (!window.setInterval) { window.setInterval = function(){ return 1; }; }
+        if (!window.clearInterval) { window.clearInterval = function(){}; }
         if (!window.history) { window.history = { pushState: function(){}, replaceState: function(){} }; }
         if (!window.location) { window.location = { pathname: '/', origin: 'https://www.instagram.com', href: 'https://www.instagram.com/' }; }
         if (!window.innerHeight) { window.innerHeight = 844; }
@@ -172,7 +217,10 @@ final class InjectedCardJavaScriptTests: XCTestCase {
           querySelector: function(){ return null; },
           createElement: function(){ return { style: {}, setAttribute: function(){}, appendChild: function(){}, querySelector: function(){ return null; }, querySelectorAll: function(){ return []; }, children: [] }; },
           head: { appendChild: function(){} },
-          documentElement: { appendChild: function(){}, backgroundColor: '' }
+          documentElement: { appendChild: function(){}, backgroundColor: '' },
+          addEventListener: function(){},
+          hidden: false,
+          body: {}
         };
         var MutationObserver = function(){ return { observe: function(){} }; };
         window.StopScroll = window.StopScroll || {};
