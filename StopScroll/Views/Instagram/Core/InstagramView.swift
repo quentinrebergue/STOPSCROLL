@@ -248,7 +248,10 @@ struct InstagramView: View {
             BookReaderView(onDismiss: {
                 showingReader = false
                 nativeSelectedTab = SurfaceRouter.tab(for: activeSurface)
-            }, bottomInset: sharedBottomNavReservedHeight)
+            },
+            bottomInset: sharedBottomNavReservedHeight,
+            onHorizontalSectionDragChanged: handleHorizontalSurfaceDragChanged,
+            onHorizontalSectionDragEnded: handleHorizontalSurfaceDragEnded)
                 .offset(x: sectionOffset(for: "book"))
                 .opacity(sectionOpacity(for: "book"))
                 .allowsHitTesting(isInteractiveSection("book"))

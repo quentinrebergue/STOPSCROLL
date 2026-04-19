@@ -69,9 +69,30 @@ enum HorizontalSwipePolicy {
 
 enum HorizontalSwipeRecognizerPolicy {
     static func shouldBegin(velocityX: CGFloat, velocityY: CGFloat, activeTab: String) -> Bool {
-        let ratio = activeTab == "search" ? 0.9 : 1.2
-        let minSpeed: CGFloat = activeTab == "search" ? 10 : 120
+        let ratio: CGFloat
+        let minSpeed: CGFloat
+
+        switch activeTab {
+        case "search":
+            // Explore must win against inner Instagram horizontal gestures.
+            ratio = 0.9
+            minSpeed = 10
+        case "messages":
+            // In chat threads, prioritize vertical scrolling over section swipes.
+            ratio = 1.8
+            minSpeed = 220
+        default:
+            ratio = 1.2
+            minSpeed = 120
+        }
+
         return abs(velocityX) > abs(velocityY) * ratio && abs(velocityX) > minSpeed
+    }
+
+    static func shouldTrackDrag(translationX: CGFloat, translationY: CGFloat, activeTab: String) -> Bool {
+        let ratio: CGFloat = activeTab == "search" ? 1.1 : 1.35
+        let minDistance: CGFloat = activeTab == "search" ? 12 : 16
+        return abs(translationX) >= minDistance && abs(translationX) > abs(translationY) * ratio
     }
 }
 

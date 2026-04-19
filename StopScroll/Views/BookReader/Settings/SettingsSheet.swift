@@ -15,6 +15,8 @@ struct SettingsSheet: View {
     let bookTitle: String
     let allBookmarkedCards: [BookCard]
     let onDismiss: () -> Void
+    var onHorizontalSectionDragChanged: ((CGFloat) -> Void)? = nil
+    var onHorizontalSectionDragEnded: ((CGFloat, CGFloat) -> Void)? = nil
 
     @State private var library: [LibraryBook] = []
     @State private var showImportFileImporter = false
@@ -326,5 +328,32 @@ struct SettingsSheet: View {
             )
         }
         .background(palette.background.ignoresSafeArea())
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 12)
+                .onChanged { value in
+                    guard HorizontalSwipeRecognizerPolicy.shouldTrackDrag(
+                        translationX: value.translation.width,
+                        translationY: value.translation.height,
+                        activeTab: "book"
+                    ) else {
+                        return
+                    }
+                    onHorizontalSectionDragChanged?(value.translation.width)
+                }
+                .onEnded { value in
+                    guard HorizontalSwipeRecognizerPolicy.shouldTrackDrag(
+                        translationX: value.translation.width,
+                        translationY: value.translation.height,
+                        activeTab: "book"
+                    ) else {
+                        onHorizontalSectionDragEnded?(0, 0)
+                        return
+                    }
+                    onHorizontalSectionDragEnded?(
+                        value.translation.width,
+                        value.predictedEndTranslation.width - value.translation.width
+                    )
+                }
+        )
     }
 }

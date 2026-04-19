@@ -207,6 +207,20 @@ struct InstagramWebView: UIViewRepresentable {
             LogManager.shared.log("👁️ Surface active state: \(isActive)", category: "WebView", level: .debug)
             context.coordinator.applyRuntimeActiveState(isActive)
         }
+                if activeSectionTab == "messages" {
+                        uiView.evaluateJavaScript("""
+                        (function(){
+                            try {
+                                if (!location.pathname || location.pathname.indexOf('/direct') !== 0) return;
+                                var nodes = document.querySelectorAll('header a[href="/direct/inbox/"], header a[href="/direct/inbox"]');
+                                for (var i = 0; i < nodes.length; i++) {
+                                    nodes[i].style.setProperty('display', 'none', 'important');
+                                    nodes[i].style.setProperty('pointer-events', 'none', 'important');
+                                }
+                            } catch (_) {}
+                        })();
+                        """)
+                }
     }
 
 }

@@ -5,6 +5,8 @@ import SwiftUI
 struct BookReaderView: View {
     let onDismiss: () -> Void
     var bottomInset: CGFloat = 0
+    var onHorizontalSectionDragChanged: ((CGFloat) -> Void)? = nil
+    var onHorizontalSectionDragEnded: ((CGFloat, CGFloat) -> Void)? = nil
     @ObservedObject private var settings = AppSettings.shared
 
     @State private var cards: [BookCard] = []
@@ -103,7 +105,9 @@ struct BookReaderView: View {
                 currentBookId: currentBookId,
                 bookTitle: bookTitle,
                 allBookmarkedCards: bookmarkedCards(),
-                onDismiss: { showSettings = false }
+                onDismiss: { showSettings = false },
+                onHorizontalSectionDragChanged: onHorizontalSectionDragChanged,
+                onHorizontalSectionDragEnded: onHorizontalSectionDragEnded
             )
             .opacity(showSettings ? 1 : 0)
             .allowsHitTesting(showSettings)

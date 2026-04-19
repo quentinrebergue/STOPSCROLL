@@ -140,10 +140,28 @@ extension InstagramView {
         DragGesture(minimumDistance: 12)
             .onChanged { value in
                 guard currentSectionTab == tab else { return }
+                guard HorizontalSwipeRecognizerPolicy.shouldTrackDrag(
+                    translationX: value.translation.width,
+                    translationY: value.translation.height,
+                    activeTab: currentSectionTab
+                ) else {
+                    return
+                }
                 handleHorizontalSurfaceDragChanged(value.translation.width)
             }
             .onEnded { value in
                 guard currentSectionTab == tab else { return }
+                guard HorizontalSwipeRecognizerPolicy.shouldTrackDrag(
+                    translationX: value.translation.width,
+                    translationY: value.translation.height,
+                    activeTab: currentSectionTab
+                ) else {
+                    withAnimation(.interactiveSpring(response: 0.28, dampingFraction: 0.9)) {
+                        sectionSwipeTranslation = 0
+                        sectionSwipeTargetTab = nil
+                    }
+                    return
+                }
                 handleHorizontalSurfaceDragEnded(
                     value.translation.width,
                     velocity: value.predictedEndTranslation.width - value.translation.width
