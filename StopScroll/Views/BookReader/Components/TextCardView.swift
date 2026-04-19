@@ -12,6 +12,9 @@ struct TextCardView: View {
     @State private var showHeartAnimation = false
     @ObservedObject private var settings = AppSettings.shared
     private var palette: AppSettings.AdaptivePalette { settings.adaptivePalette }
+    private var cardBackground: Color {
+        settings.preferredColorScheme == .light ? palette.surface : palette.elevatedSurface
+    }
 
     private var highlightedText: AttributedString {
         var attr = AttributedString(card.text)
@@ -84,7 +87,7 @@ struct TextCardView: View {
                     .transition(.scale.combined(with: .opacity))
             }
         }
-        .background(palette.elevatedSurface)
+        .background(cardBackground)
         .clipShape(RoundedRectangle(cornerRadius: 14))
         .onTapGesture(count: 2) {
             onBookmark()

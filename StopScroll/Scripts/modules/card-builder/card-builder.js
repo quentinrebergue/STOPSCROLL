@@ -24,13 +24,34 @@
     };
   }
 
+  function parseHexColor(cssColor) {
+    if (!cssColor || typeof cssColor !== 'string') return null;
+    var m = cssColor.match(/#([0-9a-f]{6}|[0-9a-f]{3})/i);
+    if (!m) return null;
+    var h = m[1];
+    if (h.length === 3) {
+      return {
+        r: parseInt(h.charAt(0) + h.charAt(0), 16),
+        g: parseInt(h.charAt(1) + h.charAt(1), 16),
+        b: parseInt(h.charAt(2) + h.charAt(2), 16),
+        a: 1
+      };
+    }
+    return {
+      r: parseInt(h.substring(0, 2), 16),
+      g: parseInt(h.substring(2, 4), 16),
+      b: parseInt(h.substring(4, 6), 16),
+      a: 1
+    };
+  }
+
   function luminance(rgb) {
     if (!rgb) return 0;
     return (0.2126 * rgb.r + 0.7152 * rgb.g + 0.0722 * rgb.b);
   }
 
   function contrastTextForBg(bgCss) {
-    var rgb = parseRGB(bgCss);
+    var rgb = parseRGB(bgCss) || parseHexColor(bgCss);
     if (!rgb) return 'rgb(245, 245, 245)';
     return luminance(rgb) < 140 ? 'rgb(245, 245, 245)' : 'rgb(18, 18, 18)';
   }
@@ -256,6 +277,57 @@
     } catch (e) { return true; }
   }
 
+  function isNeutralCardTextColor(cssColor) {
+    if (!cssColor || typeof cssColor !== 'string') return false;
+    var c = cssColor.toLowerCase();
+    return c.indexOf('244,246,250') >= 0 || c.indexOf('#f4f6fa') >= 0 || c.indexOf('245, 245, 245') >= 0;
+  }
+
+  // Content section text color follows the content background (card media),
+  // while header/caption/actions still follow Instagram theme text color.
+  function applyContentColors(card, type) {
+    var media = ensureMediaArea(card);
+    if (!media) return;
+
+    var bg = media.style.background || '';
+    var contentText = contrastTextForBg(bg);
+    var contentMuted = (contentText === 'rgb(18, 18, 18)') ? 'rgba(18,18,18,0.62)' : 'rgba(245,245,245,0.62)';
+
+    media.style.color = contentText;
+
+    var nodes = media.querySelectorAll('div, span, p, h1, h2, h3, h4, h5, h6');
+    for (var i = 0; i < nodes.length; i++) {
+      var n = nodes[i];
+      var current = n.style && n.style.color ? n.style.color : '';
+      if (!current || isNeutralCardTextColor(current)) {
+        n.style.color = contentText;
+      }
+      if (current && current.toLowerCase().indexOf('rgba(244,246,250,0.') >= 0) {
+        n.style.color = contentMuted;
+      }
+    }
+
+    var neutralButtons = media.querySelectorAll('button');
+    for (var j = 0; j < neutralButtons.length; j++) {
+      var b = neutralButtons[j];
+      var bc = b.style && b.style.color ? b.style.color : '';
+      if (!bc || isNeutralCardTextColor(bc)) {
+        b.style.color = contentText;
+      }
+    }
+
+    if (_colorDebugCount < 24) {
+      _colorDebugCount += 1;
+      emitColorDebugLog('applyContentColors', {
+        sample: _colorDebugCount,
+        type: type,
+        mediaBackground: bg,
+        contentText: contentText,
+        contentMuted: contentMuted
+      });
+    }
+  }
+
   // ── Apply native Instagram colors to non-media sections ───
   function applyNativeColors(card, colors) {
     // Outer card background (header + caption area)
@@ -355,6 +427,7 @@
     if (card) {
       var colors = detectInstagramColors();
       applyGradientBg(card, type);
+      applyContentColors(card, type);
       applyNativeColors(card, colors);
       appendCaption(card, config, colors);
       observeButtonReveal(card);

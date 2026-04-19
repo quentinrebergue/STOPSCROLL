@@ -13,7 +13,6 @@ struct InstagramView: View {
     @State var reloadToken = 0
     @State var showingSettings = false
     @State var showingDashboard = false
-    @State var returnToDashboardAfterSettings = false
     /// Incremented when the user closes Settings so the WebView re-injects the updated label list.
     @State var labelsToken = 0
     @AppStorage("ss_xp_total") var totalXP = 0
@@ -106,8 +105,8 @@ struct InstagramView: View {
                 // stays outside of the visible area behind our native bar.
                 .padding(.bottom, -webViewBottomOverscan)
                 .ignoresSafeArea(edges: .bottom)
-                .opacity(activeSurface == .main && !showingReader && !showingDashboard ? 1 : 0)
-                .allowsHitTesting(activeSurface == .main && !showingReader && !showingDashboard)
+                .opacity(activeSurface == .main && !showingReader && !showingDashboard && !showingSettings ? 1 : 0)
+                .allowsHitTesting(activeSurface == .main && !showingReader && !showingDashboard && !showingSettings)
                 .id("surface-main")
             }
 
@@ -137,8 +136,8 @@ struct InstagramView: View {
                 )
                 .padding(.bottom, -webViewBottomOverscan)
                 .ignoresSafeArea(edges: .bottom)
-                .opacity(activeSurface == .messages && !showingReader && !showingDashboard ? 1 : 0)
-                .allowsHitTesting(activeSurface == .messages && !showingReader && !showingDashboard)
+                .opacity(activeSurface == .messages && !showingReader && !showingDashboard && !showingSettings ? 1 : 0)
+                .allowsHitTesting(activeSurface == .messages && !showingReader && !showingDashboard && !showingSettings)
                 .id("surface-messages")
             }
 
@@ -168,8 +167,8 @@ struct InstagramView: View {
                 )
                 .padding(.bottom, -webViewBottomOverscan)
                 .ignoresSafeArea(edges: .bottom)
-                .opacity(activeSurface == .search && !showingReader && !showingDashboard ? 1 : 0)
-                .allowsHitTesting(activeSurface == .search && !showingReader && !showingDashboard)
+                .opacity(activeSurface == .search && !showingReader && !showingDashboard && !showingSettings ? 1 : 0)
+                .allowsHitTesting(activeSurface == .search && !showingReader && !showingDashboard && !showingSettings)
                 .id("surface-search")
             }
 
@@ -199,8 +198,8 @@ struct InstagramView: View {
                 )
                 .padding(.bottom, -webViewBottomOverscan)
                 .ignoresSafeArea(edges: .bottom)
-                .opacity(activeSurface == .profile && !showingReader && !showingDashboard ? 1 : 0)
-                .allowsHitTesting(activeSurface == .profile && !showingReader && !showingDashboard)
+                .opacity(activeSurface == .profile && !showingReader && !showingDashboard && !showingSettings ? 1 : 0)
+                .allowsHitTesting(activeSurface == .profile && !showingReader && !showingDashboard && !showingSettings)
                 .id("surface-profile")
             }
 
@@ -212,7 +211,6 @@ struct InstagramView: View {
             DashboardView(onDismiss: {
                 showingDashboard = false
             }, onOpenSettings: {
-                returnToDashboardAfterSettings = true
                 showingDashboard = false
                 DispatchQueue.main.async {
                     showingSettings = true
@@ -223,6 +221,19 @@ struct InstagramView: View {
             .ignoresSafeArea(edges: .bottom)
             .zIndex(12)
 
+            SettingsView(onDismiss: {
+                showingSettings = false
+                labelsToken += 1
+            }, onOpenDashboard: {
+                showingSettings = false
+                showingDashboard = true
+                nativeSelectedTab = "dashboard"
+            })
+            .opacity(showingSettings ? 1 : 0)
+            .allowsHitTesting(showingSettings)
+            .ignoresSafeArea(edges: .bottom)
+            .zIndex(13)
+
             GeometryReader { geo in
                 instagramSurfaceColor
                     .frame(height: geo.safeAreaInsets.top)
@@ -232,7 +243,7 @@ struct InstagramView: View {
             .allowsHitTesting(false)
             .zIndex(5)
 
-            if isActiveSurfaceLoading && !showingReader && !showingDashboard {
+            if isActiveSurfaceLoading && !showingReader && !showingDashboard && !showingSettings {
                 VStack(spacing: 0) {
                     LoadingBar()
                     Spacer()
@@ -305,29 +316,11 @@ struct InstagramView: View {
             .zIndex(15)
         }
         .background(instagramSurfaceColor.ignoresSafeArea())
-        .fullScreenCover(isPresented: $showingSettings) {
-            SettingsView(onDismiss: {
-                showingSettings = false
-                labelsToken += 1  // triggers label re-injection into the live WebView
-                if returnToDashboardAfterSettings {
-                    returnToDashboardAfterSettings = false
-                    DispatchQueue.main.async {
-                        showingDashboard = true
-                        nativeSelectedTab = "dashboard"
-                    }
-                }
-            }, onOpenDashboard: {
-                returnToDashboardAfterSettings = false
-                showingSettings = false
-                showingDashboard = true
-            })
-        }
         .confirmationDialog("StopScroll", isPresented: $showControlCenterChooser, titleVisibility: .visible) {
             Button("Dashboard") {
                 showingDashboard = true
             }
             Button("Parametres") {
-                returnToDashboardAfterSettings = false
                 showingSettings = true
             }
             Button("Cancel", role: .cancel) {}

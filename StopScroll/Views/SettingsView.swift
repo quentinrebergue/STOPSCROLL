@@ -222,11 +222,16 @@ struct SettingsView: View {
             .navigationTitle("StopScroll Settings")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done", action: onDismiss)
-                }
                 ToolbarItem(placement: .navigationBarLeading) {
-                    EditButton()
+                    Button {
+                        if let onOpenDashboard {
+                            onOpenDashboard()
+                        } else {
+                            onDismiss()
+                        }
+                    } label: {
+                        Label("Dashboard", systemImage: "chevron.left")
+                    }
                 }
             }
             .alert("Reset labels?", isPresented: $showResetAlert) {
