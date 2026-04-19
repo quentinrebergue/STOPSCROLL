@@ -528,6 +528,7 @@ struct DashboardView: View {
     @AppStorage("ss_goal_minutes_per_day") private var goalMinutesPerDay = 30
     @AppStorage("ss_usage_sessions_today") private var sessionsToday = 0
     @AppStorage("ss_usage_minutes_today") private var minutesToday = 0
+    @AppStorage("ss_instagram_username") private var instagramUsername = ""
 
     private var xpLevel: Int {
         XPProgress.level(for: totalXP)
@@ -546,6 +547,7 @@ struct DashboardView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     goalsCard
+                    accountCard
                     usageCard
                     progressionCard
                 }
@@ -609,6 +611,36 @@ struct DashboardView: View {
 
             ProgressView(value: usageProgress)
                 .tint(Color(red: 0.35, green: 0.85, blue: 0.45))
+        }
+        .padding(14)
+        .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(Color(white: 0.1)))
+        .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(Color.white.opacity(0.08), lineWidth: 1))
+    }
+
+    private var accountCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Compte Instagram")
+                .font(.headline)
+                .foregroundColor(.white)
+
+            Text("Pseudo utilise pour la navigation profil (ex: quentin_rebergue)")
+                .font(.caption)
+                .foregroundColor(.gray)
+
+            TextField("pseudo_instagram", text: $instagramUsername)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+                .foregroundColor(.white)
+                .padding(10)
+                .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(Color.white.opacity(0.06)))
+                .onChange(of: instagramUsername) { value in
+                    let cleaned = value
+                        .trimmingCharacters(in: .whitespacesAndNewlines)
+                        .replacingOccurrences(of: "@", with: "")
+                    if cleaned != value {
+                        instagramUsername = cleaned
+                    }
+                }
         }
         .padding(14)
         .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(Color(white: 0.1)))

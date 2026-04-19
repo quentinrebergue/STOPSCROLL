@@ -202,6 +202,24 @@
       }
       return true;
     }
+
+    // Fallbacks for cases where bottom tab links are not yet discoverable.
+    if (tab === 'search') {
+      global.location.href = '/explore/';
+      return true;
+    }
+    if (tab === 'home') {
+      global.location.href = '/';
+      return true;
+    }
+    if (tab === 'profile') {
+      var raw = (global.__STOPSCROLL_INSTAGRAM_USERNAME || '').trim();
+      var username = raw.replace(/^@+/, '').replace(/[^a-zA-Z0-9._]/g, '');
+      if (username) {
+        global.location.href = '/' + username + '/';
+        return true;
+      }
+    }
     return false;
   }
 

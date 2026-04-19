@@ -210,3 +210,8 @@ Destination de test recommandee dans ce repo:
 - reprise runtime au retour de la surface active (`setPaused(false)`)
 - eviction memoire V1: sur memory warning iOS, destruction de la surface inactive puis recreation lazy au prochain switch
 - details complets dans `docs/TWO_WEBVIEW_STRATEGY.md`
+
+13. Fiabilisation navigation Search/Profile
+- fallback `search` vers `/explore/` si mapping DOM indisponible
+- fallback `profile` via pseudo Instagram configure (`ss_instagram_username`)
+- commande de navigation renvoyee automatiquement quand une surface active est recreee (post-eviction)

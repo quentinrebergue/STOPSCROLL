@@ -134,14 +134,10 @@ struct InstagramWebView: UIViewRepresentable {
         }
         if context.coordinator.lastNativeNavCommandToken != nativeNavCommandToken {
             context.coordinator.lastNativeNavCommandToken = nativeNavCommandToken
-            guard selectedNativeTab != "book", selectedNativeTab != "dashboard" else {
-                return
-            }
-            let tab = selectedNativeTab
-                .replacingOccurrences(of: "\\", with: "\\\\")
-                .replacingOccurrences(of: "'", with: "\\'")
-            let script = "(function(){var ns=window.StopScroll;if(ns&&ns.nav&&ns.nav.nativeNavigateToTab){ns.nav.nativeNavigateToTab('\(tab)');}})();"
-            uiView.evaluateJavaScript(script)
+            context.coordinator.sendNativeNavigationCommand(tab: selectedNativeTab, onlyIfActive: true)
+        } else if !context.coordinator.didSendInitialActiveNavCommand, isActive {
+            context.coordinator.didSendInitialActiveNavCommand = true
+            context.coordinator.sendNativeNavigationCommand(tab: selectedNativeTab, onlyIfActive: true)
         }
         if context.coordinator.lastIsActive != isActive {
             context.coordinator.lastIsActive = isActive
@@ -161,7 +157,10 @@ struct InstagramWebView: UIViewRepresentable {
         let srcData = (try? JSONSerialization.data(withJSONObject: sources)) ?? Data()
         let srcJson = String(data: srcData, encoding: .utf8) ?? "[]"
         let devMode = AppSettings.shared.devMode ? "true" : "false"
-        return "window.__STOPSCROLL_AD_LABELS = \(json); window.__STOPSCROLL_FREQUENCY = \(freq); window.__STOPSCROLL_ARTICLE_SOURCES = \(srcJson); window.__STOPSCROLL_DEV_MODE = \(devMode);"
+        let username = (UserDefaults.standard.string(forKey: "ss_instagram_username") ?? "")
+            .replacingOccurrences(of: "\\", with: "\\\\")
+            .replacingOccurrences(of: "'", with: "\\'")
+        return "window.__STOPSCROLL_AD_LABELS = \(json); window.__STOPSCROLL_FREQUENCY = \(freq); window.__STOPSCROLL_ARTICLE_SOURCES = \(srcJson); window.__STOPSCROLL_DEV_MODE = \(devMode); window.__STOPSCROLL_INSTAGRAM_USERNAME = '\(username)';"
     }
 
     private func buildYAMLInjectionScript() -> String? {
@@ -241,6 +240,7 @@ struct InstagramWebView: UIViewRepresentable {
         var lastWikipediaTitle: String
         var lastNativeNavCommandToken: Int
         var lastIsActive: Bool
+        var didSendInitialActiveNavCommand: Bool
 
         init(_ parent: InstagramWebView) {
             self.parent = parent
@@ -249,6 +249,17 @@ struct InstagramWebView: UIViewRepresentable {
             self.lastWikipediaTitle = ""
             self.lastNativeNavCommandToken = parent.nativeNavCommandToken
             self.lastIsActive = parent.isActive
+            self.didSendInitialActiveNavCommand = false
+        }
+
+        func sendNativeNavigationCommand(tab: String, onlyIfActive: Bool) {
+            if onlyIfActive && !parent.isActive { return }
+            guard tab != "book", tab != "dashboard" else { return }
+            let escapedTab = tab
+                .replacingOccurrences(of: "\\", with: "\\\\")
+                .replacingOccurrences(of: "'", with: "\\'")
+            let script = "(function(){var ns=window.StopScroll;if(ns&&ns.nav&&ns.nav.nativeNavigateToTab){ns.nav.nativeNavigateToTab('\(escapedTab)');}})();"
+            webView?.evaluateJavaScript(script)
         }
 
         func userContentController(_ controller: WKUserContentController, didReceive message: WKScriptMessage) {
