@@ -50,6 +50,8 @@ struct ChapterCard: View {
 
 struct SectionCard: View {
     let title: String
+    @ObservedObject private var settings = AppSettings.shared
+    private var palette: AppSettings.AdaptivePalette { settings.adaptivePalette }
 
     var body: some View {
         VStack(spacing: 16) {
@@ -69,7 +71,7 @@ struct SectionCard: View {
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(white: 0.13))
+        .background(palette.elevatedSurface)
         .clipShape(RoundedRectangle(cornerRadius: 14))
     }
 }

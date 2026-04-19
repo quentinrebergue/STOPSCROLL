@@ -79,18 +79,7 @@ struct BookReaderView: View {
                     readerContent
                 }
             }
-        }
-        .ignoresSafeArea(edges: .bottom)
-        .background(appBackgroundColor)
-        .fileImporter(
-            isPresented: $showFilePicker,
-            allowedContentTypes: Self.allowedTypes
-        ) { result in
-            if case .success(let url) = result {
-                loadBook(from: url)
-            }
-        }
-        .sheet(isPresented: $showSettings) {
+
             SettingsSheet(
                 mode: mode,
                 onModeChange: { newMode in
@@ -113,8 +102,22 @@ struct BookReaderView: View {
                 },
                 currentBookId: currentBookId,
                 bookTitle: bookTitle,
-                allBookmarkedCards: bookmarkedCards()
+                allBookmarkedCards: bookmarkedCards(),
+                onDismiss: { showSettings = false }
             )
+            .opacity(showSettings ? 1 : 0)
+            .allowsHitTesting(showSettings)
+            .ignoresSafeArea()
+        }
+        .ignoresSafeArea(edges: .bottom)
+        .background(appBackgroundColor)
+        .fileImporter(
+            isPresented: $showFilePicker,
+            allowedContentTypes: Self.allowedTypes
+        ) { result in
+            if case .success(let url) = result {
+                loadBook(from: url)
+            }
         }
         .onAppear {
             if !resolvedCurrentArticleId.isEmpty {

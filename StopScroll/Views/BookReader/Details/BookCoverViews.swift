@@ -4,6 +4,7 @@ import SwiftUI
 
 struct BookCoverThumbnail: View {
     let bookId: String
+    @ObservedObject private var settings = AppSettings.shared
 
     private var uiImage: UIImage? {
         guard let data = BookStorage.loadCover(bookId: bookId) else { return nil }
@@ -19,9 +20,9 @@ struct BookCoverThumbnail: View {
             } else {
                 Image(systemName: "book.closed")
                     .font(.system(size: 16))
-                    .foregroundColor(Color(white: 0.65))
+                    .foregroundColor(settings.adaptivePalette.secondaryText)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color(white: 0.15))
+                    .background(settings.adaptivePalette.elevatedSurface)
             }
         }
         .frame(width: 34, height: 50)
@@ -33,6 +34,7 @@ struct BookCoverThumbnail: View {
 
 struct BookCoverLarge: View {
     let bookId: String
+    @ObservedObject private var settings = AppSettings.shared
 
     private var uiImage: UIImage? {
         guard let data = BookStorage.loadCover(bookId: bookId) else { return nil }
@@ -48,16 +50,16 @@ struct BookCoverLarge: View {
             } else {
                 Image(systemName: "book.closed.fill")
                     .font(.system(size: 44))
-                    .foregroundColor(Color(white: 0.7))
+                    .foregroundColor(settings.adaptivePalette.secondaryText)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color(white: 0.14))
+                    .background(settings.adaptivePalette.elevatedSurface)
             }
         }
         .frame(width: 90, height: 128)
         .clipShape(RoundedRectangle(cornerRadius: 10))
         .overlay(
             RoundedRectangle(cornerRadius: 10)
-                .stroke(Color.white.opacity(0.08), lineWidth: 1)
+                .stroke(settings.adaptivePalette.border, lineWidth: 1)
         )
     }
 }

@@ -10,13 +10,15 @@ struct TextCardView: View {
     var highlightText: String? = nil
 
     @State private var showHeartAnimation = false
+    @ObservedObject private var settings = AppSettings.shared
+    private var palette: AppSettings.AdaptivePalette { settings.adaptivePalette }
 
     private var highlightedText: AttributedString {
         var attr = AttributedString(card.text)
         if let hl = highlightText, !hl.isEmpty,
            let range = attr.range(of: hl) {
             attr[range].underlineStyle = .single
-            attr[range].foregroundColor = .white
+            attr[range].foregroundColor = palette.primaryText
         }
         return attr
     }
@@ -28,7 +30,7 @@ struct TextCardView: View {
                 HStack {
                     Text(card.chapterTitle.isEmpty ? "Page \(card.page)" : card.chapterTitle)
                         .font(.system(size: 12, weight: .medium, design: .monospaced))
-                        .foregroundColor(Color(white: 0.4))
+                        .foregroundColor(palette.secondaryText)
                         .lineLimit(1)
 
                     Spacer()
@@ -44,13 +46,13 @@ struct TextCardView: View {
                 .padding(.bottom, 6)
 
                 Rectangle()
-                    .fill(Color(white: 0.15))
+                    .fill(palette.border)
                     .frame(height: 0.5)
                     .padding(.horizontal, 20)
 
                 Text(highlightedText)
                     .font(.custom("Charter", size: mode.fontSize))
-                    .foregroundColor(Color(white: 0.92))
+                    .foregroundColor(palette.primaryText)
                     .lineSpacing(mode.lineSpacing)
                     .frame(maxWidth: .infinity, alignment: .topLeading)
                     .padding(.horizontal, 22)
@@ -60,14 +62,14 @@ struct TextCardView: View {
                 Spacer(minLength: 0)
 
                 Rectangle()
-                    .fill(Color(white: 0.15))
+                    .fill(palette.border)
                     .frame(height: 0.5)
                     .padding(.horizontal, 20)
 
                 HStack {
                     Text("Page \(card.page), Card \(card.cardIndexInPage)")
                         .font(.system(size: 11, weight: .medium, design: .monospaced))
-                        .foregroundColor(Color(white: 0.3))
+                        .foregroundColor(palette.secondaryText)
                     Spacer()
                 }
                 .padding(.horizontal, 20)
@@ -82,7 +84,7 @@ struct TextCardView: View {
                     .transition(.scale.combined(with: .opacity))
             }
         }
-        .background(Color(white: 0.09))
+        .background(palette.elevatedSurface)
         .clipShape(RoundedRectangle(cornerRadius: 14))
         .onTapGesture(count: 2) {
             onBookmark()

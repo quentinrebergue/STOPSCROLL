@@ -76,7 +76,7 @@
     post.setAttribute('data-ss-xp-card', '1');
     post.style.cssText = [
       'display:flex', 'flex-direction:column', 'width:100%', 'height:100%',
-      'background:#1a1a22', 'color:#f4f6fa',
+      'background:#1a1a22',
       'font-family:' + FONT, 'box-sizing:border-box', 'overflow:hidden'
     ].join(';');
 
@@ -108,7 +108,7 @@
     var more = document.createElement('div');
     more.textContent = '\u00B7\u00B7\u00B7';
     more.setAttribute('data-ss-more', '');
-    more.style.cssText = 'font-size:20px;letter-spacing:3px;line-height:1;color:rgba(244,246,250,0.45);padding:4px 2px';
+    more.style.cssText = 'font-size:20px;letter-spacing:3px;line-height:1;opacity:0.45;padding:4px 2px';
 
     header.appendChild(avatarRow);
     header.appendChild(more);

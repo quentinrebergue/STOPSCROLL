@@ -14,6 +14,7 @@ struct SettingsSheet: View {
     let currentBookId: String
     let bookTitle: String
     let allBookmarkedCards: [BookCard]
+    let onDismiss: () -> Void
 
     @State private var library: [LibraryBook] = []
     @State private var showImportFileImporter = false
@@ -290,7 +291,7 @@ struct SettingsSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") { dismiss() }
+                    Button("Done") { onDismiss() }
                 }
             }
             .onAppear {
@@ -324,5 +325,6 @@ struct SettingsSheet: View {
                 onCompletion: handleImportedFile
             )
         }
+        .background(palette.background.ignoresSafeArea())
     }
 }
