@@ -112,6 +112,21 @@ extension InstagramWebView.Coordinator {
             }
             return true
         }
+        if type == "debugLog" {
+            let message = (payload["message"] as? String) ?? "[JS] debug log"
+            let category = (payload["category"] as? String) ?? "JS"
+            let levelRaw = ((payload["level"] as? String) ?? "DEBUG").uppercased()
+            let level: LogLevel
+            switch levelRaw {
+            case "INFO": level = .info
+            case "WARNING", "WARN": level = .warning
+            case "ERROR": level = .error
+            case "CRITICAL": level = .critical
+            default: level = .debug
+            }
+            LogManager.shared.log(message, category: category, level: level)
+            return true
+        }
         if type == "nativeNavState" {
             let tab = (payload["tab"] as? String) ?? "home"
             let badgeCount = Self.parseXPAmount(payload["messageBadge"])

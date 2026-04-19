@@ -9,11 +9,61 @@
 
   // ── Instagram color detection (cached) ─────────────────────
   var _igColors = null;
+  var _igColorsAt = 0;
+  var _colorDebugCount = 0;
+
+  function parseRGB(cssColor) {
+    if (!cssColor || typeof cssColor !== 'string') return null;
+    var m = cssColor.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([0-9.]+))?\)/i);
+    if (!m) return null;
+    return {
+      r: parseInt(m[1], 10),
+      g: parseInt(m[2], 10),
+      b: parseInt(m[3], 10),
+      a: m[4] != null ? parseFloat(m[4]) : 1
+    };
+  }
+
+  function luminance(rgb) {
+    if (!rgb) return 0;
+    return (0.2126 * rgb.r + 0.7152 * rgb.g + 0.0722 * rgb.b);
+  }
+
+  function contrastTextForBg(bgCss) {
+    var rgb = parseRGB(bgCss);
+    if (!rgb) return 'rgb(245, 245, 245)';
+    return luminance(rgb) < 140 ? 'rgb(245, 245, 245)' : 'rgb(18, 18, 18)';
+  }
+
+  function isUsableTextColor(cssColor, bgCss) {
+    var text = parseRGB(cssColor);
+    if (!text) return false;
+    if (text.a < 0.8) return false;
+    var bg = parseRGB(bgCss);
+    if (!bg) return true;
+    // Keep only colors with enough luminance delta; avoids pale/low-contrast picks.
+    return Math.abs(luminance(text) - luminance(bg)) >= 55;
+  }
+
+  function emitColorDebugLog(stage, payload) {
+    var msg = '[ColorProbe] ' + stage + ' ' + JSON.stringify(payload || {});
+    try {
+      if (ns.dom && ns.dom.postToBridge) {
+        ns.dom.postToBridge({ type: 'debugLog', category: 'ColorProbe', level: 'DEBUG', message: msg });
+      }
+    } catch (_) {}
+    try { if (global.console && global.console.log) global.console.log(msg); } catch (_) {}
+  }
 
   function detectInstagramColors() {
-    if (_igColors) return _igColors;
-    _igColors = { bg: '#000', text: '#f5f5f5' };
+    var now = Date.now();
+    if (_igColors && (now - _igColorsAt) < 5000) return _igColors;
+
+    _igColors = { bg: 'rgb(0, 0, 0)', text: 'rgb(245, 245, 245)' };
+    _igColorsAt = now;
+
     try {
+      var textFound = false;
       var articles = document.querySelectorAll('article:not([data-ss-replaced])');
       for (var i = 0; i < articles.length; i++) {
         var art = articles[i];
@@ -23,24 +73,51 @@
         }
         var hdr = art.querySelector('header');
         if (hdr) {
-          var spans = hdr.querySelectorAll('span, a');
+          var spans = hdr.querySelectorAll('a, h2, span');
           for (var j = 0; j < spans.length; j++) {
             if (spans[j].textContent && spans[j].textContent.trim().length > 0) {
-              _igColors.text = getComputedStyle(spans[j]).color;
-              break;
+              var c = getComputedStyle(spans[j]).color;
+              if (isUsableTextColor(c, _igColors.bg)) {
+                _igColors.text = c;
+                textFound = true;
+                break;
+              }
             }
           }
         }
         break; // one article is enough
       }
+
       // Fallback: check body background
-      if (_igColors.bg === '#000') {
+      if (_igColors.bg === 'rgb(0, 0, 0)') {
         var bodyBg = getComputedStyle(document.body).backgroundColor;
         if (bodyBg && bodyBg !== 'rgba(0, 0, 0, 0)' && bodyBg !== 'transparent') {
           _igColors.bg = bodyBg;
         }
       }
+
+      // Fallback: body text color, then contrast-based color.
+      if (!textFound) {
+        var bodyText = getComputedStyle(document.body).color;
+        if (isUsableTextColor(bodyText, _igColors.bg)) {
+          _igColors.text = bodyText;
+          textFound = true;
+        }
+      }
+      if (!textFound) {
+        _igColors.text = contrastTextForBg(_igColors.bg);
+      }
     } catch (e) {}
+
+    if (_colorDebugCount < 12) {
+      _colorDebugCount += 1;
+      emitColorDebugLog('detectInstagramColors', {
+        sample: _colorDebugCount,
+        bg: _igColors.bg,
+        text: _igColors.text
+      });
+    }
+
     return _igColors;
   }
 
@@ -190,6 +267,7 @@
     var header = card.children[0];
     if (header) {
       header.style.borderBottom = '1px solid ' + borderColor;
+      header.style.color = colors.text;
       var divs = header.querySelectorAll('div');
       for (var i = 0; i < divs.length; i++) {
         var d = divs[i];
@@ -197,11 +275,16 @@
         if (d.style.borderRadius === '50%') continue;
         d.style.color = colors.text;
       }
+      var username = header.querySelector('[data-ss-username]');
+      if (username) username.style.color = colors.text;
+      var more = header.querySelector('[data-ss-more]');
+      if (more) more.style.color = colors.text;
     }
     // Action bar: last child
     var actionBar = card.children[card.children.length - 1];
     if (actionBar) {
       actionBar.style.borderTop = '1px solid ' + borderColor;
+      actionBar.style.color = colors.text;
       var btns = actionBar.querySelectorAll('button');
       for (var j = 0; j < btns.length; j++) btns[j].style.color = colors.text;
     }
@@ -275,6 +358,15 @@
       applyNativeColors(card, colors);
       appendCaption(card, config, colors);
       observeButtonReveal(card);
+      if (_colorDebugCount < 20) {
+        _colorDebugCount += 1;
+        emitColorDebugLog('buildCardFor', {
+          sample: _colorDebugCount,
+          type: type,
+          bg: colors.bg,
+          text: colors.text
+        });
+      }
     }
     return card;
   }
