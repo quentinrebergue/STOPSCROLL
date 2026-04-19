@@ -215,3 +215,8 @@ Destination de test recommandee dans ce repo:
 - fallback `search` vers `/explore/` si mapping DOM indisponible
 - fallback `profile` via pseudo Instagram configure (`ss_instagram_username`)
 - commande de navigation renvoyee automatiquement quand une surface active est recreee (post-eviction)
+
+14. Prompt pseudo Instagram pour onglet profil
+- si l'utilisateur tape profil sans pseudo configure, une sheet native demande le pseudo
+- apres validation, le pseudo est sauvegarde et la navigation profil est relancee
+- cette valeur alimente le fallback profile de la nav secondaire

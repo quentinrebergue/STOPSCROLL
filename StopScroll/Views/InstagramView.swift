@@ -51,6 +51,9 @@ struct InstagramView: View {
     @State private var activeSurface: WebSurface = .main
     @State private var hasMainSurface = true
     @State private var hasMessagesSurface = true
+    @AppStorage("ss_instagram_username") private var instagramUsername = ""
+    @State private var showInstagramUsernamePrompt = false
+    @State private var instagramUsernameDraft = ""
 
     private var isActiveSurfaceLoading: Bool {
         switch activeSurface {
@@ -75,6 +78,7 @@ struct InstagramView: View {
                     initialURLString: "https://www.instagram.com/",
                     isActive: activeSurface == .main,
                     tracksLoading: true,
+                    scriptProfile: .full,
                     onGrantXP: { amount, source in
                         grantXP(amount: amount, source: source)
                     }
@@ -101,6 +105,7 @@ struct InstagramView: View {
                     initialURLString: "https://www.instagram.com/direct/inbox/",
                     isActive: activeSurface == .messages,
                     tracksLoading: true,
+                    scriptProfile: .navigationLite,
                     onGrantXP: { amount, source in
                         grantXP(amount: amount, source: source)
                     }
@@ -173,12 +178,20 @@ struct InstagramView: View {
                                 return
                             }
                             if tab == "messages" {
-                                if !hasMessagesSurface {
-                                    hasMessagesSurface = true
-                                    isLoadingMessages = true
+                                openInstagramSecondary(tab: "messages")
+                                return
+                            }
+                            if tab == "search" {
+                                openInstagramSecondary(tab: "search")
+                                return
+                            }
+                            if tab == "profile" {
+                                if instagramUsername.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                                    instagramUsernameDraft = ""
+                                    showInstagramUsernamePrompt = true
+                                    return
                                 }
-                                activeSurface = .messages
-                                nativeSelectedTab = "messages"
+                                openInstagramSecondary(tab: "profile")
                                 return
                             }
                             if !hasMainSurface {
@@ -221,6 +234,37 @@ struct InstagramView: View {
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.didReceiveMemoryWarningNotification)) { _ in
             evictInactiveSurface()
         }
+        .sheet(isPresented: $showInstagramUsernamePrompt) {
+            InstagramUsernamePromptSheet(
+                username: $instagramUsernameDraft,
+                onCancel: {
+                    showInstagramUsernamePrompt = false
+                },
+                onConfirm: {
+                    let cleaned = instagramUsernameDraft
+                        .trimmingCharacters(in: .whitespacesAndNewlines)
+                        .replacingOccurrences(of: "@", with: "")
+                    guard !cleaned.isEmpty else { return }
+                    instagramUsername = cleaned
+                    labelsToken += 1
+                    showInstagramUsernamePrompt = false
+                    openInstagramSecondary(tab: "profile")
+                }
+            )
+        }
+        .onChange(of: instagramUsername) { _ in
+            labelsToken += 1
+        }
+    }
+
+    private func openInstagramSecondary(tab: String) {
+        if !hasMessagesSurface {
+            hasMessagesSurface = true
+            isLoadingMessages = true
+        }
+        activeSurface = .messages
+        nativeSelectedTab = tab
+        nativeNavCommandToken += 1
     }
 
     private func evictInactiveSurface() {
@@ -301,6 +345,44 @@ struct InstagramView: View {
         }
         xpHideWorkItem = workItem
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.15, execute: workItem)
+    }
+}
+
+private struct InstagramUsernamePromptSheet: View {
+    @Binding var username: String
+    let onCancel: () -> Void
+    let onConfirm: () -> Void
+
+    var body: some View {
+        NavigationView {
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Entrez votre pseudo Instagram pour ouvrir votre profil depuis la navbar native.")
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
+
+                TextField("pseudo_instagram", text: $username)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                    .padding(10)
+                    .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(Color.white.opacity(0.08)))
+
+                Spacer()
+            }
+            .padding(16)
+            .background(Color(white: 0.08).ignoresSafeArea())
+            .navigationTitle("Pseudo Instagram")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Annuler") { onCancel() }
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Valider") { onConfirm() }
+                        .disabled(username.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                }
+            }
+        }
+        .preferredColorScheme(.dark)
     }
 }
 

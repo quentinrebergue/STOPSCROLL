@@ -13,11 +13,23 @@ Eviter la navigation fragile via simulation de clics DOM entre sections Instagra
 
 2. WebView messages (`messages`)
 - URL de base: `https://www.instagram.com/direct/inbox/`
-- Active uniquement quand l'utilisateur ouvre l'onglet messages dans la navbar native.
+- Surface secondaire pour les sections Instagram hors feed (messages/search/profile).
+- Active quand l'utilisateur ouvre un onglet Instagram natif autre que feed.
 
 3. Affichage
 - Une seule WebView visible/interactable a la fois.
 - Switch natif = changement de surface visible (pas recreation immediate).
+
+4. Repartition fonctionnelle
+- WebView 1 reste la surface feed prioritaire.
+- WebView 2 est la surface de navigation Instagram secondaire.
+- Home affiche la surface feed.
+- Messages/Search/Profile affichent la surface secondaire.
+
+5. Optimisation JS par surface
+- WebView 1 (feed): runtime complet StopScroll.
+- WebView 2 (secondaire): profile JS leger (`constants`, `dom-utils`, `nav-management`) + sync nav state periodique.
+- Objectif: reduire la charge CPU/memoire de la surface secondaire.
 
 ## Optimisations necessaires
 
@@ -37,7 +49,7 @@ Eviter la navigation fragile via simulation de clics DOM entre sections Instagra
 - Les deux WebView sont initialisees puis conservees.
 - Le switch est instantane apres le premier chargement.
 
-4. Gouvernance memoire (etape suivante)
+6. Gouvernance memoire (etape suivante)
 - Si pression memoire iOS: detruire la WebView inactive la moins recente.
 - Recharger a la demande avec restauration minimale d'URL.
 

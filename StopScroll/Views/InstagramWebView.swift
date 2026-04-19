@@ -3,6 +3,11 @@ import WebKit
 import UserNotifications
 
 struct InstagramWebView: UIViewRepresentable {
+    enum ScriptProfile {
+        case full
+        case navigationLite
+    }
+
     @Binding var isLoading: Bool
     @Binding var showingReader: Bool
     @Binding var showingSettings: Bool
@@ -16,10 +21,11 @@ struct InstagramWebView: UIViewRepresentable {
     var initialURLString: String = "https://www.instagram.com/"
     var isActive: Bool = true
     var tracksLoading: Bool = true
+    var scriptProfile: ScriptProfile = .full
     var onGrantXP: (Int, String) -> Void = { _, _ in }
 
-    /// Module scripts injected in dependency order before the bootstrap.
-    private static let moduleScripts: [String] = [
+    /// Full runtime scripts injected in dependency order before the bootstrap.
+    private static let fullModuleScripts: [String] = [
         "constants",
         "config",
         "dom-utils",
@@ -48,6 +54,13 @@ struct InstagramWebView: UIViewRepresentable {
         "runtime-state",
         "runtime-ui",
         "runtime-scan",
+    ]
+
+    /// Lightweight scripts used by non-feed surfaces (messages/search/profile).
+    private static let navigationLiteScripts: [String] = [
+        "constants",
+        "dom-utils",
+        "nav-management",
     ]
 
     func makeCoordinator() -> Coordinator { Coordinator(self) }
@@ -79,8 +92,8 @@ struct InstagramWebView: UIViewRepresentable {
             forMainFrameOnly: true
         ))
 
-        // Inject all module scripts in dependency order, then the bootstrap.
-        for script in Self.loadAllScripts() {
+        // Inject scripts profile for this surface.
+        for script in Self.loadScripts(profile: scriptProfile) {
             config.userContentController.addUserScript(WKUserScript(
                 source: script,
                 injectionTime: .atDocumentEnd,
@@ -195,21 +208,52 @@ struct InstagramWebView: UIViewRepresentable {
         return "window.__STOPSCROLL_BOOK = {title:'\(escapedTitle)',page:\(cardIndex),totalPages:\(totalPages),hasBook:\(!bookId.isEmpty)};"
     }
 
-    /// Loads all module scripts + bootstrap in dependency order from the bundle.
-    private static func loadAllScripts() -> [String] {
+    /// Loads scripts for the requested profile.
+    private static func loadScripts(profile: ScriptProfile) -> [String] {
+        let names: [String]
+        switch profile {
+        case .full:
+            names = fullModuleScripts
+        case .navigationLite:
+            names = navigationLiteScripts
+        }
+
         var scripts: [String] = []
-        for name in moduleScripts {
+        for name in names {
             if let url = Bundle.main.url(forResource: name, withExtension: "js"),
                let src = try? String(contentsOf: url, encoding: .utf8) {
                 scripts.append(src)
             }
         }
-        // Bootstrap entry point – must come last.
-        if let url = Bundle.main.url(forResource: "block_reels", withExtension: "js"),
-           let src = try? String(contentsOf: url, encoding: .utf8) {
-            scripts.append(src)
+        if profile == .full {
+            // Full bootstrap entry point – must come last.
+            if let url = Bundle.main.url(forResource: "block_reels", withExtension: "js"),
+               let src = try? String(contentsOf: url, encoding: .utf8) {
+                scripts.append(src)
+            }
+        } else {
+            scripts.append(navigationSyncBootstrapScript())
         }
         return scripts
+    }
+
+    private static func navigationSyncBootstrapScript() -> String {
+        """
+        (function(){
+            if (window.__STOPSCROLL_NAV_LITE_RUNNING) return;
+            window.__STOPSCROLL_NAV_LITE_RUNNING = true;
+            var tick = function(){
+                var ns = window.StopScroll;
+                if (ns && ns.nav && ns.nav.syncNativeNavState) {
+                    ns.nav.syncNativeNavState();
+                }
+            };
+            tick();
+            window.addEventListener('popstate', tick);
+            document.addEventListener('visibilitychange', function(){ if (!document.hidden) tick(); });
+            window.__STOPSCROLL_NAV_LITE_TIMER = setInterval(tick, 1200);
+        })();
+        """
     }
 
 
@@ -812,8 +856,8 @@ struct InstagramWebView: UIViewRepresentable {
             webView.evaluateJavaScript(parent.buildBookStateScript())
             // Inject user label list (UserDefaults) so JS picks up any edits.
             webView.evaluateJavaScript(parent.buildLabelsInjectionScript())
-            // Re-inject all module scripts + bootstrap after each navigation.
-            for script in InstagramWebView.loadAllScripts() {
+            // Re-inject scripts profile after each navigation.
+            for script in InstagramWebView.loadScripts(profile: parent.scriptProfile) {
                 webView.evaluateJavaScript(script)
             }
             applyRuntimeActiveState(parent.isActive)

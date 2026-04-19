@@ -28,6 +28,7 @@ Spec concrete des prochaines features anti-procrastination:
 - navbar native synchronisee deja livree (onglets + badge messages + sync webview)
 - strategie 2 webview livree (main + messages avec pause runtime inactive)
 - eviction memoire V1 livree (memory warning -> destruction surface inactive, recreation lazy)
+- webview secondaire etendue (messages/search/profile) avec injection JS legere
 - cohabitation livre/article: finaliser switcher explicite dans le reader
 
 ## Next (1-2 mois)
