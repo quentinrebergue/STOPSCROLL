@@ -3,48 +3,48 @@ import UIKit
 
 struct InstagramView: View {
 
-    @State private var isLoadingMain = true
-    @State private var isLoadingMessages = true
-    @State private var isLoadingSearch = true
-    @State private var isLoadingProfile = true
-    @State private var showingReader = false
-    @State private var reloadToken = 0
-    @State private var showingSettings = false
-    @State private var showingDashboard = false
-    @State private var returnToDashboardAfterSettings = false
+    @State var isLoadingMain = true
+    @State var isLoadingMessages = true
+    @State var isLoadingSearch = true
+    @State var isLoadingProfile = true
+    @State var showingReader = false
+    @State var reloadToken = 0
+    @State var showingSettings = false
+    @State var showingDashboard = false
+    @State var returnToDashboardAfterSettings = false
     /// Incremented when the user closes Settings so the WebView re-injects the updated label list.
-    @State private var labelsToken = 0
-    @AppStorage("ss_xp_total") private var totalXP = 0
-    @State private var xpIslandVisible = false
-    @State private var xpLastGain = 0
-    @State private var xpHideWorkItem: DispatchWorkItem?
-    @State private var xpProgressWorkItem: DispatchWorkItem?
-    @State private var xpInfoWorkItem: DispatchWorkItem?
-    @State private var xpIslandNudge: CGFloat = 0
-    @State private var xpDisplayedProgress: Double = 0
-    @State private var xpInfoPhase: XPInfoPhase = .gain
-    @State private var nativeSelectedTab: String = "home"
-    @State private var nativeMessageBadgeCount: Int = 0
-    @State private var nativeNavCommandToken: Int = 0
-    @State private var messagesNavigationURL: String? = nil
-    @State private var messagesNavigationToken: Int = 0
-    @State private var searchNavigationURL: String? = nil
-    @State private var searchNavigationToken: Int = 0
-    @State private var profileNavigationURL: String? = nil
-    @State private var profileNavigationToken: Int = 0
-    @State private var showControlCenterChooser = false
-    @State private var activeSurface: WebSurface = .main
-    @State private var hasMainSurface = true
-    @State private var hasMessagesSurface = false
-    @State private var hasSearchSurface = false
-    @State private var hasProfileSurface = false
-    @AppStorage("ss_instagram_username") private var instagramUsername = ""
-    @AppStorage("ss_webview_count") private var webViewCount = 2
-    @State private var showInstagramUsernamePrompt = false
-    @State private var instagramUsernameDraft = ""
-    @AppStorage("ss_instagram_theme_dark") private var instagramThemeIsDark = true
+    @State var labelsToken = 0
+    @AppStorage("ss_xp_total") var totalXP = 0
+    @State var xpIslandVisible = false
+    @State var xpLastGain = 0
+    @State var xpHideWorkItem: DispatchWorkItem?
+    @State var xpProgressWorkItem: DispatchWorkItem?
+    @State var xpInfoWorkItem: DispatchWorkItem?
+    @State var xpIslandNudge: CGFloat = 0
+    @State var xpDisplayedProgress: Double = 0
+    @State var xpInfoPhase: XPInfoPhase = .gain
+    @State var nativeSelectedTab: String = "home"
+    @State var nativeMessageBadgeCount: Int = 0
+    @State var nativeNavCommandToken: Int = 0
+    @State var messagesNavigationURL: String? = nil
+    @State var messagesNavigationToken: Int = 0
+    @State var searchNavigationURL: String? = nil
+    @State var searchNavigationToken: Int = 0
+    @State var profileNavigationURL: String? = nil
+    @State var profileNavigationToken: Int = 0
+    @State var showControlCenterChooser = false
+    @State var activeSurface: WebSurface = .main
+    @State var hasMainSurface = true
+    @State var hasMessagesSurface = false
+    @State var hasSearchSurface = false
+    @State var hasProfileSurface = false
+    @AppStorage("ss_instagram_username") var instagramUsername = ""
+    @AppStorage("ss_webview_count") var webViewCount = 2
+    @State var showInstagramUsernamePrompt = false
+    @State var instagramUsernameDraft = ""
+    @AppStorage("ss_instagram_theme_dark") var instagramThemeIsDark = true
 
-    private var isActiveSurfaceLoading: Bool {
+    var isActiveSurfaceLoading: Bool {
         switch activeSurface {
         case .main: return isLoadingMain
         case .messages: return isLoadingMessages
@@ -53,14 +53,14 @@ struct InstagramView: View {
         }
     }
 
-    private var normalizedWebViewCount: Int {
+    var normalizedWebViewCount: Int {
         min(max(webViewCount, 1), 4)
     }
 
-    private let webViewBottomOverscan: CGFloat = 116
-    private let sharedBottomNavReservedHeight: CGFloat = 92
+    let webViewBottomOverscan: CGFloat = 116
+    let sharedBottomNavReservedHeight: CGFloat = 92
 
-    private var instagramSurfaceColor: Color {
+    var instagramSurfaceColor: Color {
         instagramThemeIsDark ? .black : .white
     }
 
@@ -352,204 +352,4 @@ struct InstagramView: View {
         }
     }
 
-    private func openInstagramTab(_ tab: String) {
-        LogManager.shared.log("🔗 Tab selected: \(tab), mode: \(normalizedWebViewCount), surface: \(surfaceFor(tab: tab))", category: "Navigation", level: .info)
-        
-        if tab == "home" {
-            ensureSurfaceAvailable(.main)
-            activeSurface = .main
-            nativeSelectedTab = "home"
-            LogManager.shared.log("→ Home: activeSurface = main", category: "Navigation", level: .debug)
-            return
-        }
-
-        if normalizedWebViewCount == 1 {
-            ensureSurfaceAvailable(.main)
-            activeSurface = .main
-            nativeSelectedTab = tab
-            nativeNavCommandToken += 1
-            LogManager.shared.log("→ Mode 1: all tabs on main surface", category: "Navigation", level: .debug)
-            return
-        }
-
-        if tab == "profile" && instagramUsername.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            instagramUsernameDraft = ""
-            showInstagramUsernamePrompt = true
-            LogManager.shared.log("⚠️ Profile tab: no username set, prompting", category: "Navigation", level: .warning)
-            return
-        }
-
-        guard let targetURL = InstagramSecondaryRoute.url(for: tab, username: instagramUsername) else {
-            LogManager.shared.log("❌ Failed to generate URL for tab: \(tab)", category: "Navigation", level: .error)
-            return
-        }
-
-        let targetSurface = surfaceFor(tab: tab)
-        ensureSurfaceAvailable(targetSurface)
-        activeSurface = targetSurface
-        nativeSelectedTab = tab
-        LogManager.shared.log("→ Target surface: \(targetSurface), URL: \(targetURL)", category: "Navigation", level: .debug)
-
-        switch targetSurface {
-        case .main:
-            break
-        case .messages:
-            isLoadingMessages = true
-            messagesNavigationURL = targetURL
-            messagesNavigationToken += 1
-            LogManager.shared.log("→ Messages: loading started", category: "Navigation", level: .debug)
-        case .search:
-            isLoadingSearch = true
-            searchNavigationURL = targetURL
-            searchNavigationToken += 1
-            LogManager.shared.log("→ Search: loading started", category: "Navigation", level: .debug)
-        case .profile:
-            isLoadingProfile = true
-            profileNavigationURL = targetURL
-            profileNavigationToken += 1
-            LogManager.shared.log("→ Profile: loading started", category: "Navigation", level: .debug)
-        }
-    }
-
-    private func surfaceFor(tab: String) -> WebSurface {
-        SurfaceRouter.surface(for: tab, webViewCount: normalizedWebViewCount)
-    }
-
-    private func ensureSurfaceAvailable(_ surface: WebSurface) {
-        switch surface {
-        case .main:
-            if !hasMainSurface {
-                hasMainSurface = true
-                isLoadingMain = true
-            }
-        case .messages:
-            if !hasMessagesSurface {
-                hasMessagesSurface = true
-                isLoadingMessages = true
-            }
-        case .search:
-            if !hasSearchSurface {
-                hasSearchSurface = true
-                isLoadingSearch = true
-            }
-        case .profile:
-            if !hasProfileSurface {
-                hasProfileSurface = true
-                isLoadingProfile = true
-            }
-        }
-    }
-
-    private func reconfigureSurfacesForCurrentMode() {
-        LogManager.shared.log("🔄 Reconfiguring surfaces for mode \(normalizedWebViewCount)", category: "Routing", level: .info)
-        
-        activeSurface = surfaceFor(tab: nativeSelectedTab)
-
-        // Lazy mode: keep only the active surface mounted after config changes.
-        hasMainSurface = false
-        hasMessagesSurface = false
-        hasSearchSurface = false
-        hasProfileSurface = false
-
-        ensureSurfaceAvailable(activeSurface)
-
-        if normalizedWebViewCount < 2 {
-            hasMessagesSurface = false
-        }
-        if normalizedWebViewCount < 3 {
-            hasSearchSurface = false
-        }
-        if normalizedWebViewCount < 4 {
-            hasProfileSurface = false
-        }
-    }
-
-    private func evictInactiveSurface() {
-        if normalizedWebViewCount < 2 {
-            return
-        }
-
-        if activeSurface != .main {
-            hasMainSurface = false
-            isLoadingMain = true
-        }
-        if normalizedWebViewCount >= 2, activeSurface != .messages {
-            hasMessagesSurface = false
-            isLoadingMessages = true
-        }
-        if normalizedWebViewCount >= 3, activeSurface != .search {
-            hasSearchSurface = false
-            isLoadingSearch = true
-        }
-        if normalizedWebViewCount == 4, activeSurface != .profile {
-            hasProfileSurface = false
-            isLoadingProfile = true
-        }
-    }
-
-    private func grantXP(amount: Int, source: String) {
-        let progressStartDelayWhenVisible = 0.16
-        let progressStartDelayOnAppear = 0.22
-        let safeAmount = min(max(amount, 1), 200)
-        let previousTotal = totalXP
-        totalXP += safeAmount
-        let targetProgress = XPProgress.progress(for: totalXP)
-        xpLastGain = safeAmount
-        _ = source // reserved for future reward categories
-        xpInfoPhase = .gain
-
-        xpHideWorkItem?.cancel()
-        xpProgressWorkItem?.cancel()
-        xpInfoWorkItem?.cancel()
-
-        if xpIslandVisible {
-            withAnimation(.interactiveSpring(response: 0.32, dampingFraction: 0.74, blendDuration: 0.16)) {
-                xpIslandNudge = 0.045
-            }
-            withAnimation(.easeOut(duration: 0.28).delay(0.05)) {
-                xpIslandNudge = 0
-            }
-            // Island already visible: animate from previous level ratio to target ratio.
-            xpDisplayedProgress = XPProgress.progress(for: previousTotal)
-            let progressItem = DispatchWorkItem {
-                withAnimation(.easeOut(duration: 0.42)) {
-                    xpDisplayedProgress = targetProgress
-                }
-            }
-            xpProgressWorkItem = progressItem
-            DispatchQueue.main.asyncAfter(deadline: .now() + progressStartDelayWhenVisible, execute: progressItem)
-        } else {
-            // Show the current ratio immediately, then animate only the gained progression.
-            xpDisplayedProgress = XPProgress.progress(for: previousTotal)
-            withAnimation(.interactiveSpring(response: 0.56, dampingFraction: 0.82, blendDuration: 0.2)) {
-                xpIslandVisible = true
-            }
-
-            let progressItem = DispatchWorkItem {
-                withAnimation(.easeOut(duration: 0.48)) {
-                    xpDisplayedProgress = targetProgress
-                }
-            }
-            xpProgressWorkItem = progressItem
-            DispatchQueue.main.asyncAfter(deadline: .now() + progressStartDelayOnAppear, execute: progressItem)
-        }
-
-        // Minimal timeline: quick gain text, then current/required XP ratio.
-        let infoItem = DispatchWorkItem {
-            withAnimation(.easeOut(duration: 0.2)) {
-                xpInfoPhase = .progress
-            }
-        }
-        xpInfoWorkItem = infoItem
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.72, execute: infoItem)
-
-        let workItem = DispatchWorkItem {
-            withAnimation(.easeOut(duration: 0.34)) {
-                xpIslandVisible = false
-            }
-        }
-        xpHideWorkItem = workItem
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.15, execute: workItem)
-    }
 }
-

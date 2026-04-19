@@ -46,9 +46,19 @@
 		7484628AC4F24FC3A62D0BEE /* session-stats.js in Resources */ = {isa = PBXBuildFile; fileRef = 459D5381A32D4A489B570713 /* session-stats.js */; };
 		767CD5C99713E1A7FABA3036 /* InstagramView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7458C392340CA051B9872EA /* InstagramView.swift */; };
 		57218583F1444C87A92909F2 /* InstagramViewSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06E1D5530CDF4C7CA6BEA71F /* InstagramViewSupport.swift */; };
+		A099AE2021064A6297458DDC /* InstagramView+Actions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42E930E48F9248608B2EC422 /* InstagramView+Actions.swift */; };
 		81C4BF166B93D00B3D6765B9 /* scroll-lock.js in Resources */ = {isa = PBXBuildFile; fileRef = 47C612B0F7A1DCD29ADBEEF9 /* scroll-lock.js */; };
 		83F82C06AE917D7565F44576 /* InstagramWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98D36FB79C7EDDFDA593A7C9 /* InstagramWebView.swift */; };
 		1711C7E266074EFFAD963692 /* InstagramWebViewScripts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36FCB25113904961B1510777 /* InstagramWebViewScripts.swift */; };
+		008D33F44B7045A0A722948C /* InstagramWebView+Coordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BCC673054FD4E879D7347A6 /* InstagramWebView+Coordinator.swift */; };
+		0364D7499DF64538BCB34083 /* XPProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC77F4CBE5FC44EFAA078872 /* XPProgress.swift */; };
+		13106EBB3137418E9E2213D2 /* SurfaceRouting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5689B23C1AF54C20978DD126 /* SurfaceRouting.swift */; };
+		BBE7D1DFBF514814BB184E50 /* InstagramSecondaryRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25A3F150F9840E88AC41A61 /* InstagramSecondaryRoute.swift */; };
+		079F3B7CB3E14559A5BDA00B /* InstagramUsernamePromptSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA3DB3AC4BFB41FBA4AFEEC4 /* InstagramUsernamePromptSheet.swift */; };
+		B0850E3C96CF4059AFEDF811 /* NativeInstagramTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F753773FB34419AB19782C2 /* NativeInstagramTabBar.swift */; };
+		16FB9CE04FB0416C949F6797 /* LoadingBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = C41D6FA073DE4585B532C0A7 /* LoadingBar.swift */; };
+		5555B4A386F244848BAD3F43 /* XPDynamicIsland.swift in Sources */ = {isa = PBXBuildFile; fileRef = C61A44706D4243B09E49265F /* XPDynamicIsland.swift */; };
+		6CF6E661E46A4AB09C19F2B2 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B4FAD839023458C87E7EA20 /* DashboardView.swift */; };
 		87D5B5C7224D6580853F46AC /* build_block_reels.mjs in Resources */ = {isa = PBXBuildFile; fileRef = F6C771D48DF469657B4736F9 /* build_block_reels.mjs */; };
 		9041891F5A55383856E0C868 /* CardType.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC266854481DCE0687F62A4A /* CardType.swift */; };
 		9AEDCF87B455004504649DF7 /* runtime-state.js in Resources */ = {isa = PBXBuildFile; fileRef = FCC3507A23B2C8EF5C9F1582 /* runtime-state.js */; };
@@ -140,6 +150,16 @@
 		8D621B9E95F4CDC4E78C462C /* TestHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestHelpers.swift; sourceTree = "<group>"; };
 		98D36FB79C7EDDFDA593A7C9 /* InstagramWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebView/InstagramWebView.swift; sourceTree = "<group>"; };
 		36FCB25113904961B1510777 /* InstagramWebViewScripts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebView/InstagramWebViewScripts.swift; sourceTree = "<group>"; };
+		2BCC673054FD4E879D7347A6 /* InstagramWebView+Coordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebView/InstagramWebView+Coordinator.swift"; sourceTree = "<group>"; };
+		42E930E48F9248608B2EC422 /* InstagramView+Actions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Core/InstagramView+Actions.swift"; sourceTree = "<group>"; };
+		4F753773FB34419AB19782C2 /* NativeInstagramTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support/NativeInstagramTabBar.swift; sourceTree = "<group>"; };
+		5689B23C1AF54C20978DD126 /* SurfaceRouting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support/SurfaceRouting.swift; sourceTree = "<group>"; };
+		9B4FAD839023458C87E7EA20 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support/DashboardView.swift; sourceTree = "<group>"; };
+		AC77F4CBE5FC44EFAA078872 /* XPProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support/XPProgress.swift; sourceTree = "<group>"; };
+		C41D6FA073DE4585B532C0A7 /* LoadingBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support/LoadingBar.swift; sourceTree = "<group>"; };
+		C61A44706D4243B09E49265F /* XPDynamicIsland.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support/XPDynamicIsland.swift; sourceTree = "<group>"; };
+		E25A3F150F9840E88AC41A61 /* InstagramSecondaryRoute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support/InstagramSecondaryRoute.swift; sourceTree = "<group>"; };
+		FA3DB3AC4BFB41FBA4AFEEC4 /* InstagramUsernamePromptSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support/InstagramUsernamePromptSheet.swift; sourceTree = "<group>"; };
 		9A79C980F9AD98BD101601E9 /* dorian-gray.epub */ = {isa = PBXFileReference; lastKnownFileType = file; path = "dorian-gray.epub"; sourceTree = "<group>"; };
 		9BA157D7898D2DA526AFDCB1 /* top-menu.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "top-menu.js"; sourceTree = "<group>"; };
 		AE258A5A7FBD16C1374360DC /* build_block_reels.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = build_block_reels.sh; sourceTree = "<group>"; };
@@ -367,9 +387,19 @@
 			isa = PBXGroup;
 			children = (
 				F7458C392340CA051B9872EA /* InstagramView.swift */,
+				42E930E48F9248608B2EC422 /* InstagramView+Actions.swift */,
 				06E1D5530CDF4C7CA6BEA71F /* InstagramViewSupport.swift */,
+				AC77F4CBE5FC44EFAA078872 /* XPProgress.swift */,
+				5689B23C1AF54C20978DD126 /* SurfaceRouting.swift */,
+				E25A3F150F9840E88AC41A61 /* InstagramSecondaryRoute.swift */,
+				FA3DB3AC4BFB41FBA4AFEEC4 /* InstagramUsernamePromptSheet.swift */,
+				4F753773FB34419AB19782C2 /* NativeInstagramTabBar.swift */,
+				C41D6FA073DE4585B532C0A7 /* LoadingBar.swift */,
+				C61A44706D4243B09E49265F /* XPDynamicIsland.swift */,
+				9B4FAD839023458C87E7EA20 /* DashboardView.swift */,
 				98D36FB79C7EDDFDA593A7C9 /* InstagramWebView.swift */,
 				36FCB25113904961B1510777 /* InstagramWebViewScripts.swift */,
+				2BCC673054FD4E879D7347A6 /* InstagramWebView+Coordinator.swift */,
 			);
 			path = Instagram;
 			sourceTree = "<group>";
@@ -597,9 +627,19 @@
 				9041891F5A55383856E0C868 /* CardType.swift in Sources */,
 				3DFB4A28B148B1DFFC2C66EA /* EPUBParser.swift in Sources */,
 				767CD5C99713E1A7FABA3036 /* InstagramView.swift in Sources */,
+				A099AE2021064A6297458DDC /* InstagramView+Actions.swift in Sources */,
 				57218583F1444C87A92909F2 /* InstagramViewSupport.swift in Sources */,
+				0364D7499DF64538BCB34083 /* XPProgress.swift in Sources */,
+				13106EBB3137418E9E2213D2 /* SurfaceRouting.swift in Sources */,
+				BBE7D1DFBF514814BB184E50 /* InstagramSecondaryRoute.swift in Sources */,
+				079F3B7CB3E14559A5BDA00B /* InstagramUsernamePromptSheet.swift in Sources */,
+				B0850E3C96CF4059AFEDF811 /* NativeInstagramTabBar.swift in Sources */,
+				16FB9CE04FB0416C949F6797 /* LoadingBar.swift in Sources */,
+				5555B4A386F244848BAD3F43 /* XPDynamicIsland.swift in Sources */,
+				6CF6E661E46A4AB09C19F2B2 /* DashboardView.swift in Sources */,
 				83F82C06AE917D7565F44576 /* InstagramWebView.swift in Sources */,
 				1711C7E266074EFFAD963692 /* InstagramWebViewScripts.swift in Sources */,
+				008D33F44B7045A0A722948C /* InstagramWebView+Coordinator.swift in Sources */,
 				4DE917A22D9B670A345EBF68 /* MiniZIP.swift in Sources */,
 				4730F705C47912493598425B /* ReadingMode.swift in Sources */,
 				1BCF5AD12F94EAF70042FC96 /* LogManager.swift in Sources */,
