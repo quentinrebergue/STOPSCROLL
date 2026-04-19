@@ -208,4 +208,5 @@ Destination de test recommandee dans ce repo:
   - blocage scan/injection
   - pause best-effort des videos
 - reprise runtime au retour de la surface active (`setPaused(false)`)
+- eviction memoire V1: sur memory warning iOS, destruction de la surface inactive puis recreation lazy au prochain switch
 - details complets dans `docs/TWO_WEBVIEW_STRATEGY.md`

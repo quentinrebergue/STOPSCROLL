@@ -34,6 +34,7 @@
 | SS-022 | P0 | Bug | Mapping nav topbar/bottombar | Eviter qu un onglet natif declenche des boutons topbar (ex +) en ciblant uniquement la nav bottom | Done |
 | SS-023 | P0 | Bug | Navigation native sans reload | Simuler interaction SPA sur boutons tab Instagram et fallback history local sans hard reload | Done |
 | SS-024 | P1 | Improvement | Strategie 2 WebView | Surfaces main/messages avec pause runtime inactive pour stabilite nav et perf | Done |
+| SS-025 | P1 | Improvement | Eviction memoire 2 WebView | Sur memory warning, detruire la surface inactive puis recreation lazy a la demande | Done |
 | SS-023 | P0 | Bug | Navigation native sans reload | Simuler interaction SPA sur boutons tab Instagram et fallback history local sans hard reload | Done |
 
 ## Idees d amelioration produit

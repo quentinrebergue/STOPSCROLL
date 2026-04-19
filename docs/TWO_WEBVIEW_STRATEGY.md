@@ -41,6 +41,19 @@ Eviter la navigation fragile via simulation de clics DOM entre sections Instagra
 - Si pression memoire iOS: detruire la WebView inactive la moins recente.
 - Recharger a la demande avec restauration minimale d'URL.
 
+## Eviction memoire V1 implementee
+
+1. Detection
+- ecoute de `UIApplication.didReceiveMemoryWarningNotification` cote SwiftUI.
+
+2. Politique
+- conserver la WebView active.
+- detruire la WebView inactive (`has*Surface = false`).
+
+3. Rehydration
+- recreation lazy de la surface au prochain tap utilisateur sur l'onglet correspondant.
+- remise de l'etat loading pour garder un feedback propre.
+
 ## Decision UX
 
 1. Navbar native reste la source de verite pour:
