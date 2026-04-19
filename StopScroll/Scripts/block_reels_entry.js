@@ -2,16 +2,16 @@
 // Modules are loaded by Swift (InstagramWebView.swift) in dependency order before this script.
 // The build script (build_block_reels.mjs) strips these imports and writes block_reels.js.
 
-import './modules/constants.js';
-import './modules/config.js';
-import './modules/dom-utils.js';
-import './modules/session-stats.js';
-import './modules/scroll-lock.js';
-import './modules/page-manager.js';
-import './modules/nav-management.js';
-import './modules/top-menu.js';
-import './modules/ad-detection.js';
-import './modules/card-logic.js';
+import './modules/core/constants.js';
+import './modules/core/config.js';
+import './modules/core/dom-utils.js';
+import './modules/analytics/session-stats.js';
+import './modules/navigation/scroll-lock.js';
+import './modules/navigation/page-manager.js';
+import './modules/navigation/nav-management.js';
+import './modules/navigation/top-menu.js';
+import './modules/feed/ad-detection.js';
+import './modules/feed/card-logic.js';
 import './modules/card-builder/card-builder-helpers.js';
 import './modules/card-builder/card-metrics.js';
 import './modules/card-builder/card-mood.js';
@@ -19,8 +19,8 @@ import './modules/card-builder/card-timer.js';
 import './modules/card-builder/card-stop.js';
 import './modules/card-builder/card-stats.js';
 import './modules/card-builder/card-builder.js';
-import './modules/card-injection.js';
-import './modules/tracking.js';
+import './modules/feed/card-injection.js';
+import './modules/analytics/tracking.js';
 import './runtime/runtime-state.js';
 import './runtime/runtime-ui.js';
 import './runtime/runtime-scan.js';
