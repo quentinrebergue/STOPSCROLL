@@ -9,12 +9,9 @@ struct NativeInstagramTabBar: View {
 
     var body: some View {
         HStack(spacing: 2) {
-            tabButton(id: "home", icon: "house")
-            tabButton(id: "search", icon: "magnifyingglass")
-            tabButton(id: "book", icon: "book.closed")
-            tabButton(id: "messages", icon: "paperplane", badge: messageBadgeCount)
-            tabButton(id: "dashboard", icon: "square.grid.2x2")
-            tabButton(id: "profile", icon: "person.crop.circle")
+            ForEach(NativeTabLayout.items, id: \.id) { item in
+                tabButton(id: item.id, icon: item.icon, badge: item.id == "messages" ? messageBadgeCount : 0)
+            }
         }
         .padding(.horizontal, 10)
         .padding(.top, 10)

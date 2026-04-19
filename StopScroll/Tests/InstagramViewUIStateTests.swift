@@ -173,4 +173,82 @@ final class InstagramViewUIStateTests: XCTestCase {
 
         XCTAssertFalse(showingSettings, "Le tap sur une tab native doit fermer l'overlay Settings")
     }
+
+    /// **Test 14**: Un changement live de couleur sur la surface active doit invalider les autres surfaces seulement.
+    func testRefreshPolicy_lazyReloadTargetsExcludeSourceSurface() {
+        let targets = WebRefreshPolicy.lazyReloadTargets(excluding: .profile)
+
+        XCTAssertEqual(targets, Set([.main, .messages, .search]))
+        XCTAssertFalse(targets.contains(.profile))
+    }
+
+    /// **Test 15**: Une surface pending doit consommer son refresh lazy quand elle devient active.
+    func testRefreshPolicy_consumePendingLazyReload() {
+        let pending: Set<WebSurface> = [.messages, .search]
+
+        XCTAssertTrue(WebRefreshPolicy.shouldConsumeLazyReload(for: .messages, pendingSurfaces: pending))
+        XCTAssertFalse(WebRefreshPolicy.shouldConsumeLazyReload(for: .main, pendingSurfaces: pending))
+    }
+
+    /// **Test 16**: Le swipe horizontal suit l'ordre de la native navbar, y compris BookReader et Dashboard.
+    func testNativeTabLayoutUsesNavbarAdjacency() {
+        XCTAssertEqual(NativeTabLayout.adjacentTab(to: "messages", swipeTranslation: 140), "book")
+        XCTAssertEqual(NativeTabLayout.adjacentTab(to: "messages", swipeTranslation: -140), "dashboard")
+        XCTAssertEqual(NativeTabLayout.adjacentTab(to: "dashboard", swipeTranslation: 140), "messages")
+        XCTAssertEqual(NativeTabLayout.adjacentTab(to: "dashboard", swipeTranslation: -140), "profile")
+    }
+
+    /// **Test 17**: Aucun swipe ne doit sortir des bornes de la navbar.
+    func testNativeTabLayoutStopsAtEdges() {
+        XCTAssertNil(NativeTabLayout.adjacentTab(to: "home", swipeTranslation: 120))
+        XCTAssertNil(NativeTabLayout.adjacentTab(to: "profile", swipeTranslation: -120))
+    }
+
+    /// **Test 18**: Le swipe ne commit que si la distance ou la vitesse est suffisante.
+    func testHorizontalSwipeCommitPolicy() {
+        XCTAssertFalse(HorizontalSwipePolicy.shouldCommit(translation: 20, velocity: 100, pageWidth: 390))
+        XCTAssertTrue(HorizontalSwipePolicy.shouldCommit(translation: 90, velocity: 100, pageWidth: 390))
+        XCTAssertTrue(HorizontalSwipePolicy.shouldCommit(translation: 20, velocity: 900, pageWidth: 390))
+    }
+
+    /// **Test 19**: Le recognizer horizontal ne doit s'activer que pour un geste surtout horizontal.
+    func testHorizontalSwipeRecognizerPolicy() {
+        XCTAssertTrue(HorizontalSwipeRecognizerPolicy.shouldBegin(velocityX: 500, velocityY: 100, activeTab: "home"))
+        XCTAssertFalse(HorizontalSwipeRecognizerPolicy.shouldBegin(velocityX: 180, velocityY: 220, activeTab: "home"))
+        XCTAssertFalse(HorizontalSwipeRecognizerPolicy.shouldBegin(velocityX: 80, velocityY: 10, activeTab: "home"))
+    }
+
+    /// **Test 20**: En recherche, le recognizer doit etre plus permissif pour eviter les swipes IG internes.
+    func testHorizontalSwipeRecognizerPolicy_searchIsMorePermissive() {
+        let shouldBeginInSearch = HorizontalSwipeRecognizerPolicy.shouldBegin(velocityX: 70, velocityY: 20, activeTab: "search")
+        let shouldBeginInHome = HorizontalSwipeRecognizerPolicy.shouldBegin(velocityX: 70, velocityY: 20, activeTab: "home")
+
+        XCTAssertTrue(shouldBeginInSearch)
+        XCTAssertFalse(shouldBeginInHome)
+    }
+
+    /// **Test 21**: Le preview de swipe anime la page cible depuis le bord oppose.
+    func testHorizontalSwipePreviewOffset() {
+        XCTAssertEqual(HorizontalSwipeAnimation.previewTargetOffset(translation: -120, pageWidth: 390), 270)
+        XCTAssertEqual(HorizontalSwipeAnimation.previewTargetOffset(translation: 120, pageWidth: 390), -270)
+    }
+
+    /// **Test 22**: En mode multi-webview, la section visible suit la surface active, pas le tab sync JS.
+    func testVisibleSectionPolicy_usesActiveSurfaceInMultiWebViewMode() {
+        let tab = VisibleSectionPolicy.currentTab(
+            showingReader: false,
+            showingDashboard: false,
+            normalizedWebViewCount: 4,
+            nativeSelectedTab: "home",
+            activeSurface: .profile
+        )
+
+        XCTAssertEqual(tab, "profile")
+    }
+
+    /// **Test 23**: La surface messages ne doit pas utiliser l'overscan bas reserve aux autres surfaces.
+    func testMessagesSurfaceHasNoBottomOverscan() {
+        XCTAssertEqual(WebViewLayoutPolicy.bottomOverscan(for: .messages, defaultOverscan: 116), 0)
+        XCTAssertEqual(WebViewLayoutPolicy.bottomOverscan(for: .main, defaultOverscan: 116), 116)
+    }
 }

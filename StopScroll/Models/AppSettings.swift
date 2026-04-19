@@ -39,6 +39,9 @@ final class AppSettings: ObservableObject {
     /// Increments when the user requests a manual background refresh from Settings.
     @Published private(set) var backgroundRefreshToken: Int = 0
 
+    /// Increments when a live Instagram color change should lazily invalidate other webviews.
+    @Published private(set) var lazyWebViewRefreshToken: Int = 0
+
     // MARK: - Built-in defaults per language prefix
 
     static let defaultLabels: [String: [String]] = [
@@ -111,7 +114,10 @@ final class AppSettings: ObservableObject {
         }
     }
 
-    func updateInstagramBackgroundColor(_ cssColor: String?) {
+    func updateInstagramBackgroundColor(
+        _ cssColor: String?,
+        invalidateOtherWebViewsLazily: Bool = false
+    ) {
         guard let cssColor = cssColor?.trimmingCharacters(in: .whitespacesAndNewlines),
               let normalized = Self.normalizedCSSColor(cssColor) else {
             return
@@ -120,6 +126,9 @@ final class AppSettings: ObservableObject {
         DispatchQueue.main.async {
             guard self.instagramBackgroundCSS != normalized else { return }
             self.instagramBackgroundCSS = normalized
+            if invalidateOtherWebViewsLazily {
+                self.lazyWebViewRefreshToken += 1
+            }
         }
     }
 

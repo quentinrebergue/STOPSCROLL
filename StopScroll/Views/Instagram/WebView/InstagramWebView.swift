@@ -27,6 +27,10 @@ struct InstagramWebView: UIViewRepresentable {
     var tracksLoading: Bool = true
     var scriptProfile: ScriptProfile = .full
     var handlesInstagramNavigation: Bool = true
+    var allowsHorizontalSurfaceSwipe: Bool = false
+    var activeSectionTab: String = "home"
+    var onHorizontalSurfaceDragChanged: ((CGFloat) -> Void)? = nil
+    var onHorizontalSurfaceDragEnded: ((CGFloat, CGFloat) -> Void)? = nil
     var requestedURLString: String? = nil
     var requestedURLToken: Int = 0
     @Binding var instagramThemeIsDark: Bool
@@ -141,6 +145,7 @@ struct InstagramWebView: UIViewRepresentable {
         webView.scrollView.keyboardDismissMode = .onDrag
         webView.allowsLinkPreview = false
         webView.customUserAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1"
+        context.coordinator.installHorizontalPanRecognizer(on: webView)
 
         if let url = URL(string: initialURLString) {
             webView.load(URLRequest(url: url))
@@ -149,6 +154,7 @@ struct InstagramWebView: UIViewRepresentable {
     }
 
     func updateUIView(_ uiView: WKWebView, context: Context) {
+        context.coordinator.parent = self
         if context.coordinator.lastReloadToken != reloadToken {
             context.coordinator.lastReloadToken = reloadToken
             uiView.reload()
@@ -168,7 +174,7 @@ struct InstagramWebView: UIViewRepresentable {
         }
         if context.coordinator.lastThemeRefreshToken != themeRefreshToken {
             context.coordinator.lastThemeRefreshToken = themeRefreshToken
-            uiView.evaluateJavaScript("(function(){var ns=window.StopScroll;if(ns&&ns.dom&&ns.dom.detectTheme){ns.dom.detectTheme();}})();")
+            uiView.evaluateJavaScript("(function(){var ns=window.StopScroll;if(ns&&ns.dom&&ns.dom.detectTheme){ns.dom.detectTheme();}if(ns&&ns.cardBuilder&&ns.cardBuilder.refreshInjectedCardColors){ns.cardBuilder.refreshInjectedCardColors();}})();")
         }
         if context.coordinator.lastNativeNavCommandToken != nativeNavCommandToken {
             context.coordinator.lastNativeNavCommandToken = nativeNavCommandToken

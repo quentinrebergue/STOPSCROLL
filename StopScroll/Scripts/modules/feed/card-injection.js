@@ -3,6 +3,9 @@
   'use strict';
 
   var ns = (global.StopScroll = global.StopScroll || {});
+  var _cardCacheByPostKey = Object.create(null);
+  var _cardTypeByPostKey = Object.create(null);
+  var _fallbackKeySeq = 0;
 
   // ── Timer-expired motivational messages ─────────────────
   var EXPIRED_MESSAGES = [
@@ -107,17 +110,94 @@
     }
   }
 
-  function injectCardIntoPost(article, type, config) {
-    var h = article.offsetHeight;
-    if (h < 80) return false;
+  function normalizePath(path) {
+    if (!path) return '';
+    return path.endsWith('/') ? path : path + '/';
+  }
 
-    var card = ns.cardBuilder.buildCardFor(type, config);
-    if (!card) return false;
+  function buildStablePostKey(snapshot) {
+    if (!snapshot) return '';
+    if (snapshot.permalink) return normalizePath(snapshot.permalink);
+    if (snapshot.mediaKey) return snapshot.mediaKey;
+    if (snapshot.headerHref || snapshot.previewText) {
+      return (snapshot.headerHref || '') + '::' + (snapshot.previewText || '');
+    }
+    return '';
+  }
+
+  function snapshotArticleIdentity(article) {
+    var snapshot = {
+      permalink: '',
+      mediaKey: '',
+      headerHref: '',
+      previewText: ''
+    };
+
+    var anchors = article.querySelectorAll('a[href]');
+    for (var i = 0; i < anchors.length; i++) {
+      var href = anchors[i].getAttribute('href') || '';
+      var match = href.match(/\/(p|reel|reels)\/[^/?#]+\/?/i);
+      if (match) {
+        snapshot.permalink = match[0];
+        break;
+      }
+    }
+
+    var media = article.querySelector('img[src], img[currentSrc], video[src], video[poster]');
+    if (media) {
+      snapshot.mediaKey = media.currentSrc || media.getAttribute('src') || media.getAttribute('poster') || '';
+    }
+
+    var headerLink = article.querySelector('header a[href]');
+    snapshot.headerHref = headerLink ? (headerLink.getAttribute('href') || '') : '';
+    snapshot.previewText = (article.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 80);
+    return snapshot;
+  }
+
+  function rememberCardType(postKey, type) {
+    if (!postKey || !type) return;
+    _cardTypeByPostKey[postKey] = type;
+  }
+
+  function resolveEffectiveCardType(postKey, requestedType) {
+    return postKey ? (_cardTypeByPostKey[postKey] || requestedType) : requestedType;
+  }
+
+  function getPostKey(article) {
+    if (!article) return '';
+
+    var existing = article.getAttribute('data-ss-post-key');
+    if (existing) return existing;
+
+    var stableKey = buildStablePostKey(snapshotArticleIdentity(article));
+    if (stableKey) {
+      article.setAttribute('data-ss-post-key', stableKey);
+      return stableKey;
+    }
+
+    var fallbackKey = 'fallback-post-' + (++_fallbackKeySeq);
+    article.setAttribute('data-ss-post-key', fallbackKey);
+    return fallbackKey;
+  }
+
+  function prepareCardForReuse(card, height, type, postKey) {
+    if (!card) return;
+    card.setAttribute('data-ss-card-type', type || card.getAttribute('data-ss-card-type') || 'unknown');
+    if (postKey) card.setAttribute('data-ss-post-key', postKey);
+    card.style.minHeight = height + 'px';
+    card.style.height = '100%';
+  }
+
+  function attachCardToArticle(article, card, type, postKey) {
+    var h = article.offsetHeight;
+    prepareCardForReuse(card, h, type, postKey);
 
     article.style.setProperty('min-height', h + 'px', 'important');
     article.style.setProperty('overflow', 'hidden', 'important');
     article.style.setProperty('position', 'relative', 'important');
     article.setAttribute('data-ss-replaced', 'true');
+    article.setAttribute('data-ss-card-type', type || card.getAttribute('data-ss-card-type') || 'unknown');
+    if (postKey) article.setAttribute('data-ss-post-key', postKey);
 
     hideOriginalContent(article);
 
@@ -125,16 +205,43 @@
       hideOriginalContent(article);
     }).observe(article, { childList: true, subtree: false });
 
+    var oldWrapper = article.querySelector('[data-ss-injection]');
+    if (oldWrapper) oldWrapper.remove();
+
     var wrapper = document.createElement('div');
     wrapper.setAttribute('data-ss-injection', 'true');
     wrapper.style.cssText = 'position:absolute;inset:0;overflow:hidden';
-
     wrapper.appendChild(card);
     article.appendChild(wrapper);
     return true;
   }
 
+  function injectCardIntoPost(article, type, config) {
+    var h = article.offsetHeight;
+    if (h < 80) return false;
+
+    var postKey = getPostKey(article);
+    var cachedCard = postKey ? _cardCacheByPostKey[postKey] : null;
+    var effectiveType = resolveEffectiveCardType(postKey, type);
+
+    var card = cachedCard || ns.cardBuilder.buildCardFor(effectiveType, config);
+    if (!card) return false;
+
+    if (postKey) {
+      _cardCacheByPostKey[postKey] = card;
+      rememberCardType(postKey, effectiveType);
+    }
+
+    return attachCardToArticle(article, card, effectiveType, postKey);
+  }
+
   ns.cardInjection = {
+    buildStablePostKey: buildStablePostKey,
+    getPostKey: getPostKey,
+    rememberCardType: rememberCardType,
+    resolveEffectiveCardType: resolveEffectiveCardType,
+    hasCachedCard: function (postKey) { return !!(postKey && _cardCacheByPostKey[postKey]); },
+    getCachedCardType: function (postKey) { return postKey ? (_cardTypeByPostKey[postKey] || null) : null; },
     injectCardIntoPost: injectCardIntoPost,
     injectTimerExpiredCard: injectTimerExpiredCard
   };

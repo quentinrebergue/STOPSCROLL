@@ -142,6 +142,11 @@
     return _igColors;
   }
 
+  function invalidateInstagramColorCache() {
+    _igColors = null;
+    _igColorsAt = 0;
+  }
+
   // ── Captions ───────────────────────────────────────────────
   function pickCaption(config) {
     var list = config.captions;
@@ -237,26 +242,33 @@
     media.style.position = 'relative';
 
     // ── Glassmorphism overlay with subtle noise texture ──────
-    var glass = document.createElement('div');
-    glass.style.cssText = [
-      'position:absolute', 'inset:0', 'z-index:0',
-      'background:rgba(255,255,255,0.06)',
-      'backdrop-filter:blur(18px) saturate(1.3)',
-      '-webkit-backdrop-filter:blur(18px) saturate(1.3)',
-      'pointer-events:none'
-    ].join(';');
+    var glass = media.querySelector('[data-ss-glass]');
+    if (!glass) {
+      glass = document.createElement('div');
+      glass.setAttribute('data-ss-glass', '');
+      glass.style.cssText = [
+        'position:absolute', 'inset:0', 'z-index:0',
+        'background:rgba(255,255,255,0.06)',
+        'backdrop-filter:blur(18px) saturate(1.3)',
+        '-webkit-backdrop-filter:blur(18px) saturate(1.3)',
+        'pointer-events:none'
+      ].join(';');
+      media.insertBefore(glass, media.firstChild);
+    }
 
     // Noise texture via tiny inline SVG data-URI (no extra request)
-    var noise = document.createElement('div');
-    noise.style.cssText = [
-      'position:absolute', 'inset:0', 'z-index:0',
-      'opacity:0.045', 'pointer-events:none', 'mix-blend-mode:overlay',
-      'background-image:url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'200\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\'/%3E%3C/svg%3E")',
-      'background-size:200px 200px'
-    ].join(';');
-
-    media.insertBefore(noise, media.firstChild);
-    media.insertBefore(glass, media.firstChild);
+    var noise = media.querySelector('[data-ss-noise]');
+    if (!noise) {
+      noise = document.createElement('div');
+      noise.setAttribute('data-ss-noise', '');
+      noise.style.cssText = [
+        'position:absolute', 'inset:0', 'z-index:0',
+        'opacity:0.045', 'pointer-events:none', 'mix-blend-mode:overlay',
+        'background-image:url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'200\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\'/%3E%3C/svg%3E")',
+        'background-size:200px 200px'
+      ].join(';');
+      media.insertBefore(noise, media.firstChild);
+    }
 
     // Make sure actual content sits above the glass
     for (var ci = 0; ci < media.children.length; ci++) {
@@ -333,6 +345,8 @@
     // Outer card background (header + caption area)
     card.style.background = colors.bg;
     card.style.color = colors.text;
+    card.setAttribute('data-ss-theme-bg', colors.bg);
+    card.setAttribute('data-ss-theme-text', colors.text);
     // Border color adapts to background luminance
     var borderColor = isDarkColor(colors.bg) ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
     // Header: first child
@@ -425,6 +439,7 @@
     if (type === 'book')    card = cb.buildBookCard(config);
     if (type === 'culture') card = cb.buildCultureCard(config);
     if (card) {
+      card.setAttribute('data-ss-card-type', type);
       var colors = detectInstagramColors();
       applyGradientBg(card, type);
       applyContentColors(card, type);
@@ -444,5 +459,24 @@
     return card;
   }
 
+  function refreshInjectedCardColors() {
+    invalidateInstagramColorCache();
+    var colors = detectInstagramColors();
+    var cards = document.querySelectorAll('[data-ss-injection] [data-ss-card-type]');
+    for (var i = 0; i < cards.length; i++) {
+      var card = cards[i];
+      var type = card.getAttribute('data-ss-card-type') || 'stop';
+      var previousBg = card.getAttribute('data-ss-theme-bg') || '';
+      var previousText = card.getAttribute('data-ss-theme-text') || '';
+      if (previousBg === colors.bg && previousText === colors.text) {
+        continue;
+      }
+      applyGradientBg(card, type);
+      applyContentColors(card, type);
+      applyNativeColors(card, colors);
+    }
+  }
+
   cb.buildCardFor = buildCardFor;
+  cb.refreshInjectedCardColors = refreshInjectedCardColors;
 })(window);

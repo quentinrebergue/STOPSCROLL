@@ -5,6 +5,14 @@
     const ns = (global.StopScroll = global.StopScroll || {});
     var _bridgeSeq = 0;
     var _pendingBridgeRequests = {};
+    var _backgroundWatchTimer = 0;
+    var _lastWatchedBackground = '';
+    var _watchVisibilityHandlerInstalled = false;
+
+    function normalizePath(path) {
+        if (!path) return '/';
+        return path.endsWith('/') ? path : path + '/';
+    }
 
     function isMainFeed() {
         const path = global.location.pathname;
@@ -32,6 +40,10 @@
     function isSettingsPage() {
         const path = global.location.pathname;
         return path.startsWith('/accounts/') || path.startsWith('/settings/');
+    }
+
+    function isAccountsEditPage() {
+        return normalizePath(global.location.pathname) === '/accounts/edit/';
     }
 
     function postToNative(message) {
@@ -129,8 +141,11 @@
         postToBridge({ type: 'language', value: lang });
     }
 
-    function detectTheme() {
-        var bg = detectInstagramBackgroundColor();
+    function resolveInstagramTheme(bg, extraPayload) {
+        var payload = extraPayload ? Object.assign({}, extraPayload) : {};
+        payload.type = 'instagramTheme';
+        payload.background = bg;
+
         var m = bg.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
         var dark = true;
         if (m) {
@@ -140,7 +155,14 @@
             var luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b);
             dark = luminance < 140;
         }
-        postToBridge({ type: 'instagramTheme', dark: dark, background: bg });
+
+        payload.dark = dark;
+        return payload;
+    }
+
+    function detectTheme() {
+        var bg = detectInstagramBackgroundColor();
+        postToBridge(resolveInstagramTheme(bg));
     }
 
     function detectInstagramBackgroundColor() {
@@ -161,11 +183,55 @@
                     bg = bodyBg;
                 }
             }
+
+            if (bg === 'rgb(0, 0, 0)') {
+                var rootBg = global.getComputedStyle(document.documentElement).backgroundColor;
+                if (rootBg && rootBg !== 'rgba(0, 0, 0, 0)' && rootBg !== 'transparent') {
+                    bg = rootBg;
+                }
+            }
         } catch (_) {
             // Ignore color probing failures.
         }
         return bg;
     }
+
+    function watchAccountsEditBackgroundTick() {
+        if (document.hidden || !isAccountsEditPage()) {
+            _lastWatchedBackground = '';
+            return;
+        }
+
+        var bg = detectInstagramBackgroundColor();
+        if (!bg || bg === _lastWatchedBackground) {
+            return;
+        }
+
+        _lastWatchedBackground = bg;
+        postToBridge(resolveInstagramTheme(bg, {
+            source: 'accountsEditWatcher',
+            lazyRefresh: true
+        }));
+    }
+
+    function ensureAccountsEditBackgroundWatcher() {
+        if (_backgroundWatchTimer) return;
+
+        _backgroundWatchTimer = global.setInterval(watchAccountsEditBackgroundTick, 1200);
+        watchAccountsEditBackgroundTick();
+
+        global.addEventListener('popstate', watchAccountsEditBackgroundTick);
+        if (!_watchVisibilityHandlerInstalled) {
+            _watchVisibilityHandlerInstalled = true;
+            document.addEventListener('visibilitychange', function () {
+                if (!document.hidden) {
+                    watchAccountsEditBackgroundTick();
+                }
+            });
+        }
+    }
+
+    ensureAccountsEditBackgroundWatcher();
 
     ns.dom = {
         isMainFeed: isMainFeed,
@@ -174,6 +240,7 @@
         isSingleContentPage: isSingleContentPage,
         isReelsTab: isReelsTab,
         isSettingsPage: isSettingsPage,
+        isAccountsEditPage: isAccountsEditPage,
         postToNative: postToNative,
         postToBridge: postToBridge,
         postToBridgeWithCallback: postToBridgeWithCallback,

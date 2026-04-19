@@ -95,6 +95,7 @@
 		F17FDA4E403CE54FAE123382 /* build_block_reels.sh in Resources */ = {isa = PBXBuildFile; fileRef = AE258A5A7FBD16C1374360DC /* build_block_reels.sh */; };
 		FF2BE8CECF7504888ABD0C9D /* TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D621B9E95F4CDC4E78C462C /* TestHelpers.swift */; };
 		GA01B000000000000000C001 /* GuardianAPITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = GA01F000000000000000C001 /* GuardianAPITests.swift */; };
+		IJ01B000000000000000C001 /* InjectedCardJavaScriptTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = IJ01F000000000000000C001 /* InjectedCardJavaScriptTests.swift */; };
 		RG01B000000000000000C001 /* RegressionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = RG01F000000000000000C001 /* RegressionTests.swift */; };
 					63D06DA8C46945C58DDCD9E5 /* BookReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E51684E30BE740D9B3A4474F /* BookReaderTests.swift */; };
 		UI01B000000000000000C001 /* InstagramViewUIStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = UI01F000000000000000C001 /* InstagramViewUIStateTests.swift */; };
@@ -202,6 +203,7 @@
 		06E1D5530CDF4C7CA6BEA71F /* InstagramViewSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support/InstagramViewSupport.swift; sourceTree = "<group>"; };
 		FCC3507A23B2C8EF5C9F1582 /* runtime-state.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "runtime-state.js"; sourceTree = "<group>"; };
 		GA01F000000000000000C001 /* GuardianAPITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuardianAPITests.swift; sourceTree = "<group>"; };
+		IJ01F000000000000000C001 /* InjectedCardJavaScriptTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InjectedCardJavaScriptTests.swift; sourceTree = "<group>"; };
 		RG01F000000000000000C001 /* RegressionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegressionTests.swift; sourceTree = "<group>"; };
 					E51684E30BE740D9B3A4474F /* BookReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookReaderTests.swift; sourceTree = "<group>"; };
 		UI01F000000000000000C001 /* InstagramViewUIStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstagramViewUIStateTests.swift; sourceTree = "<group>"; };
@@ -255,6 +257,7 @@
 				49830F744711A2144EE7185B /* BookParserEPUBTests.swift */,
 									E51684E30BE740D9B3A4474F /* BookReaderTests.swift */,
 				GA01F000000000000000C001 /* GuardianAPITests.swift */,
+				IJ01F000000000000000C001 /* InjectedCardJavaScriptTests.swift */,
 				RG01F000000000000000C001 /* RegressionTests.swift */,
 				UI01F000000000000000C001 /* InstagramViewUIStateTests.swift */,
 				8D621B9E95F4CDC4E78C462C /* TestHelpers.swift */,
@@ -677,6 +680,7 @@
 				1BCF5AD42F94EB120042FC96 /* ConsoleView.swift in Sources */,
 				EB23AA3BFD54DE2E2E8C7F47 /* BookParserEPUBTests.swift in Sources */,
 				GA01B000000000000000C001 /* GuardianAPITests.swift in Sources */,
+				IJ01B000000000000000C001 /* InjectedCardJavaScriptTests.swift in Sources */,
 				RG01B000000000000000C001 /* RegressionTests.swift in Sources */,
 									63D06DA8C46945C58DDCD9E5 /* BookReaderTests.swift in Sources */,
 				UI01B000000000000000C001 /* InstagramViewUIStateTests.swift in Sources */,

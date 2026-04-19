@@ -27,6 +27,16 @@
       return;
     }
     ns.adDetection.scanForNewAds(state, function (post) {
+      var postKey = ns.cardInjection && ns.cardInjection.getPostKey ? ns.cardInjection.getPostKey(post) : '';
+      if (postKey && ns.cardInjection && ns.cardInjection.hasCachedCard && ns.cardInjection.hasCachedCard(postKey)) {
+        ns.cardInjection.injectCardIntoPost(
+          post,
+          ns.cardInjection.getCachedCardType(postKey),
+          state.config
+        );
+        return;
+      }
+
       state.opportunities += 1;
       var tried = {};
       for (var attempts = 0; attempts < 5; attempts++) {

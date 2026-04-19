@@ -43,6 +43,8 @@
     if (path === '/') return 'home';
     if (path.startsWith('/explore')) return 'search';
     if (path.startsWith('/direct')) return 'messages';
+    // Profile settings/account pages should keep the profile tab selected.
+    if (path.startsWith('/accounts') || path.startsWith('/settings')) return 'profile';
     if (path.startsWith('/accounts/activity')) return 'activity';
     if (isProfilePath(path)) return 'profile';
     return 'home';

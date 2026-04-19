@@ -149,9 +149,22 @@ extension InstagramWebView.Coordinator {
                 isDark = true
             }
             let background = (payload["background"] as? String) ?? (payload["bg"] as? String)
+            let invalidateOtherWebViewsLazily: Bool
+            if let boolValue = payload["lazyRefresh"] as? Bool {
+                invalidateOtherWebViewsLazily = boolValue
+            } else if let intValue = payload["lazyRefresh"] as? Int {
+                invalidateOtherWebViewsLazily = intValue != 0
+            } else if let stringValue = payload["lazyRefresh"] as? String {
+                invalidateOtherWebViewsLazily = stringValue == "1" || stringValue.lowercased() == "true"
+            } else {
+                invalidateOtherWebViewsLazily = false
+            }
             DispatchQueue.main.async {
                 self.parent.instagramThemeIsDark = isDark
-                AppSettings.shared.updateInstagramBackgroundColor(background)
+                AppSettings.shared.updateInstagramBackgroundColor(
+                    background,
+                    invalidateOtherWebViewsLazily: invalidateOtherWebViewsLazily
+                )
             }
             return true
         }

@@ -9,6 +9,9 @@
     ns.topMenu.injectTopMenu();
     ns.nav.cleanLegacyReloadButton();
     ns.nav.syncNativeNavState();
+    if (ns.cardBuilder && ns.cardBuilder.refreshInjectedCardColors) {
+      ns.cardBuilder.refreshInjectedCardColors();
+    }
   }
 
   function applyPagePolicies(state) {
