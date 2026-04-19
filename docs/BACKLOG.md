@@ -31,6 +31,10 @@
 | SS-019 | P1 | Improvement | Navbar native synchronisee | Barre native, badge messages, masquage navbar Instagram, navigation onglets vers WebView | Done |
 | SS-020 | P1 | Improvement | Navbar native polish UX | Restauration icone livre, hub dashboard/settings, profil corrige, masquage nav Instagram renforce | Done |
 | SS-021 | P1 | Improvement | Navbar native strategy shift | Trigger boutons Instagram (pas de page forcee), hide nav via layout WebView, suppression icone coeur | Done |
+| SS-022 | P0 | Bug | Mapping nav topbar/bottombar | Eviter qu un onglet natif declenche des boutons topbar (ex +) en ciblant uniquement la nav bottom | Done |
+| SS-023 | P0 | Bug | Navigation native sans reload | Simuler interaction SPA sur boutons tab Instagram et fallback history local sans hard reload | Done |
+| SS-024 | P1 | Improvement | Strategie 2 WebView | Surfaces main/messages avec pause runtime inactive pour stabilite nav et perf | Done |
+| SS-023 | P0 | Bug | Navigation native sans reload | Simuler interaction SPA sur boutons tab Instagram et fallback history local sans hard reload | Done |
 
 ## Idees d amelioration produit
 

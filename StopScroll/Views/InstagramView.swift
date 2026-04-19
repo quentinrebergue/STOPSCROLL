@@ -21,7 +21,13 @@ enum XPProgress {
 }
 
 struct InstagramView: View {
-    @State private var isLoading = true
+    private enum WebSurface {
+        case main
+        case messages
+    }
+
+    @State private var isLoadingMain = true
+    @State private var isLoadingMessages = true
     @State private var showingReader = false
     @State private var reloadToken = 0
     @State private var showingSettings = false
@@ -41,11 +47,19 @@ struct InstagramView: View {
     @State private var nativeMessageBadgeCount: Int = 0
     @State private var nativeNavCommandToken: Int = 0
     @State private var showControlCenterChooser = false
+    @State private var activeSurface: WebSurface = .main
+
+    private var isActiveSurfaceLoading: Bool {
+        switch activeSurface {
+        case .main: return isLoadingMain
+        case .messages: return isLoadingMessages
+        }
+    }
 
     var body: some View {
         ZStack {
             InstagramWebView(
-                isLoading: $isLoading,
+                isLoading: $isLoadingMain,
                 showingReader: $showingReader,
                 showingSettings: $showingSettings,
                 showingDashboard: $showingDashboard,
@@ -54,6 +68,9 @@ struct InstagramView: View {
                 selectedNativeTab: $nativeSelectedTab,
                 nativeMessageBadgeCount: $nativeMessageBadgeCount,
                 nativeNavCommandToken: $nativeNavCommandToken,
+                initialURLString: "https://www.instagram.com/",
+                isActive: activeSurface == .main,
+                tracksLoading: true,
                 onGrantXP: { amount, source in
                     grantXP(amount: amount, source: source)
                 }
@@ -62,13 +79,37 @@ struct InstagramView: View {
             // stays outside of the visible area behind our native bar.
             .padding(.bottom, -76)
             .ignoresSafeArea(edges: .bottom)
+            .opacity(activeSurface == .main ? 1 : 0)
+            .allowsHitTesting(activeSurface == .main)
+
+            InstagramWebView(
+                isLoading: $isLoadingMessages,
+                showingReader: $showingReader,
+                showingSettings: $showingSettings,
+                showingDashboard: $showingDashboard,
+                reloadToken: $reloadToken,
+                labelsToken: $labelsToken,
+                selectedNativeTab: $nativeSelectedTab,
+                nativeMessageBadgeCount: $nativeMessageBadgeCount,
+                nativeNavCommandToken: $nativeNavCommandToken,
+                initialURLString: "https://www.instagram.com/direct/inbox/",
+                isActive: activeSurface == .messages,
+                tracksLoading: true,
+                onGrantXP: { amount, source in
+                    grantXP(amount: amount, source: source)
+                }
+            )
+            .padding(.bottom, -76)
+            .ignoresSafeArea(edges: .bottom)
+            .opacity(activeSurface == .messages ? 1 : 0)
+            .allowsHitTesting(activeSurface == .messages)
 
             BookReaderView(onDismiss: { showingReader = false })
                 .opacity(showingReader ? 1 : 0)
                 .allowsHitTesting(showingReader)
                 .ignoresSafeArea(edges: .bottom)
 
-            if isLoading {
+            if isActiveSurfaceLoading {
                 VStack(spacing: 0) {
                     LoadingBar()
                     Spacer()
@@ -124,6 +165,12 @@ struct InstagramView: View {
                                 showControlCenterChooser = true
                                 return
                             }
+                            if tab == "messages" {
+                                activeSurface = .messages
+                                nativeSelectedTab = "messages"
+                                return
+                            }
+                            activeSurface = .main
                             nativeSelectedTab = tab
                             nativeNavCommandToken += 1
                         }

@@ -6,6 +6,7 @@
 
   function createScheduleScan(state, applyNavInjections, applyPagePolicies) {
     function scheduleScan() {
+      if (state.paused || global.__STOPSCROLL_RUNTIME_PAUSED) return;
       if (state.scanScheduled) return;
       state.scanScheduled = true;
       requestAnimationFrame(function () {

@@ -189,6 +189,8 @@ Destination de test recommandee dans ce repo:
 - synchronisation badge messages -> natif via bridge (`messageBadge`)
 - navigation natif -> WebView via trigger des boutons Instagram (dispatch events DOM sur les liens de nav)
 - sections supportees en V1: home, search, messages, activity, profile
+- mapping des onglets verrouille sur la nav bottom d Instagram (heuristiques position + liens tab) pour eviter les collisions avec la topbar (ex: bouton +)
+- navigation native anti-reload: interaction simulee prioritairement sur le noeud visuel interne des tabs (pas le lien brut), avec fallback `history.pushState` pour rester en SPA
 
 11. Ajustements UX navbar native
 - icone livre restauree dans la barre native (ouvre `BookReaderView` en natif)
@@ -196,3 +198,14 @@ Destination de test recommandee dans ce repo:
 - correction routage profil: priorite au lien avatar/profil Instagram (evite redirection vers edit settings)
 - sans injection CSS de masquage: la webview est etendue vers le bas pour sortir la navbar Instagram de la zone visible
 - icone coeur retiree de la barre native
+
+12. Strategie 2 WebView (main + messages)
+- deux surfaces `WKWebView` sont maintenues: principale (`/`) et messages (`/direct/inbox/`)
+- une seule surface est visible/interactable a la fois (activation exclusive)
+- la surface inactive passe en mode pause runtime JS (`setPaused(true)`)
+- optimisations pause:
+  - arret scan periodique
+  - blocage scan/injection
+  - pause best-effort des videos
+- reprise runtime au retour de la surface active (`setPaused(false)`)
+- details complets dans `docs/TWO_WEBVIEW_STRATEGY.md`

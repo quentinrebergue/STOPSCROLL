@@ -5,6 +5,9 @@
   var ns = (global.StopScroll = global.StopScroll || {});
 
   function scanNewPosts(state) {
+    if (state.paused || global.__STOPSCROLL_RUNTIME_PAUSED) {
+      return;
+    }
     var cfg = state.config.feed_injection;
 
     // ── Timer-expired mode: replace ALL posts, even non-ads ──
@@ -65,21 +68,42 @@
   }
 
   function setupLightweightTracking(state, scheduleScanFn) {
+    if (state.trackingSetupDone) {
+      startPeriodicScan(state, scheduleScanFn);
+      return;
+    }
+    state.trackingSetupDone = true;
+
     global.addEventListener('scroll', function () {
       if (ns.sessionStats) ns.sessionStats.onScrollActivity();
       scheduleScanFn();
     }, { passive: true });
     global.addEventListener('resize', scheduleScanFn);
-    if (state.periodicScanTimer) clearInterval(state.periodicScanTimer);
-    state.periodicScanTimer = setInterval(scheduleScanFn, 1400);
+    startPeriodicScan(state, scheduleScanFn);
     document.addEventListener('visibilitychange', function () {
       if (!document.hidden) scheduleScanFn();
     });
   }
 
+  function startPeriodicScan(state, scheduleScanFn) {
+    if (state.periodicScanTimer) clearInterval(state.periodicScanTimer);
+    state.periodicScanTimer = setInterval(function () {
+      if (state.paused || global.__STOPSCROLL_RUNTIME_PAUSED) return;
+      scheduleScanFn();
+    }, 1400);
+  }
+
+  function stopPeriodicScan(state) {
+    if (!state.periodicScanTimer) return;
+    clearInterval(state.periodicScanTimer);
+    state.periodicScanTimer = null;
+  }
+
   ns.tracking = {
     scanNewPosts: scanNewPosts,
     patchHistoryForSPA: patchHistoryForSPA,
-    setupLightweightTracking: setupLightweightTracking
+    setupLightweightTracking: setupLightweightTracking,
+    startPeriodicScan: startPeriodicScan,
+    stopPeriodicScan: stopPeriodicScan
   };
 })(window);

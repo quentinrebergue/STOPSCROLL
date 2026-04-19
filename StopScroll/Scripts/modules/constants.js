@@ -85,7 +85,9 @@
             seenPosts: new WeakSet(),
             periodicScanTimer: null,
             scanScheduled: false,
-            scrollLockActive: false
+            scrollLockActive: false,
+            paused: false,
+            trackingSetupDone: false
         }
     };
 })(window);

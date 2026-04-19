@@ -19,6 +19,8 @@
         ns.runtimeUI.applyNavInjections,
         ns.runtimeUI.applyPagePolicies
     );
+    window.__STOPSCROLL_SCHEDULE_SCAN = scheduleScan;
+    window.__STOPSCROLL_RUNTIME_PAUSED = false;
 
     function bootstrap() {
         ns.runtimeState.initializeRuntimeState(state);

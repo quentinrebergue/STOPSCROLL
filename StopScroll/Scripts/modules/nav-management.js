@@ -49,7 +49,55 @@
   }
 
   function getNavLinks() {
-    return Array.from(document.querySelectorAll('nav a[href]'));
+    const tabNav = findBottomTabNav();
+    if (!tabNav) return [];
+    return Array.from(tabNav.querySelectorAll('a[href]'));
+  }
+
+  function findBottomTabNav() {
+    const navs = Array.from(document.querySelectorAll('nav'));
+    if (!navs.length) return null;
+
+    let bestNav = null;
+    let bestScore = -1;
+
+    for (let i = 0; i < navs.length; i++) {
+      const nav = navs[i];
+      const links = Array.from(nav.querySelectorAll('a[href]'));
+      if (!links.length) continue;
+
+      let score = 0;
+      let hasHome = false;
+      let hasSearch = false;
+      let hasMessages = false;
+      let hasProfile = false;
+
+      for (let k = 0; k < links.length; k++) {
+        const path = pathFromHref(links[k].getAttribute('href') || links[k].href || '');
+        if (normalizePath(path) === '/') { hasHome = true; continue; }
+        if (normalizePath(path).startsWith('/explore')) { hasSearch = true; continue; }
+        if (normalizePath(path).startsWith('/direct')) { hasMessages = true; continue; }
+        if (isProfilePath(path)) { hasProfile = true; continue; }
+      }
+
+      if (hasHome) score += 2;
+      if (hasSearch) score += 2;
+      if (hasMessages) score += 2;
+      if (hasProfile) score += 2;
+
+      const rect = nav.getBoundingClientRect();
+      const nearBottom = rect.top > global.innerHeight * 0.45;
+      const isFixed = global.getComputedStyle(nav).position === 'fixed';
+      if (nearBottom) score += 3;
+      if (isFixed) score += 2;
+
+      if (score > bestScore) {
+        bestScore = score;
+        bestNav = nav;
+      }
+    }
+
+    return bestScore >= 6 ? bestNav : null;
   }
 
   function findTabLink(tab) {
@@ -119,12 +167,37 @@
 
     const link = findTabLink(tab);
     if (link) {
-      const events = ['pointerdown', 'mousedown', 'touchstart', 'mouseup', 'touchend', 'click'];
-      for (let i = 0; i < events.length; i++) {
+      // Prefer dispatching events on an inner visual node (icon/span) so React handlers fire
+      // without triggering the anchor default navigation (which causes full page reloads).
+      const interactionTarget = link.querySelector('svg, span, div') || link;
+
+      try {
+        interactionTarget.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true, pointerType: 'touch' }));
+      } catch (_) {}
+      try {
+        interactionTarget.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true, view: global }));
+      } catch (_) {}
+      try {
+        interactionTarget.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, cancelable: true, pointerType: 'touch' }));
+      } catch (_) {}
+      try {
+        interactionTarget.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, cancelable: true, view: global }));
+      } catch (_) {}
+      try {
+        interactionTarget.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: global }));
+      } catch (_) {}
+
+      // Fallback: update SPA history state without network navigation.
+      const href = link.getAttribute('href') || link.href || '';
+      const path = pathFromHref(href);
+      if (path && normalizePath(path) !== normalizePath(global.location.pathname)) {
         try {
-          link.dispatchEvent(new MouseEvent(events[i], { bubbles: true, cancelable: true, view: global }));
+          global.history.pushState({}, '', path + (path.endsWith('/') ? '' : '/'));
+          global.dispatchEvent(new Event('pushstate'));
+          global.dispatchEvent(new PopStateEvent('popstate'));
+          global.dispatchEvent(new Event('locationchange'));
         } catch (_) {
-          // Continue dispatch sequence even if one event constructor fails.
+          // Keep silent: click simulation above is the primary path.
         }
       }
       return true;

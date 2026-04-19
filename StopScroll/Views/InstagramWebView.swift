@@ -13,6 +13,9 @@ struct InstagramWebView: UIViewRepresentable {
     @Binding var selectedNativeTab: String
     @Binding var nativeMessageBadgeCount: Int
     @Binding var nativeNavCommandToken: Int
+    var initialURLString: String = "https://www.instagram.com/"
+    var isActive: Bool = true
+    var tracksLoading: Bool = true
     var onGrantXP: (Int, String) -> Void = { _, _ in }
 
     /// Module scripts injected in dependency order before the bootstrap.
@@ -105,7 +108,7 @@ struct InstagramWebView: UIViewRepresentable {
         webView.allowsLinkPreview = false
         webView.customUserAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1"
 
-        if let url = URL(string: "https://www.instagram.com/") {
+        if let url = URL(string: initialURLString) {
             webView.load(URLRequest(url: url))
         }
         return webView
@@ -139,6 +142,10 @@ struct InstagramWebView: UIViewRepresentable {
                 .replacingOccurrences(of: "'", with: "\\'")
             let script = "(function(){var ns=window.StopScroll;if(ns&&ns.nav&&ns.nav.nativeNavigateToTab){ns.nav.nativeNavigateToTab('\(tab)');}})();"
             uiView.evaluateJavaScript(script)
+        }
+        if context.coordinator.lastIsActive != isActive {
+            context.coordinator.lastIsActive = isActive
+            context.coordinator.applyRuntimeActiveState(isActive)
         }
     }
 
@@ -233,6 +240,7 @@ struct InstagramWebView: UIViewRepresentable {
         var lastLabelsToken: Int
         var lastWikipediaTitle: String
         var lastNativeNavCommandToken: Int
+        var lastIsActive: Bool
 
         init(_ parent: InstagramWebView) {
             self.parent = parent
@@ -240,6 +248,7 @@ struct InstagramWebView: UIViewRepresentable {
             self.lastLabelsToken = parent.labelsToken
             self.lastWikipediaTitle = ""
             self.lastNativeNavCommandToken = parent.nativeNavCommandToken
+            self.lastIsActive = parent.isActive
         }
 
         func userContentController(_ controller: WKUserContentController, didReceive message: WKScriptMessage) {
@@ -344,6 +353,7 @@ struct InstagramWebView: UIViewRepresentable {
                 let tab = (payload["tab"] as? String) ?? "home"
                 let badgeCount = Self.parseXPAmount(payload["messageBadge"])
                 DispatchQueue.main.async {
+                    guard self.parent.isActive else { return }
                     self.parent.selectedNativeTab = tab
                     self.parent.nativeMessageBadgeCount = max(0, badgeCount)
                 }
@@ -795,10 +805,19 @@ struct InstagramWebView: UIViewRepresentable {
             for script in InstagramWebView.loadAllScripts() {
                 webView.evaluateJavaScript(script)
             }
+            applyRuntimeActiveState(parent.isActive)
             DispatchQueue.main.async {
+                guard self.parent.tracksLoading else { return }
                 withAnimation(.easeOut(duration: 0.3)) {
                     self.parent.isLoading = false
                 }
+            }
+        }
+
+        func applyRuntimeActiveState(_ active: Bool) {
+            let js = "(function(){var ns=window.StopScroll;var st=ns&&ns._state; if(ns&&ns.runtimeState&&ns.runtimeState.setPaused&&st){ns.runtimeState.setPaused(st,\(!active));}})();"
+            DispatchQueue.main.async {
+                self.webView?.evaluateJavaScript(js)
             }
         }
 
