@@ -168,9 +168,7 @@ struct InstagramWebView: UIViewRepresentable {
         }
         if context.coordinator.lastThemeRefreshToken != themeRefreshToken {
             context.coordinator.lastThemeRefreshToken = themeRefreshToken
-            if isActive {
-                uiView.evaluateJavaScript("(function(){var ns=window.StopScroll;if(ns&&ns.dom&&ns.dom.detectTheme){ns.dom.detectTheme();}})();")
-            }
+            uiView.evaluateJavaScript("(function(){var ns=window.StopScroll;if(ns&&ns.dom&&ns.dom.detectTheme){ns.dom.detectTheme();}})();")
         }
         if context.coordinator.lastNativeNavCommandToken != nativeNavCommandToken {
             context.coordinator.lastNativeNavCommandToken = nativeNavCommandToken

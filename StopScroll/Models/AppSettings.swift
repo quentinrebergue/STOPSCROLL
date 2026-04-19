@@ -118,6 +118,7 @@ final class AppSettings: ObservableObject {
         }
 
         DispatchQueue.main.async {
+            guard self.instagramBackgroundCSS != normalized else { return }
             self.instagramBackgroundCSS = normalized
         }
     }

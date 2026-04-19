@@ -10,7 +10,10 @@ struct InstagramView: View {
     @State var isLoadingSearch = true
     @State var isLoadingProfile = true
     @State var showingReader = false
-    @State var reloadToken = 0
+    @State var reloadTokenMain = 0
+    @State var reloadTokenMessages = 0
+    @State var reloadTokenSearch = 0
+    @State var reloadTokenProfile = 0
     @State var showingSettings = false
     @State var showingDashboard = false
     /// Incremented when the user closes Settings so the WebView re-injects the updated label list.
@@ -45,6 +48,8 @@ struct InstagramView: View {
     @State var instagramUsernameDraft = ""
     @AppStorage("ss_instagram_theme_dark") var instagramThemeIsDark = true
     @State var themeRefreshToken = 0
+    @State private var lastObservedInjectionFrequency = AppSettings.shared.injectionFrequency
+    @State private var lastObservedBackgroundCSS = AppSettings.shared.instagramBackgroundCSS
 
     var isActiveSurfaceLoading: Bool {
         switch activeSurface {
@@ -83,7 +88,7 @@ struct InstagramView: View {
                     showingReader: $showingReader,
                     showingSettings: $showingSettings,
                     showingDashboard: $showingDashboard,
-                    reloadToken: $reloadToken,
+                    reloadToken: $reloadTokenMain,
                     labelsToken: $labelsToken,
                     themeRefreshToken: $themeRefreshToken,
                     selectedNativeTab: $nativeSelectedTab,
@@ -116,7 +121,7 @@ struct InstagramView: View {
                     showingReader: $showingReader,
                     showingSettings: $showingSettings,
                     showingDashboard: $showingDashboard,
-                    reloadToken: $reloadToken,
+                    reloadToken: $reloadTokenMessages,
                     labelsToken: $labelsToken,
                     themeRefreshToken: $themeRefreshToken,
                     selectedNativeTab: $nativeSelectedTab,
@@ -147,7 +152,7 @@ struct InstagramView: View {
                     showingReader: $showingReader,
                     showingSettings: $showingSettings,
                     showingDashboard: $showingDashboard,
-                    reloadToken: $reloadToken,
+                    reloadToken: $reloadTokenSearch,
                     labelsToken: $labelsToken,
                     themeRefreshToken: $themeRefreshToken,
                     selectedNativeTab: $nativeSelectedTab,
@@ -178,7 +183,7 @@ struct InstagramView: View {
                     showingReader: $showingReader,
                     showingSettings: $showingSettings,
                     showingDashboard: $showingDashboard,
-                    reloadToken: $reloadToken,
+                    reloadToken: $reloadTokenProfile,
                     labelsToken: $labelsToken,
                     themeRefreshToken: $themeRefreshToken,
                     selectedNativeTab: $nativeSelectedTab,
@@ -211,10 +216,9 @@ struct InstagramView: View {
             DashboardView(onDismiss: {
                 showingDashboard = false
             }, onOpenSettings: {
+                // Show settings first to avoid one-frame feed flash.
+                showingSettings = true
                 showingDashboard = false
-                DispatchQueue.main.async {
-                    showingSettings = true
-                }
             })
             .opacity(showingDashboard ? 1 : 0)
             .allowsHitTesting(showingDashboard)
@@ -290,6 +294,9 @@ struct InstagramView: View {
                     selectedTab: nativeSelectedTab,
                     messageBadgeCount: nativeMessageBadgeCount,
                     onSelectTab: { tab in
+                        if showingSettings {
+                            showingSettings = false
+                        }
                         // Any tab switch away from dashboard should reveal the target page.
                         if tab != "dashboard" {
                             showingDashboard = false
@@ -356,8 +363,40 @@ struct InstagramView: View {
             }
             reconfigureSurfacesForCurrentMode()
         }
+        .onReceive(settings.$adLabels) { _ in
+            labelsToken += 1
+        }
+        .onReceive(settings.$articleSources) { _ in
+            labelsToken += 1
+        }
+        .onReceive(settings.$devMode) { _ in
+            labelsToken += 1
+        }
+        .onReceive(settings.$injectionFrequency) { newValue in
+            if WebRefreshPolicy.shouldReloadFeedOnInjectionChange(
+                oldValue: lastObservedInjectionFrequency,
+                newValue: newValue
+            ) {
+                reloadTokenMain += 1
+                labelsToken += 1
+                lastObservedInjectionFrequency = newValue
+            }
+        }
         .onReceive(settings.$backgroundRefreshToken) { _ in
             themeRefreshToken += 1
+        }
+        .onReceive(settings.$instagramBackgroundCSS) { newCSS in
+            if WebRefreshPolicy.shouldReloadAllWebViewsOnBackgroundChange(
+                previousCSS: lastObservedBackgroundCSS,
+                newCSS: newCSS
+            ) {
+                reloadTokenMain += 1
+                reloadTokenMessages += 1
+                reloadTokenSearch += 1
+                reloadTokenProfile += 1
+                themeRefreshToken += 1
+                lastObservedBackgroundCSS = newCSS
+            }
         }
         .onAppear {
             reconfigureSurfacesForCurrentMode()

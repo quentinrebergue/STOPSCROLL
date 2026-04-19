@@ -119,6 +119,16 @@ struct PageProgressSegmentView: View {
     let resetActive: Bool
     let resetStart: Date?
     let mergeSegments: Bool
+    @Environment(\.colorScheme) private var colorScheme
+
+    private var trackColor: Color {
+        colorScheme == .light ? Color.black.opacity(0.15) : Color.white.opacity(0.25)
+    }
+
+    private var fillColor: Color {
+        if celebrate { return .green }
+        return colorScheme == .light ? Color.black.opacity(0.78) : Color.white
+    }
 
     private var normalFill: CGFloat {
         index < currentOnPage ? 1 : 0
@@ -161,12 +171,12 @@ struct PageProgressSegmentView: View {
             GeometryReader { geo in
                 ZStack(alignment: .leading) {
                     RoundedRectangle(cornerRadius: 1.5)
-                        .fill(Color(white: 0.25))
+                        .fill(trackColor)
                         .frame(width: geo.size.width + mergeOverlap)
                         .offset(x: -mergeOverlap / 2)
 
                     RoundedRectangle(cornerRadius: 1.5)
-                        .fill(celebrate ? Color.green : Color.white)
+                        .fill(fillColor)
                         .frame(width: (geo.size.width + mergeOverlap) * fillAmount(at: timeline.date))
                         .offset(x: -mergeOverlap / 2)
                 }
@@ -183,6 +193,16 @@ struct PageProgressUnifiedResetView: View {
     let total: Int
     let celebrate: Bool
     let resetStart: Date?
+    @Environment(\.colorScheme) private var colorScheme
+
+    private var trackColor: Color {
+        colorScheme == .light ? Color.black.opacity(0.15) : Color.white.opacity(0.25)
+    }
+
+    private var fillColor: Color {
+        if celebrate { return .green }
+        return colorScheme == .light ? Color.black.opacity(0.78) : Color.white
+    }
 
     private func fillAmount(at now: Date) -> CGFloat {
         guard let resetStart else { return 1 }
@@ -199,10 +219,10 @@ struct PageProgressUnifiedResetView: View {
             GeometryReader { geo in
                 ZStack(alignment: .leading) {
                     RoundedRectangle(cornerRadius: 1.5)
-                        .fill(Color(white: 0.25))
+                        .fill(trackColor)
 
                     RoundedRectangle(cornerRadius: 1.5)
-                        .fill(celebrate ? Color.green : Color.white)
+                        .fill(fillColor)
                         .frame(width: geo.size.width * fillAmount(at: timeline.date))
                 }
             }

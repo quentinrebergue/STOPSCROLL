@@ -12,8 +12,9 @@ final class InstagramViewUIStateTests: XCTestCase {
         let isActiveSurfaceLoading = true  // WebView en cours de chargement
         let showingReader = true            // BookReader visible
         let showingDashboard = false        // Dashboard non visible
+        let showingSettings = false
 
-        let shouldShowLoadingBar = isActiveSurfaceLoading && !showingReader && !showingDashboard
+        let shouldShowLoadingBar = isActiveSurfaceLoading && !showingReader && !showingDashboard && !showingSettings
 
         XCTAssertFalse(shouldShowLoadingBar, "LoadingBar doit être caché quand BookReader est affiché, même si WebView charge")
     }
@@ -23,8 +24,9 @@ final class InstagramViewUIStateTests: XCTestCase {
         let isActiveSurfaceLoading = true
         let showingReader = false
         let showingDashboard = true
+        let showingSettings = false
 
-        let shouldShowLoadingBar = isActiveSurfaceLoading && !showingReader && !showingDashboard
+        let shouldShowLoadingBar = isActiveSurfaceLoading && !showingReader && !showingDashboard && !showingSettings
 
         XCTAssertFalse(shouldShowLoadingBar, "LoadingBar doit être caché quand Dashboard est affiché")
     }
@@ -34,8 +36,9 @@ final class InstagramViewUIStateTests: XCTestCase {
         let isActiveSurfaceLoading = true
         let showingReader = false
         let showingDashboard = false
+        let showingSettings = false
 
-        let shouldShowLoadingBar = isActiveSurfaceLoading && !showingReader && !showingDashboard
+        let shouldShowLoadingBar = isActiveSurfaceLoading && !showingReader && !showingDashboard && !showingSettings
 
         XCTAssertTrue(shouldShowLoadingBar, "LoadingBar doit être visible quand pas d'overlay")
     }
@@ -45,8 +48,9 @@ final class InstagramViewUIStateTests: XCTestCase {
         let isActiveSurfaceLoading = false
         let showingReader = false
         let showingDashboard = false
+        let showingSettings = false
 
-        let shouldShowLoadingBar = isActiveSurfaceLoading && !showingReader && !showingDashboard
+        let shouldShowLoadingBar = isActiveSurfaceLoading && !showingReader && !showingDashboard && !showingSettings
 
         XCTAssertFalse(shouldShowLoadingBar, "LoadingBar doit être caché quand WebView ne charge pas")
     }
@@ -56,9 +60,10 @@ final class InstagramViewUIStateTests: XCTestCase {
         let activeSurface = "main"
         let showingReader = true
         let showingDashboard = false
+        let showingSettings = false
 
         // WebView visibility condition
-        let mainWebViewVisible = activeSurface == "main" && !showingReader && !showingDashboard
+        let mainWebViewVisible = activeSurface == "main" && !showingReader && !showingDashboard && !showingSettings
 
         XCTAssertFalse(mainWebViewVisible, "WebView principale ne doit pas être visible quand BookReader est ouvert")
     }
@@ -68,8 +73,9 @@ final class InstagramViewUIStateTests: XCTestCase {
         let activeSurface = "main"
         let showingReader = false
         let showingDashboard = true
+        let showingSettings = false
 
-        let mainWebViewVisible = activeSurface == "main" && !showingReader && !showingDashboard
+        let mainWebViewVisible = activeSurface == "main" && !showingReader && !showingDashboard && !showingSettings
 
         XCTAssertFalse(mainWebViewVisible, "WebView ne doit pas être visible quand Dashboard est ouvert")
     }
@@ -119,25 +125,52 @@ final class InstagramViewUIStateTests: XCTestCase {
         XCTAssertEqual(messagesSurface, "messages", "Mode 3: surface partagée doit être 'messages'")
     }
 
-    /// **Test 9**: Retour au Dashboard après fermeture Settings depuis Dashboard
-    func testReturnToDashboardAfterSettings() {
-        var returnToDashboardFlag = false
-        var showingDashboard = true
+    /// **Test 9**: LoadingBar cachée si Settings est ouvert
+    func testLoadingBarHiddenWhenSettingsOpen() {
+        let isActiveSurfaceLoading = true
+        let showingReader = false
+        let showingDashboard = false
+        let showingSettings = true
+
+        let shouldShowLoadingBar = isActiveSurfaceLoading && !showingReader && !showingDashboard && !showingSettings
+        XCTAssertFalse(shouldShowLoadingBar, "LoadingBar doit être caché quand Settings est affiché")
+    }
+
+    /// **Test 10**: WebView cachée si Settings est ouvert
+    func testWebViewHiddenWhenSettingsOpen() {
+        let activeSurface = "main"
+        let showingReader = false
+        let showingDashboard = false
+        let showingSettings = true
+
+        let mainWebViewVisible = activeSurface == "main" && !showingReader && !showingDashboard && !showingSettings
+        XCTAssertFalse(mainWebViewVisible, "WebView ne doit pas être visible quand Settings est affiché")
+    }
+
+    /// **Test 11**: Le refresh feed ne se fait que si la fréquence change vraiment
+    func testRefreshPolicy_feedReloadOnInjectionChange() {
+        XCTAssertTrue(WebRefreshPolicy.shouldReloadFeedOnInjectionChange(oldValue: 5, newValue: 10))
+        XCTAssertFalse(WebRefreshPolicy.shouldReloadFeedOnInjectionChange(oldValue: 5, newValue: 5))
+    }
+
+    /// **Test 12**: Le refresh global se fait seulement si la couleur de background change
+    func testRefreshPolicy_reloadAllOnBackgroundChange() {
+        XCTAssertTrue(WebRefreshPolicy.shouldReloadAllWebViewsOnBackgroundChange(previousCSS: "rgb(10, 10, 10)", newCSS: "rgb(240, 240, 240)"))
+        XCTAssertFalse(WebRefreshPolicy.shouldReloadAllWebViewsOnBackgroundChange(previousCSS: "rgb(10, 10, 10)", newCSS: "rgb(10, 10, 10)"))
+        XCTAssertFalse(WebRefreshPolicy.shouldReloadAllWebViewsOnBackgroundChange(previousCSS: "rgb(10, 10, 10)", newCSS: "   "))
+    }
+
+    /// **Test 13**: Un tap sur la native tab bar doit fermer Settings
+    func testNativeTabSelectionClosesSettingsOverlay() {
         var showingSettings = true
+        let selectedTab = "home"
 
-        // Simuler l'ouverture de Settings depuis Dashboard
-        returnToDashboardFlag = true
-        showingDashboard = false
-        showingSettings = true
-
-        // Simuler la fermeture de Settings
-        showingSettings = false
-        if returnToDashboardFlag {
-            returnToDashboardFlag = false
-            showingDashboard = true  // Retour au Dashboard
+        // Mirrors InstagramView onSelectTab behavior.
+        if showingSettings {
+            showingSettings = false
         }
+        _ = selectedTab
 
-        XCTAssertTrue(showingDashboard, "Après fermeture Settings depuis Dashboard, Dashboard doit réapparaître")
-        XCTAssertFalse(returnToDashboardFlag, "Flag de retour doit être réinitialisé")
+        XCTAssertFalse(showingSettings, "Le tap sur une tab native doit fermer l'overlay Settings")
     }
 }

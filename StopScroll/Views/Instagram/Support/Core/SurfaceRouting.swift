@@ -31,3 +31,17 @@ enum SurfaceRouter {
         }
     }
 }
+
+/// Small pure helpers for deciding when to refresh one/all webviews.
+enum WebRefreshPolicy {
+    static func shouldReloadFeedOnInjectionChange(oldValue: Int, newValue: Int) -> Bool {
+        oldValue != newValue
+    }
+
+    static func shouldReloadAllWebViewsOnBackgroundChange(previousCSS: String, newCSS: String) -> Bool {
+        let oldTrimmed = previousCSS.trimmingCharacters(in: .whitespacesAndNewlines)
+        let newTrimmed = newCSS.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !newTrimmed.isEmpty else { return false }
+        return oldTrimmed != newTrimmed
+    }
+}

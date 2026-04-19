@@ -336,7 +336,7 @@ struct BookReaderView: View {
         return HStack(spacing: 3) {
             Text("Page.\(page)")
                 .font(.system(size: 9, weight: .medium, design: .monospaced))
-                .foregroundColor(Color(white: 0.4))
+                .foregroundColor(palette.secondaryText)
                 .fixedSize()
 
             Group {
@@ -403,15 +403,15 @@ struct BookReaderView: View {
         return HStack(spacing: 3) {
             Text(label)
                 .font(.system(size: 9, weight: .medium, design: .monospaced))
-                .foregroundColor(Color(white: 0.4))
+                .foregroundColor(palette.secondaryText)
                 .fixedSize()
 
             GeometryReader { geo in
                 ZStack(alignment: .leading) {
                     RoundedRectangle(cornerRadius: 2)
-                        .fill(Color(white: 0.2))
+                        .fill(palette.border)
                     RoundedRectangle(cornerRadius: 2)
-                        .fill(progress >= 1.0 ? Color.green : Color(red: 0.4, green: 0.6, blue: 1.0))
+                        .fill(progress >= 1.0 ? Color.green : palette.primaryText.opacity(settings.preferredColorScheme == .light ? 0.72 : 0.88))
                         .frame(width: geo.size.width * min(progress, 1.0))
                         .animation(.easeInOut(duration: 0.3), value: progress)
                 }
