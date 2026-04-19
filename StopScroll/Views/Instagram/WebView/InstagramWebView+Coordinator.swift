@@ -65,6 +65,7 @@ extension InstagramWebView {
                   let pan = gestureRecognizer as? UIPanGestureRecognizer,
                   parent.allowsHorizontalSurfaceSwipe,
                   parent.isActive,
+                HorizontalSwipeRecognizerPolicy.shouldAllowSectionSwipe(activeTab: parent.activeSectionTab),
                   !parent.showingReader,
                   !parent.showingDashboard,
                   !parent.showingSettings else {
@@ -88,6 +89,7 @@ extension InstagramWebView {
         @objc private func handleHorizontalPan(_ recognizer: UIPanGestureRecognizer) {
             guard parent.allowsHorizontalSurfaceSwipe,
                   parent.isActive,
+                HorizontalSwipeRecognizerPolicy.shouldAllowSectionSwipe(activeTab: parent.activeSectionTab),
                   !parent.showingReader,
                   !parent.showingDashboard,
                   !parent.showingSettings else {

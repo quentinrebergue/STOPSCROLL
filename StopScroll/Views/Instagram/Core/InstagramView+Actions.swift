@@ -7,6 +7,17 @@ extension InstagramView {
             showingSettings = false
         }
 
+        if tab == "home",
+           currentSectionTab == "home",
+           !showingReader,
+           !showingDashboard,
+           !showingSettings,
+           !showingBookReaderSettings {
+            nativeSelectedTab = "home"
+            nativeNavCommandToken += 1
+            return
+        }
+
         sectionSwipeTargetTab = nil
         sectionSwipeTranslation = 0
 
@@ -93,7 +104,7 @@ extension InstagramView {
     }
 
     func handleHorizontalSurfaceDragChanged(_ translation: CGFloat) {
-        guard !showingSettings else { return }
+        guard !showingSettings && !showingBookReaderSettings else { return }
 
         let clamped = max(-sectionPageWidth, min(sectionPageWidth, translation))
         sectionSwipeTranslation = clamped
@@ -102,7 +113,7 @@ extension InstagramView {
     }
 
     func handleHorizontalSurfaceDragEnded(_ translation: CGFloat, velocity: CGFloat) {
-        guard !showingSettings else {
+        guard !showingSettings && !showingBookReaderSettings else {
             withAnimation(.interactiveSpring(response: 0.28, dampingFraction: 0.9)) {
                 sectionSwipeTranslation = 0
                 sectionSwipeTargetTab = nil
@@ -203,7 +214,7 @@ extension InstagramView {
     }
 
     func isInteractiveSection(_ tab: String) -> Bool {
-        !showingSettings && tab == currentSectionTab
+        !showingSettings && !showingBookReaderSettings && tab == currentSectionTab
         }
 
     func consumePendingLazyReloadIfNeeded(for surface: WebSurface) {

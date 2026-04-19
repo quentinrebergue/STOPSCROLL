@@ -68,6 +68,10 @@ enum HorizontalSwipePolicy {
 }
 
 enum HorizontalSwipeRecognizerPolicy {
+    static func shouldAllowSectionSwipe(activeTab: String) -> Bool {
+        activeTab != "messages"
+    }
+
     static func shouldBegin(velocityX: CGFloat, velocityY: CGFloat, activeTab: String) -> Bool {
         let ratio: CGFloat
         let minSpeed: CGFloat

@@ -53,6 +53,7 @@ struct InstagramView: View {
     @State private var lastObservedLazyWebViewRefreshToken = AppSettings.shared.lazyWebViewRefreshToken
     @State var sectionSwipeTranslation: CGFloat = 0
     @State var sectionSwipeTargetTab: String? = nil
+    @State var showingBookReaderSettings = false
 
     var isActiveSurfaceLoading: Bool {
         switch activeSurface {
@@ -116,7 +117,7 @@ struct InstagramView: View {
                     tracksLoading: true,
                     scriptProfile: .full,
                     handlesInstagramNavigation: normalizedWebViewCount == 1,
-                    allowsHorizontalSurfaceSwipe: !showingSettings,
+                    allowsHorizontalSurfaceSwipe: !showingSettings && !showingBookReaderSettings,
                     activeSectionTab: currentSectionTab,
                     onHorizontalSurfaceDragChanged: handleHorizontalSurfaceDragChanged,
                     onHorizontalSurfaceDragEnded: handleHorizontalSurfaceDragEnded,
@@ -154,7 +155,7 @@ struct InstagramView: View {
                     tracksLoading: true,
                     scriptProfile: .reelBlocker,
                     handlesInstagramNavigation: true,
-                    allowsHorizontalSurfaceSwipe: !showingSettings,
+                    allowsHorizontalSurfaceSwipe: !showingSettings && !showingBookReaderSettings,
                     activeSectionTab: currentSectionTab,
                     onHorizontalSurfaceDragChanged: handleHorizontalSurfaceDragChanged,
                     onHorizontalSurfaceDragEnded: handleHorizontalSurfaceDragEnded,
@@ -190,7 +191,7 @@ struct InstagramView: View {
                     tracksLoading: true,
                     scriptProfile: .reelBlocker,
                     handlesInstagramNavigation: true,
-                    allowsHorizontalSurfaceSwipe: !showingSettings,
+                    allowsHorizontalSurfaceSwipe: !showingSettings && !showingBookReaderSettings,
                     activeSectionTab: currentSectionTab,
                     onHorizontalSurfaceDragChanged: handleHorizontalSurfaceDragChanged,
                     onHorizontalSurfaceDragEnded: handleHorizontalSurfaceDragEnded,
@@ -226,7 +227,7 @@ struct InstagramView: View {
                     tracksLoading: true,
                     scriptProfile: .navigationLite,
                     handlesInstagramNavigation: true,
-                    allowsHorizontalSurfaceSwipe: !showingSettings,
+                    allowsHorizontalSurfaceSwipe: !showingSettings && !showingBookReaderSettings,
                     activeSectionTab: currentSectionTab,
                     onHorizontalSurfaceDragChanged: handleHorizontalSurfaceDragChanged,
                     onHorizontalSurfaceDragEnded: handleHorizontalSurfaceDragEnded,
@@ -247,11 +248,13 @@ struct InstagramView: View {
 
             BookReaderView(onDismiss: {
                 showingReader = false
+                showingBookReaderSettings = false
                 nativeSelectedTab = SurfaceRouter.tab(for: activeSurface)
             },
             bottomInset: sharedBottomNavReservedHeight,
-            onHorizontalSectionDragChanged: handleHorizontalSurfaceDragChanged,
-            onHorizontalSectionDragEnded: handleHorizontalSurfaceDragEnded)
+            onSettingsVisibilityChanged: { isVisible in
+                showingBookReaderSettings = isVisible
+            })
                 .offset(x: sectionOffset(for: "book"))
                 .opacity(sectionOpacity(for: "book"))
                 .allowsHitTesting(isInteractiveSection("book"))

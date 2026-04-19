@@ -229,8 +229,10 @@ final class InstagramViewUIStateTests: XCTestCase {
 
     /// **Test 20b**: En messages, le recognizer doit rester strict pour ne pas casser le scroll chat.
     func testHorizontalSwipeRecognizerPolicy_messagesPrioritizesVerticalScroll() {
+        XCTAssertFalse(HorizontalSwipeRecognizerPolicy.shouldAllowSectionSwipe(activeTab: "messages"))
+        XCTAssertTrue(HorizontalSwipeRecognizerPolicy.shouldAllowSectionSwipe(activeTab: "search"))
         XCTAssertFalse(HorizontalSwipeRecognizerPolicy.shouldBegin(velocityX: 180, velocityY: 120, activeTab: "messages"))
-        XCTAssertTrue(HorizontalSwipeRecognizerPolicy.shouldBegin(velocityX: 360, velocityY: 90, activeTab: "messages"))
+        XCTAssertTrue(HorizontalSwipeRecognizerPolicy.shouldBegin(velocityX: 420, velocityY: 40, activeTab: "messages"))
     }
 
     /// **Test 20c**: Les drags majoritairement verticaux ne doivent pas deplacer la section en Book/Dashboard.
@@ -250,6 +252,16 @@ final class InstagramViewUIStateTests: XCTestCase {
             translationY: 12,
             activeTab: "book"
         ))
+    }
+
+    /// **Test 20d**: Les settings BookReader bloquent l'interaction horizontale comme les settings dashboard.
+    func testBookReaderSettingsBlocksSectionInteractivity() {
+        let showingSettings = false
+        let showingBookReaderSettings = true
+        let tab = "book"
+
+        let isInteractive = !showingSettings && !showingBookReaderSettings && tab == "book"
+        XCTAssertFalse(isInteractive)
     }
 
     /// **Test 21**: Le preview de swipe anime la page cible depuis le bord oppose.

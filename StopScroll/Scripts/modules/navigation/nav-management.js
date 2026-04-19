@@ -154,6 +154,28 @@
     return 0;
   }
 
+  function readHomeVerticalOffset() {
+    var scrolling = document.scrollingElement || document.documentElement || document.body;
+    var winOffset = typeof global.scrollY === 'number' ? global.scrollY : 0;
+    var nodeOffset = scrolling && typeof scrolling.scrollTop === 'number' ? scrolling.scrollTop : 0;
+    return Math.max(winOffset, nodeOffset, 0);
+  }
+
+  function scrollHomeToTop() {
+    if (typeof global.scrollTo === 'function') {
+      try {
+        global.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (_) {
+        global.scrollTo(0, 0);
+      }
+    }
+
+    var scrolling = document.scrollingElement || document.documentElement || document.body;
+    if (scrolling && typeof scrolling.scrollTop === 'number') {
+      scrolling.scrollTop = 0;
+    }
+  }
+
   function syncNativeNavState() {
     const tab = detectCurrentTab();
     const badge = readMessageBadge();
@@ -166,6 +188,15 @@
 
   function nativeNavigateToTab(tab) {
     if (!tab) return false;
+
+    if (tab === 'home' && detectCurrentTab() === 'home') {
+      if (readHomeVerticalOffset() > 8) {
+        scrollHomeToTop();
+      } else {
+        dom.postToBridge('reloadFeed');
+      }
+      return true;
+    }
 
     const link = findTabLink(tab);
     if (link) {

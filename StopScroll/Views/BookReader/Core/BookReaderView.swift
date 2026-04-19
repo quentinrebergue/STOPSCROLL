@@ -5,8 +5,7 @@ import SwiftUI
 struct BookReaderView: View {
     let onDismiss: () -> Void
     var bottomInset: CGFloat = 0
-    var onHorizontalSectionDragChanged: ((CGFloat) -> Void)? = nil
-    var onHorizontalSectionDragEnded: ((CGFloat, CGFloat) -> Void)? = nil
+    var onSettingsVisibilityChanged: ((Bool) -> Void)? = nil
     @ObservedObject private var settings = AppSettings.shared
 
     @State private var cards: [BookCard] = []
@@ -105,9 +104,10 @@ struct BookReaderView: View {
                 currentBookId: currentBookId,
                 bookTitle: bookTitle,
                 allBookmarkedCards: bookmarkedCards(),
-                onDismiss: { showSettings = false },
-                onHorizontalSectionDragChanged: onHorizontalSectionDragChanged,
-                onHorizontalSectionDragEnded: onHorizontalSectionDragEnded
+                onDismiss: {
+                    showSettings = false
+                    onSettingsVisibilityChanged?(false)
+                }
             )
             .opacity(showSettings ? 1 : 0)
             .allowsHitTesting(showSettings)
@@ -207,7 +207,10 @@ struct BookReaderView: View {
                     .foregroundColor(palette.secondaryText)
                     .padding(.trailing, 8)
 
-                Button { showSettings = true } label: {
+                Button {
+                    showSettings = true
+                    onSettingsVisibilityChanged?(true)
+                } label: {
                     Image(systemName: "gearshape")
                         .font(.system(size: 16))
                         .foregroundColor(palette.secondaryText)

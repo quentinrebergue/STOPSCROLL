@@ -66,6 +66,58 @@ final class InjectedCardJavaScriptTests: XCTestCase {
         XCTAssertEqual(result?.toString(), "profile")
       }
 
+    func testNavManagement_homeReselectScrollsToTopWhenNotAtTop() throws {
+        let context = try makeJSContext()
+        context.evaluateScript("""
+        window.__scrollCalls = 0;
+        window.__reloadCalls = 0;
+        window.scrollY = 120;
+        window.scrollTo = function() { window.__scrollCalls += 1; window.scrollY = 0; };
+        window.StopScroll.constants = window.StopScroll.constants || {};
+        window.StopScroll.dom = {
+          postToBridge: function(payload){ if (payload === 'reloadFeed') { window.__reloadCalls += 1; } }
+        };
+        window.location = { pathname: '/', origin: 'https://www.instagram.com' };
+        window.innerHeight = 844;
+        window.getComputedStyle = function(){ return { position: 'fixed' }; };
+        window.StopScroll = window.StopScroll || {};
+        """)
+
+        try evaluateScript(atRelativePath: "StopScroll/Scripts/modules/navigation/nav-management.js", in: context)
+        context.evaluateScript("window.StopScroll.nav.nativeNavigateToTab('home');")
+
+        let scrollCalls = context.evaluateScript("window.__scrollCalls")?.toInt32() ?? 0
+        let reloadCalls = context.evaluateScript("window.__reloadCalls")?.toInt32() ?? 0
+        XCTAssertEqual(scrollCalls, 1)
+        XCTAssertEqual(reloadCalls, 0)
+    }
+
+    func testNavManagement_homeReselectReloadsWhenAlreadyAtTop() throws {
+        let context = try makeJSContext()
+        context.evaluateScript("""
+        window.__scrollCalls = 0;
+        window.__reloadCalls = 0;
+        window.scrollY = 0;
+        window.scrollTo = function() { window.__scrollCalls += 1; };
+        window.StopScroll.constants = window.StopScroll.constants || {};
+        window.StopScroll.dom = {
+          postToBridge: function(payload){ if (payload === 'reloadFeed') { window.__reloadCalls += 1; } }
+        };
+        window.location = { pathname: '/', origin: 'https://www.instagram.com' };
+        window.innerHeight = 844;
+        window.getComputedStyle = function(){ return { position: 'fixed' }; };
+        window.StopScroll = window.StopScroll || {};
+        """)
+
+        try evaluateScript(atRelativePath: "StopScroll/Scripts/modules/navigation/nav-management.js", in: context)
+        context.evaluateScript("window.StopScroll.nav.nativeNavigateToTab('home');")
+
+        let scrollCalls = context.evaluateScript("window.__scrollCalls")?.toInt32() ?? 0
+        let reloadCalls = context.evaluateScript("window.__reloadCalls")?.toInt32() ?? 0
+        XCTAssertEqual(scrollCalls, 0)
+        XCTAssertEqual(reloadCalls, 1)
+    }
+
     private func makeJSContext() throws -> JSContext {
         guard let context = JSContext() else {
             throw NSError(domain: "InjectedCardJavaScriptTests", code: 1)
