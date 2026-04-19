@@ -10,6 +10,10 @@
     }
     var cfg = state.config.feed_injection;
 
+    if (ns.cardInjection && ns.cardInjection.repairBrokenInjections) {
+      ns.cardInjection.repairBrokenInjections(state.config);
+    }
+
     // ── Timer-expired mode: replace ALL posts, even non-ads ──
     var expired = window.__STOPSCROLL_TIMER_EXPIRED;
     if (expired) {

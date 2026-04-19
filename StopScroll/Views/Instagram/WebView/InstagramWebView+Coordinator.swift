@@ -56,6 +56,7 @@ extension InstagramWebView {
             recognizer.maximumNumberOfTouches = 1
             recognizer.cancelsTouchesInView = true
             webView.addGestureRecognizer(recognizer)
+            webView.scrollView.panGestureRecognizer.require(toFail: recognizer)
             horizontalPanRecognizer = recognizer
         }
 
@@ -71,11 +72,17 @@ extension InstagramWebView {
             }
 
             let velocity = pan.velocity(in: pan.view)
-            return HorizontalSwipeRecognizerPolicy.shouldBegin(
+            let shouldBegin = HorizontalSwipeRecognizerPolicy.shouldBegin(
                 velocityX: velocity.x,
                 velocityY: velocity.y,
                 activeTab: parent.activeSectionTab
             )
+            LogManager.shared.log(
+                "↔️ Swipe begin? \(shouldBegin) tab=\(parent.activeSectionTab) vx=\(Int(velocity.x)) vy=\(Int(velocity.y))",
+                category: "Swipe",
+                level: .debug
+            )
+            return shouldBegin
         }
 
         @objc private func handleHorizontalPan(_ recognizer: UIPanGestureRecognizer) {
@@ -95,11 +102,21 @@ extension InstagramWebView {
                 if parent.activeSectionTab == "search" {
                     lockWebViewScrollForHorizontalSwipe(true)
                 }
+                LogManager.shared.log(
+                    "↔️ Swipe began tab=\(parent.activeSectionTab)",
+                    category: "Swipe",
+                    level: .debug
+                )
                 parent.onHorizontalSurfaceDragChanged?(translation)
             case .changed:
                 parent.onHorizontalSurfaceDragChanged?(translation)
             case .ended, .cancelled, .failed:
                 lockWebViewScrollForHorizontalSwipe(false)
+                LogManager.shared.log(
+                    "↔️ Swipe ended tab=\(parent.activeSectionTab) dx=\(Int(translation)) vx=\(Int(velocity))",
+                    category: "Swipe",
+                    level: .debug
+                )
                 parent.onHorizontalSurfaceDragEnded?(translation, velocity)
             default:
                 return

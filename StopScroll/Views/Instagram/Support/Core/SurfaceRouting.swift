@@ -69,8 +69,8 @@ enum HorizontalSwipePolicy {
 
 enum HorizontalSwipeRecognizerPolicy {
     static func shouldBegin(velocityX: CGFloat, velocityY: CGFloat, activeTab: String) -> Bool {
-        let ratio = activeTab == "search" ? 1.05 : 1.2
-        let minSpeed: CGFloat = activeTab == "search" ? 40 : 120
+        let ratio = activeTab == "search" ? 0.9 : 1.2
+        let minSpeed: CGFloat = activeTab == "search" ? 10 : 120
         return abs(velocityX) > abs(velocityY) * ratio && abs(velocityX) > minSpeed
     }
 }

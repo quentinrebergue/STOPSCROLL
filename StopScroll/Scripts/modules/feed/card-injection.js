@@ -7,6 +7,19 @@
   var _cardTypeByPostKey = Object.create(null);
   var _fallbackKeySeq = 0;
 
+  function logInjectionDebug(message, payload) {
+    try {
+      if (ns.dom && ns.dom.postToBridge) {
+        ns.dom.postToBridge({
+          type: 'debugLog',
+          category: 'CardInjection',
+          level: 'DEBUG',
+          message: '[CardInjection] ' + message + ' ' + JSON.stringify(payload || {})
+        });
+      }
+    } catch (_) {}
+  }
+
   // ── Timer-expired motivational messages ─────────────────
   var EXPIRED_MESSAGES = [
     { emoji: '🏁', text: "Time\u2019s up! You did it \u2014 now stand up and stretch." },
@@ -163,6 +176,25 @@
     return postKey ? (_cardTypeByPostKey[postKey] || requestedType) : requestedType;
   }
 
+  function shouldReuseCachedCard(cachedCard, targetArticle) {
+    if (!cachedCard) return false;
+    if (!cachedCard.isConnected) return true;
+    if (!targetArticle) return false;
+    var owner = null;
+    try {
+      owner = cachedCard.closest ? cachedCard.closest('article') : null;
+    } catch (_) {
+      owner = null;
+    }
+    if (!owner) return true;
+    return owner === targetArticle;
+  }
+
+  function needsInjectionRepair(wrapper) {
+    if (!wrapper) return true;
+    return !wrapper.firstElementChild;
+  }
+
   function getPostKey(article) {
     if (!article) return '';
 
@@ -224,7 +256,17 @@
     var cachedCard = postKey ? _cardCacheByPostKey[postKey] : null;
     var effectiveType = resolveEffectiveCardType(postKey, type);
 
-    var card = cachedCard || ns.cardBuilder.buildCardFor(effectiveType, config);
+    var canReuseCached = shouldReuseCachedCard(cachedCard, article);
+    var card = canReuseCached ? cachedCard : null;
+    if (!card && cachedCard && cachedCard.isConnected) {
+      logInjectionDebug('cached_card_connected_elsewhere', {
+        postKey: postKey,
+        type: effectiveType
+      });
+    }
+    if (!card) {
+      card = ns.cardBuilder.buildCardFor(effectiveType, config);
+    }
     if (!card) return false;
 
     if (postKey) {
@@ -235,14 +277,44 @@
     return attachCardToArticle(article, card, effectiveType, postKey);
   }
 
+  function repairBrokenInjections(config) {
+    var replacedPosts = document.querySelectorAll('article[data-ss-replaced="true"]');
+    var repaired = 0;
+
+    for (var i = 0; i < replacedPosts.length; i++) {
+      var article = replacedPosts[i];
+      var wrapper = article.querySelector('[data-ss-injection]');
+      if (!needsInjectionRepair(wrapper)) continue;
+
+      var postKey = getPostKey(article);
+      var type = article.getAttribute('data-ss-card-type') || resolveEffectiveCardType(postKey, 'stop');
+      if (!type) continue;
+
+      var card = ns.cardBuilder && ns.cardBuilder.buildCardFor ? ns.cardBuilder.buildCardFor(type, config || { captions: [] }) : null;
+      if (!card) continue;
+
+      attachCardToArticle(article, card, type, postKey);
+      repaired += 1;
+      logInjectionDebug('repaired_empty_injection_wrapper', {
+        postKey: postKey,
+        type: type
+      });
+    }
+
+    return repaired;
+  }
+
   ns.cardInjection = {
     buildStablePostKey: buildStablePostKey,
     getPostKey: getPostKey,
     rememberCardType: rememberCardType,
     resolveEffectiveCardType: resolveEffectiveCardType,
+    shouldReuseCachedCard: shouldReuseCachedCard,
+    needsInjectionRepair: needsInjectionRepair,
     hasCachedCard: function (postKey) { return !!(postKey && _cardCacheByPostKey[postKey]); },
     getCachedCardType: function (postKey) { return postKey ? (_cardTypeByPostKey[postKey] || null) : null; },
     injectCardIntoPost: injectCardIntoPost,
+    repairBrokenInjections: repairBrokenInjections,
     injectTimerExpiredCard: injectTimerExpiredCard
   };
 })(window);
