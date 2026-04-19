@@ -97,6 +97,7 @@ struct SettingsSheet: View {
                     }
                 }
                 .listRowBackground(readCardSurface)
+                .accessibilityIdentifier("booksettings.section.readingMode")
 
                 Section("Library") {
                     Button {
@@ -172,6 +173,7 @@ struct SettingsSheet: View {
                     }
                 }
                 .listRowBackground(readCardSurface)
+                .accessibilityIdentifier("booksettings.section.library")
 
                 let articles = library.filter { $0.isArticle }
                 if !articles.isEmpty {
@@ -241,6 +243,7 @@ struct SettingsSheet: View {
                         }
                     }
                     .listRowBackground(readCardSurface)
+                    .accessibilityIdentifier("booksettings.section.articles")
                 }
 
                 let allMarked = allBookmarkedCards
@@ -288,15 +291,18 @@ struct SettingsSheet: View {
                     }
                 }
                 .listRowBackground(readCardSurface)
+                .accessibilityIdentifier("booksettings.section.data")
             }
             .listStyle(.insetGrouped)
             .scrollContentBackground(.hidden)
             .background(palette.background)
+            .accessibilityIdentifier("booksettings.list")
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") { onDismiss() }
+                        .accessibilityIdentifier("booksettings.done")
                 }
             }
             .onAppear {

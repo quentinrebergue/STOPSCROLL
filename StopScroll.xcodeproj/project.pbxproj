@@ -7,72 +7,71 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		008D33F44B7045A0A722948C /* WebView/InstagramWebView+Coordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BCC673054FD4E879D7347A6 /* WebView/InstagramWebView+Coordinator.swift */; };
+		0364D7499DF64538BCB34083 /* Support/Core/XPProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC77F4CBE5FC44EFAA078872 /* Support/Core/XPProgress.swift */; };
 		072134CAB4546F774C9B15EF /* runtime-ui.js in Resources */ = {isa = PBXBuildFile; fileRef = 6B73D89F1A2CA5F420AD4585 /* runtime-ui.js */; };
+		079F3B7CB3E14559A5BDA00B /* Support/Components/InstagramUsernamePromptSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA3DB3AC4BFB41FBA4AFEEC4 /* Support/Components/InstagramUsernamePromptSheet.swift */; };
 		0E0A5E093DD39A3D6BA043CC /* block_reels.js in Resources */ = {isa = PBXBuildFile; fileRef = E8B9D70AE41E090020003432 /* block_reels.js */; };
-		11757E0E955326E948703CF4 /* nav-management.js in Resources */ = {isa = PBXBuildFile; fileRef = 5B8AD3F66D765FAD4883A275 /* nav-management.js */; };
+		11757E0E955326E948703CF4 /* navigation/nav-management.js in Resources */ = {isa = PBXBuildFile; fileRef = 5B8AD3F66D765FAD4883A275 /* navigation/nav-management.js */; };
+		11B6E904AA844DB3963CA7A7 /* Progress/ProgressViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ABC52A2B03C4E9A86B34D97 /* Progress/ProgressViews.swift */; };
+		13106EBB3137418E9E2213D2 /* Support/Core/SurfaceRouting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5689B23C1AF54C20978DD126 /* Support/Core/SurfaceRouting.swift */; };
 		167E89196B678BCEBA68007A /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6A095CCE50876F59118428 /* AppSettings.swift */; };
-		196B2146F76AB27B059B4958 /* BookReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5A34E345922B0FB77B065C /* BookReaderView.swift */; };
-				8CBA6AF60C764CAEBAE7612A /* BookReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFFE44BA493845B1A7C140B7 /* BookReaderView.swift */; };
-				1862791F43FE4589B467F8FE /* StoredChapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D820FA81FBD40B4AF55275C /* StoredChapter.swift */; };
-				F40845A473F547639E52988F /* LibraryBook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89B12E342316493C8C23892B /* LibraryBook.swift */; };
-				11B6E904AA844DB3963CA7A7 /* ProgressViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ABC52A2B03C4E9A86B34D97 /* ProgressViews.swift */; };
-				7604A0536BC84429AE01C39E /* BookCoverViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83A39E668085493CBDF58849 /* BookCoverViews.swift */; };
-				B62FD808D930445BA9838117 /* TextCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E361622F5CF84183A150FE88 /* TextCardView.swift */; };
-				9E01600C3ECD45C3AA3686AE /* ChapterCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1879AAEFA6274D458828501A /* ChapterCard.swift */; };
-				AF1B6B94B11D470F84145A42 /* PassageDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B88D37C8BEA4C82B214B1D7 /* PassageDetailView.swift */; };
-				1F811CDC56344198A7715383 /* BookCompletionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E09F44D5F1C4D7FB5DB2504 /* BookCompletionView.swift */; };
-				8E5C825F83C64B2EA113802F /* SettingsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6935BB4BFEE4AB89277C884 /* SettingsSheet.swift */; };
-				5021167BBE92475F90182A3C /* BookDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B54E5928F746F2B3A5E4B3 /* BookDetailSheet.swift */; };
-				4E641A105B104AEE8F257207 /* BookReaderTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6040F693CA68422E87FC610B /* BookReaderTypes.swift */; };
-				28A1756D01E742EAB8ADF22B /* BookReaderDataTransfer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F97DFD9CFF9430EA3498C0F /* BookReaderDataTransfer.swift */; };
+		16FB9CE04FB0416C949F6797 /* Support/Components/LoadingBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = C41D6FA073DE4585B532C0A7 /* Support/Components/LoadingBar.swift */; };
+		1711C7E266074EFFAD963692 /* WebView/InstagramWebViewScripts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36FCB25113904961B1510777 /* WebView/InstagramWebViewScripts.swift */; };
+		1862791F43FE4589B467F8FE /* Models/StoredChapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D820FA81FBD40B4AF55275C /* Models/StoredChapter.swift */; };
 		1BCF5AD12F94EAF70042FC96 /* LogManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BCF5AD02F94EAF70042FC96 /* LogManager.swift */; };
 		1BCF5AD22F94EAF70042FC96 /* LogManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BCF5AD02F94EAF70042FC96 /* LogManager.swift */; };
 		1BCF5AD42F94EB120042FC96 /* ConsoleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BCF5AD32F94EB120042FC96 /* ConsoleView.swift */; };
 		1BCF5AD52F94EB120042FC96 /* ConsoleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BCF5AD32F94EB120042FC96 /* ConsoleView.swift */; };
 		1DEDEA7847183B5BC857B069 /* 1984.json in Resources */ = {isa = PBXBuildFile; fileRef = 31DB646D651FFA19E393C1F3 /* 1984.json */; };
+		1F811CDC56344198A7715383 /* Completion/BookCompletionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E09F44D5F1C4D7FB5DB2504 /* Completion/BookCompletionView.swift */; };
 		1F837C1C326B82742E999373 /* l-etranger.json in Resources */ = {isa = PBXBuildFile; fileRef = DC4274BB75882A985CB5C0BE /* l-etranger.json */; };
 		24151CCC554C18A28694D3EC /* dynamic_feed_config.yaml in Resources */ = {isa = PBXBuildFile; fileRef = F1AFCEC8E424892E0BC875EC /* dynamic_feed_config.yaml */; };
-		26286AE36E3383D42914218D /* constants.js in Resources */ = {isa = PBXBuildFile; fileRef = 426826A738B07C445AB3F826 /* constants.js */; };
-		2656A10B9F5D592B94197708 /* tracking.js in Resources */ = {isa = PBXBuildFile; fileRef = 2AE21283A700ADC65F40A964 /* tracking.js */; };
+		26286AE36E3383D42914218D /* core/constants.js in Resources */ = {isa = PBXBuildFile; fileRef = 426826A738B07C445AB3F826 /* core/constants.js */; };
+		2656A10B9F5D592B94197708 /* analytics/tracking.js in Resources */ = {isa = PBXBuildFile; fileRef = 2AE21283A700ADC65F40A964 /* analytics/tracking.js */; };
+		28A1756D01E742EAB8ADF22B /* Settings/BookReaderDataTransfer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F97DFD9CFF9430EA3498C0F /* Settings/BookReaderDataTransfer.swift */; };
 		3DFB4A28B148B1DFFC2C66EA /* EPUBParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BD4C6C201D9F5F16A434A29 /* EPUBParser.swift */; };
 		4730F705C47912493598425B /* ReadingMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF11588F033C75B560C0FFC8 /* ReadingMode.swift */; };
 		4DE917A22D9B670A345EBF68 /* MiniZIP.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3511D2DC94E15A5FB361C282 /* MiniZIP.swift */; };
+		4E641A105B104AEE8F257207 /* Core/BookReaderTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6040F693CA68422E87FC610B /* Core/BookReaderTypes.swift */; };
+		4E74A11777094E7FA5F1CE0F /* WebView/Coordinator/InstagramWebView+Coordinator+Guardian.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE0775101FD47738723CCDC /* WebView/Coordinator/InstagramWebView+Coordinator+Guardian.swift */; };
+		5021167BBE92475F90182A3C /* Settings/BookDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B54E5928F746F2B3A5E4B3 /* Settings/BookDetailSheet.swift */; };
+		5555B4A386F244848BAD3F43 /* Support/Components/XPDynamicIsland.swift in Sources */ = {isa = PBXBuildFile; fileRef = C61A44706D4243B09E49265F /* Support/Components/XPDynamicIsland.swift */; };
+		57218583F1444C87A92909F2 /* Support/InstagramViewSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06E1D5530CDF4C7CA6BEA71F /* Support/InstagramViewSupport.swift */; };
 		596CA626D098C5B97511B1FA /* BookCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A0650330F1551DE7DD9680 /* BookCard.swift */; };
 		5EDC12D4C1609F10C7414C18 /* l-etranger.epub in Resources */ = {isa = PBXBuildFile; fileRef = E19848A043D0CF43AB8B195A /* l-etranger.epub */; };
 		60D2C4E49811A72D0BDC744D /* runtime-scan.js in Resources */ = {isa = PBXBuildFile; fileRef = E4CD51E6F16178205EDAB216 /* runtime-scan.js */; };
+		63D06DA8C46945C58DDCD9E5 /* BookReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E51684E30BE740D9B3A4474F /* BookReaderTests.swift */; };
+		6CF6E661E46A4AB09C19F2B2 /* Support/Components/DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B4FAD839023458C87E7EA20 /* Support/Components/DashboardView.swift */; };
+		6FF35D953846418192B6DB0A /* WebView/Coordinator/InstagramWebView+Coordinator+Navigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 410A9BF37AE84904BC5B923F /* WebView/Coordinator/InstagramWebView+Coordinator+Navigation.swift */; };
+		70824C0999C14284A27E6D44 /* WebView/Coordinator/InstagramWebView+Coordinator+Bridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62AC5BB73DBB42DDAEE9BA5C /* WebView/Coordinator/InstagramWebView+Coordinator+Bridge.swift */; };
 		720A7F23F1DF3E1DB2B8AA31 /* block_reels_entry.js in Resources */ = {isa = PBXBuildFile; fileRef = D2B9DF084BF8BB4FB369AC1C /* block_reels_entry.js */; };
+		7275A51006C34C45B8E43E10 /* WebView/Coordinator/InstagramWebView+Coordinator+Wikipedia.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDEF99B3F58E436399459041 /* WebView/Coordinator/InstagramWebView+Coordinator+Wikipedia.swift */; };
 		733AE0251F257E9A545EFDAE /* dorian-gray.json in Resources */ = {isa = PBXBuildFile; fileRef = 0EE8292651B5683F1566C909 /* dorian-gray.json */; };
 		741C3867BFC8FD6966C495D0 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAF2D46EF1C6E4B340BA1FC8 /* SettingsView.swift */; };
-		7484628AC4F24FC3A62D0BEE /* session-stats.js in Resources */ = {isa = PBXBuildFile; fileRef = 459D5381A32D4A489B570713 /* session-stats.js */; };
-		767CD5C99713E1A7FABA3036 /* InstagramView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7458C392340CA051B9872EA /* InstagramView.swift */; };
-		57218583F1444C87A92909F2 /* InstagramViewSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06E1D5530CDF4C7CA6BEA71F /* InstagramViewSupport.swift */; };
-		A099AE2021064A6297458DDC /* InstagramView+Actions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42E930E48F9248608B2EC422 /* InstagramView+Actions.swift */; };
-		81C4BF166B93D00B3D6765B9 /* scroll-lock.js in Resources */ = {isa = PBXBuildFile; fileRef = 47C612B0F7A1DCD29ADBEEF9 /* scroll-lock.js */; };
-		83F82C06AE917D7565F44576 /* InstagramWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98D36FB79C7EDDFDA593A7C9 /* InstagramWebView.swift */; };
-		1711C7E266074EFFAD963692 /* InstagramWebViewScripts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36FCB25113904961B1510777 /* InstagramWebViewScripts.swift */; };
-		008D33F44B7045A0A722948C /* InstagramWebView+Coordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BCC673054FD4E879D7347A6 /* InstagramWebView+Coordinator.swift */; };
-		70824C0999C14284A27E6D44 /* InstagramWebView+Coordinator+Bridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62AC5BB73DBB42DDAEE9BA5C /* InstagramWebView+Coordinator+Bridge.swift */; };
-		7275A51006C34C45B8E43E10 /* InstagramWebView+Coordinator+Wikipedia.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDEF99B3F58E436399459041 /* InstagramWebView+Coordinator+Wikipedia.swift */; };
-		4E74A11777094E7FA5F1CE0F /* InstagramWebView+Coordinator+Guardian.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE0775101FD47738723CCDC /* InstagramWebView+Coordinator+Guardian.swift */; };
-		6FF35D953846418192B6DB0A /* InstagramWebView+Coordinator+Navigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 410A9BF37AE84904BC5B923F /* InstagramWebView+Coordinator+Navigation.swift */; };
-		A0854E164ED14BB5B58B0C64 /* InstagramWebView+Coordinator+Timer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CFE2B59D70B406ABCAE1821 /* InstagramWebView+Coordinator+Timer.swift */; };
-		0364D7499DF64538BCB34083 /* XPProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC77F4CBE5FC44EFAA078872 /* XPProgress.swift */; };
-		13106EBB3137418E9E2213D2 /* SurfaceRouting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5689B23C1AF54C20978DD126 /* SurfaceRouting.swift */; };
-		BBE7D1DFBF514814BB184E50 /* InstagramSecondaryRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25A3F150F9840E88AC41A61 /* InstagramSecondaryRoute.swift */; };
-		079F3B7CB3E14559A5BDA00B /* InstagramUsernamePromptSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA3DB3AC4BFB41FBA4AFEEC4 /* InstagramUsernamePromptSheet.swift */; };
-		B0850E3C96CF4059AFEDF811 /* NativeInstagramTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F753773FB34419AB19782C2 /* NativeInstagramTabBar.swift */; };
-		16FB9CE04FB0416C949F6797 /* LoadingBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = C41D6FA073DE4585B532C0A7 /* LoadingBar.swift */; };
-		5555B4A386F244848BAD3F43 /* XPDynamicIsland.swift in Sources */ = {isa = PBXBuildFile; fileRef = C61A44706D4243B09E49265F /* XPDynamicIsland.swift */; };
-		6CF6E661E46A4AB09C19F2B2 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B4FAD839023458C87E7EA20 /* DashboardView.swift */; };
+		7484628AC4F24FC3A62D0BEE /* analytics/session-stats.js in Resources */ = {isa = PBXBuildFile; fileRef = 459D5381A32D4A489B570713 /* analytics/session-stats.js */; };
+		7604A0536BC84429AE01C39E /* Details/BookCoverViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83A39E668085493CBDF58849 /* Details/BookCoverViews.swift */; };
+		767CD5C99713E1A7FABA3036 /* Core/InstagramView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7458C392340CA051B9872EA /* Core/InstagramView.swift */; };
+		81C4BF166B93D00B3D6765B9 /* navigation/scroll-lock.js in Resources */ = {isa = PBXBuildFile; fileRef = 47C612B0F7A1DCD29ADBEEF9 /* navigation/scroll-lock.js */; };
+		83F82C06AE917D7565F44576 /* WebView/InstagramWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98D36FB79C7EDDFDA593A7C9 /* WebView/InstagramWebView.swift */; };
 		87D5B5C7224D6580853F46AC /* build_block_reels.mjs in Resources */ = {isa = PBXBuildFile; fileRef = F6C771D48DF469657B4736F9 /* build_block_reels.mjs */; };
+		8CBA6AF60C764CAEBAE7612A /* Core/BookReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFFE44BA493845B1A7C140B7 /* Core/BookReaderView.swift */; };
+		8E5C825F83C64B2EA113802F /* Settings/SettingsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6935BB4BFEE4AB89277C884 /* Settings/SettingsSheet.swift */; };
 		9041891F5A55383856E0C868 /* CardType.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC266854481DCE0687F62A4A /* CardType.swift */; };
 		9AEDCF87B455004504649DF7 /* runtime-state.js in Resources */ = {isa = PBXBuildFile; fileRef = FCC3507A23B2C8EF5C9F1582 /* runtime-state.js */; };
-		A08075D69A4203AFCA89DB8D /* page-manager.js in Resources */ = {isa = PBXBuildFile; fileRef = 3E2D1A03E4BE037A0217B8E1 /* page-manager.js */; };
+		9E01600C3ECD45C3AA3686AE /* Components/ChapterCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1879AAEFA6274D458828501A /* Components/ChapterCard.swift */; };
+		A08075D69A4203AFCA89DB8D /* navigation/page-manager.js in Resources */ = {isa = PBXBuildFile; fileRef = 3E2D1A03E4BE037A0217B8E1 /* navigation/page-manager.js */; };
+		A0854E164ED14BB5B58B0C64 /* WebView/Coordinator/InstagramWebView+Coordinator+Timer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CFE2B59D70B406ABCAE1821 /* WebView/Coordinator/InstagramWebView+Coordinator+Timer.swift */; };
+		A099AE2021064A6297458DDC /* Core/InstagramView+Actions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42E930E48F9248608B2EC422 /* Core/InstagramView+Actions.swift */; };
 		A31410EE5D6322D2100BC284 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F5264B0892789360AAE52D0D /* Assets.xcassets */; };
 		A4057A3018DF90737D19AC67 /* 1984.epub in Resources */ = {isa = PBXBuildFile; fileRef = 42EA0EE9A5B088DE2E527697 /* 1984.epub */; };
-		AE82571374B15A67AD8769CF /* ad-detection.js in Resources */ = {isa = PBXBuildFile; fileRef = 5C66F51A6E14B547DFE57A28 /* ad-detection.js */; };
-		B968E8762E78B55C46861445 /* dom-utils.js in Resources */ = {isa = PBXBuildFile; fileRef = 0629F99C39F502C163050F96 /* dom-utils.js */; };
-		C8CD3BDC6ADADE184817FBB1 /* card-injection.js in Resources */ = {isa = PBXBuildFile; fileRef = E2ECEDAD8271AE991EADE90C /* card-injection.js */; };
+		AE82571374B15A67AD8769CF /* feed/ad-detection.js in Resources */ = {isa = PBXBuildFile; fileRef = 5C66F51A6E14B547DFE57A28 /* feed/ad-detection.js */; };
+		AF1B6B94B11D470F84145A42 /* Details/PassageDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B88D37C8BEA4C82B214B1D7 /* Details/PassageDetailView.swift */; };
+		B0850E3C96CF4059AFEDF811 /* Support/Components/NativeInstagramTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F753773FB34419AB19782C2 /* Support/Components/NativeInstagramTabBar.swift */; };
+		B62FD808D930445BA9838117 /* Components/TextCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E361622F5CF84183A150FE88 /* Components/TextCardView.swift */; };
+		B968E8762E78B55C46861445 /* core/dom-utils.js in Resources */ = {isa = PBXBuildFile; fileRef = 0629F99C39F502C163050F96 /* core/dom-utils.js */; };
+		BBE7D1DFBF514814BB184E50 /* Support/Core/InstagramSecondaryRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25A3F150F9840E88AC41A61 /* Support/Core/InstagramSecondaryRoute.swift */; };
+		C8CD3BDC6ADADE184817FBB1 /* feed/card-injection.js in Resources */ = {isa = PBXBuildFile; fileRef = E2ECEDAD8271AE991EADE90C /* feed/card-injection.js */; };
 		CB01A00000000000000000A1 /* card-builder-helpers.js in Resources */ = {isa = PBXBuildFile; fileRef = CB01F00000000000000000A1 /* card-builder-helpers.js */; };
 		CB01A00000000000000000A2 /* card-metrics.js in Resources */ = {isa = PBXBuildFile; fileRef = CB01F00000000000000000A2 /* card-metrics.js */; };
 		CB01A00000000000000000A3 /* card-mood.js in Resources */ = {isa = PBXBuildFile; fileRef = CB01F00000000000000000A3 /* card-mood.js */; };
@@ -82,30 +81,37 @@
 		CB01A00000000000000000A7 /* card-builder.js in Resources */ = {isa = PBXBuildFile; fileRef = CB01F00000000000000000A7 /* card-builder.js */; };
 		CB01A00000000000000000A8 /* card-book.js in Resources */ = {isa = PBXBuildFile; fileRef = CB01F00000000000000000A8 /* card-book.js */; };
 		CB01A00000000000000000A9 /* card-culture.js in Resources */ = {isa = PBXBuildFile; fileRef = CB01F00000000000000000A9 /* card-culture.js */; };
-		CE148C2C2BC7651AE31FC005 /* config.js in Resources */ = {isa = PBXBuildFile; fileRef = F37A75B1FDB803D6858E0529 /* config.js */; };
+		CE148C2C2BC7651AE31FC005 /* core/config.js in Resources */ = {isa = PBXBuildFile; fileRef = F37A75B1FDB803D6858E0529 /* core/config.js */; };
 		D19A3ED8A8C44F7639C83E2B /* le-petit-prince.json in Resources */ = {isa = PBXBuildFile; fileRef = 7EF2D7B2839CD4D31A83AA97 /* le-petit-prince.json */; };
 		D2A88B199E5AFA3204E3A400 /* String+HTMLStripping.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBDA853E4D3537C6E8F986AC /* String+HTMLStripping.swift */; };
 		D4185F5DE07CEB7C876C81DB /* StopScrollApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F8E5453518C42B23702CCBB /* StopScrollApp.swift */; };
 		D9C99F5FA0994BBFE0BD0DB5 /* BookParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D72F7704B8A034E5CC1CF8D2 /* BookParser.swift */; };
 		DA53C6993F4764F522EF04FF /* le-petit-prince.epub in Resources */ = {isa = PBXBuildFile; fileRef = 21B81C876FDD84E814F5A389 /* le-petit-prince.epub */; };
-		E6D38C57ACFC342FFCE57D67 /* card-logic.js in Resources */ = {isa = PBXBuildFile; fileRef = 25FF4AF8D9F7E63AB024811A /* card-logic.js */; };
+		E6D38C57ACFC342FFCE57D67 /* feed/card-logic.js in Resources */ = {isa = PBXBuildFile; fileRef = 25FF4AF8D9F7E63AB024811A /* feed/card-logic.js */; };
 		EB23AA3BFD54DE2E2E8C7F47 /* BookParserEPUBTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49830F744711A2144EE7185B /* BookParserEPUBTests.swift */; };
 		F02FAA985CC67A6BEAE1E355 /* dorian-gray.epub in Resources */ = {isa = PBXBuildFile; fileRef = 9A79C980F9AD98BD101601E9 /* dorian-gray.epub */; };
-		F0AA0D272D88F462AF10C5A0 /* top-menu.js in Resources */ = {isa = PBXBuildFile; fileRef = 9BA157D7898D2DA526AFDCB1 /* top-menu.js */; };
+		F0AA0D272D88F462AF10C5A0 /* navigation/top-menu.js in Resources */ = {isa = PBXBuildFile; fileRef = 9BA157D7898D2DA526AFDCB1 /* navigation/top-menu.js */; };
 		F17FDA4E403CE54FAE123382 /* build_block_reels.sh in Resources */ = {isa = PBXBuildFile; fileRef = AE258A5A7FBD16C1374360DC /* build_block_reels.sh */; };
+		F40845A473F547639E52988F /* Models/LibraryBook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89B12E342316493C8C23892B /* Models/LibraryBook.swift */; };
 		FF2BE8CECF7504888ABD0C9D /* TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D621B9E95F4CDC4E78C462C /* TestHelpers.swift */; };
 		GA01B000000000000000C001 /* GuardianAPITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = GA01F000000000000000C001 /* GuardianAPITests.swift */; };
+		GD01A000000000000000C001 /* knowledge/guardian.js in Resources */ = {isa = PBXBuildFile; fileRef = GD01F000000000000000C001 /* knowledge/guardian.js */; };
 		IH01B000000000000000C001 /* InjectedCardHoleRegressionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = IH01F000000000000000C001 /* InjectedCardHoleRegressionTests.swift */; };
 		IJ01B000000000000000C001 /* InjectedCardJavaScriptTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = IJ01F000000000000000C001 /* InjectedCardJavaScriptTests.swift */; };
 		RG01B000000000000000C001 /* RegressionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = RG01F000000000000000C001 /* RegressionTests.swift */; };
 		SW01B000000000000000C001 /* SwipeFromExploreRegressionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SW01F000000000000000C001 /* SwipeFromExploreRegressionTests.swift */; };
-					63D06DA8C46945C58DDCD9E5 /* BookReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E51684E30BE740D9B3A4474F /* BookReaderTests.swift */; };
 		UI01B000000000000000C001 /* InstagramViewUIStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = UI01F000000000000000C001 /* InstagramViewUIStateTests.swift */; };
-		GD01A000000000000000C001 /* guardian.js in Resources */ = {isa = PBXBuildFile; fileRef = GD01F000000000000000C001 /* guardian.js */; };
-		WK01A000000000000000B001 /* wikipedia.js in Resources */ = {isa = PBXBuildFile; fileRef = WK01F000000000000000B001 /* wikipedia.js */; };
+		WK01A000000000000000B001 /* knowledge/wikipedia.js in Resources */ = {isa = PBXBuildFile; fileRef = WK01F000000000000000B001 /* knowledge/wikipedia.js */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		1BC40A282F95342B002C7492 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 742975AE0258353861E61B22 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 180F3B4834C9782D757B939A;
+			remoteInfo = StopScroll;
+		};
 		C0D44B6D5F962AA401A75254 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 742975AE0258353861E61B22 /* Project object */;
@@ -116,67 +122,63 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		0629F99C39F502C163050F96 /* dom-utils.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = core/dom-utils.js; sourceTree = "<group>"; };
+		0629F99C39F502C163050F96 /* core/dom-utils.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "core/dom-utils.js"; sourceTree = "<group>"; };
+		06E1D5530CDF4C7CA6BEA71F /* Support/InstagramViewSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support/InstagramViewSupport.swift; sourceTree = "<group>"; };
 		0C6A095CCE50876F59118428 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		0EE8292651B5683F1566C909 /* dorian-gray.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "dorian-gray.json"; sourceTree = "<group>"; };
+		1879AAEFA6274D458828501A /* Components/ChapterCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/ChapterCard.swift; sourceTree = "<group>"; };
+		1BC40A222F95342B002C7492 /* StopScrollUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StopScrollUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1BCF5AD02F94EAF70042FC96 /* LogManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogManager.swift; sourceTree = "<group>"; };
 		1BCF5AD32F94EB120042FC96 /* ConsoleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleView.swift; sourceTree = "<group>"; };
 		21B81C876FDD84E814F5A389 /* le-petit-prince.epub */ = {isa = PBXFileReference; lastKnownFileType = file; path = "le-petit-prince.epub"; sourceTree = "<group>"; };
-		25FF4AF8D9F7E63AB024811A /* card-logic.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = feed/card-logic.js; sourceTree = "<group>"; };
-		2AE21283A700ADC65F40A964 /* tracking.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = analytics/tracking.js; sourceTree = "<group>"; };
+		25FF4AF8D9F7E63AB024811A /* feed/card-logic.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "feed/card-logic.js"; sourceTree = "<group>"; };
+		2AE21283A700ADC65F40A964 /* analytics/tracking.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = analytics/tracking.js; sourceTree = "<group>"; };
+		2BCC673054FD4E879D7347A6 /* WebView/InstagramWebView+Coordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebView/InstagramWebView+Coordinator.swift"; sourceTree = "<group>"; };
 		2BD4C6C201D9F5F16A434A29 /* EPUBParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EPUBParser.swift; sourceTree = "<group>"; };
+		2E09F44D5F1C4D7FB5DB2504 /* Completion/BookCompletionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Completion/BookCompletionView.swift; sourceTree = "<group>"; };
 		31DB646D651FFA19E393C1F3 /* 1984.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = 1984.json; sourceTree = "<group>"; };
 		3511D2DC94E15A5FB361C282 /* MiniZIP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniZIP.swift; sourceTree = "<group>"; };
-		3E2D1A03E4BE037A0217B8E1 /* page-manager.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = navigation/page-manager.js; sourceTree = "<group>"; };
-		426826A738B07C445AB3F826 /* constants.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = core/constants.js; sourceTree = "<group>"; };
+		36FCB25113904961B1510777 /* WebView/InstagramWebViewScripts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebView/InstagramWebViewScripts.swift; sourceTree = "<group>"; };
+		3ABC52A2B03C4E9A86B34D97 /* Progress/ProgressViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Progress/ProgressViews.swift; sourceTree = "<group>"; };
+		3E2D1A03E4BE037A0217B8E1 /* navigation/page-manager.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "navigation/page-manager.js"; sourceTree = "<group>"; };
+		410A9BF37AE84904BC5B923F /* WebView/Coordinator/InstagramWebView+Coordinator+Navigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebView/Coordinator/InstagramWebView+Coordinator+Navigation.swift"; sourceTree = "<group>"; };
+		426826A738B07C445AB3F826 /* core/constants.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = core/constants.js; sourceTree = "<group>"; };
+		42E930E48F9248608B2EC422 /* Core/InstagramView+Actions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Core/InstagramView+Actions.swift"; sourceTree = "<group>"; };
 		42EA0EE9A5B088DE2E527697 /* 1984.epub */ = {isa = PBXFileReference; lastKnownFileType = file; path = 1984.epub; sourceTree = "<group>"; };
 		43A0650330F1551DE7DD9680 /* BookCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookCard.swift; sourceTree = "<group>"; };
-		459D5381A32D4A489B570713 /* session-stats.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = analytics/session-stats.js; sourceTree = "<group>"; };
-		47C612B0F7A1DCD29ADBEEF9 /* scroll-lock.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = navigation/scroll-lock.js; sourceTree = "<group>"; };
+		459D5381A32D4A489B570713 /* analytics/session-stats.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "analytics/session-stats.js"; sourceTree = "<group>"; };
+		47C612B0F7A1DCD29ADBEEF9 /* navigation/scroll-lock.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "navigation/scroll-lock.js"; sourceTree = "<group>"; };
 		49830F744711A2144EE7185B /* BookParserEPUBTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookParserEPUBTests.swift; sourceTree = "<group>"; };
+		4F753773FB34419AB19782C2 /* Support/Components/NativeInstagramTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support/Components/NativeInstagramTabBar.swift; sourceTree = "<group>"; };
 		4F8E5453518C42B23702CCBB /* StopScrollApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StopScrollApp.swift; sourceTree = "<group>"; };
-		5B8AD3F66D765FAD4883A275 /* nav-management.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = navigation/nav-management.js; sourceTree = "<group>"; };
-		5C66F51A6E14B547DFE57A28 /* ad-detection.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = feed/ad-detection.js; sourceTree = "<group>"; };
+		5689B23C1AF54C20978DD126 /* Support/Core/SurfaceRouting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support/Core/SurfaceRouting.swift; sourceTree = "<group>"; };
+		5B8AD3F66D765FAD4883A275 /* navigation/nav-management.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "navigation/nav-management.js"; sourceTree = "<group>"; };
+		5C66F51A6E14B547DFE57A28 /* feed/ad-detection.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "feed/ad-detection.js"; sourceTree = "<group>"; };
+		5D820FA81FBD40B4AF55275C /* Models/StoredChapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models/StoredChapter.swift; sourceTree = "<group>"; };
+		6040F693CA68422E87FC610B /* Core/BookReaderTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/BookReaderTypes.swift; sourceTree = "<group>"; };
+		62AC5BB73DBB42DDAEE9BA5C /* WebView/Coordinator/InstagramWebView+Coordinator+Bridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebView/Coordinator/InstagramWebView+Coordinator+Bridge.swift"; sourceTree = "<group>"; };
 		6B73D89F1A2CA5F420AD4585 /* runtime-ui.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "runtime-ui.js"; sourceTree = "<group>"; };
+		6B88D37C8BEA4C82B214B1D7 /* Details/PassageDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Details/PassageDetailView.swift; sourceTree = "<group>"; };
 		7C3519B92634CB61271300F7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		7E5A34E345922B0FB77B065C /* BookReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookReaderView.swift; sourceTree = "<group>"; };
-				AFFE44BA493845B1A7C140B7 /* BookReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/BookReaderView.swift; sourceTree = "<group>"; };
-				5D820FA81FBD40B4AF55275C /* StoredChapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models/StoredChapter.swift; sourceTree = "<group>"; };
-				89B12E342316493C8C23892B /* LibraryBook.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models/LibraryBook.swift; sourceTree = "<group>"; };
-				3ABC52A2B03C4E9A86B34D97 /* ProgressViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Progress/ProgressViews.swift; sourceTree = "<group>"; };
-				83A39E668085493CBDF58849 /* BookCoverViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Details/BookCoverViews.swift; sourceTree = "<group>"; };
-				E361622F5CF84183A150FE88 /* TextCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/TextCardView.swift; sourceTree = "<group>"; };
-				1879AAEFA6274D458828501A /* ChapterCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/ChapterCard.swift; sourceTree = "<group>"; };
-				6B88D37C8BEA4C82B214B1D7 /* PassageDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Details/PassageDetailView.swift; sourceTree = "<group>"; };
-				2E09F44D5F1C4D7FB5DB2504 /* BookCompletionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Completion/BookCompletionView.swift; sourceTree = "<group>"; };
-				E6935BB4BFEE4AB89277C884 /* SettingsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings/SettingsSheet.swift; sourceTree = "<group>"; };
-				B6B54E5928F746F2B3A5E4B3 /* BookDetailSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings/BookDetailSheet.swift; sourceTree = "<group>"; };
-				6040F693CA68422E87FC610B /* BookReaderTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/BookReaderTypes.swift; sourceTree = "<group>"; };
-				8F97DFD9CFF9430EA3498C0F /* BookReaderDataTransfer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings/BookReaderDataTransfer.swift; sourceTree = "<group>"; };
 		7EF2D7B2839CD4D31A83AA97 /* le-petit-prince.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "le-petit-prince.json"; sourceTree = "<group>"; };
+		83A39E668085493CBDF58849 /* Details/BookCoverViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Details/BookCoverViews.swift; sourceTree = "<group>"; };
 		86AF0E37D9B2DA48FC635A6D /* StopScroll.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StopScroll.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		89B12E342316493C8C23892B /* Models/LibraryBook.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models/LibraryBook.swift; sourceTree = "<group>"; };
+		8CFE2B59D70B406ABCAE1821 /* WebView/Coordinator/InstagramWebView+Coordinator+Timer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebView/Coordinator/InstagramWebView+Coordinator+Timer.swift"; sourceTree = "<group>"; };
 		8D621B9E95F4CDC4E78C462C /* TestHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestHelpers.swift; sourceTree = "<group>"; };
-		98D36FB79C7EDDFDA593A7C9 /* InstagramWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebView/InstagramWebView.swift; sourceTree = "<group>"; };
-		36FCB25113904961B1510777 /* InstagramWebViewScripts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebView/InstagramWebViewScripts.swift; sourceTree = "<group>"; };
-		2BCC673054FD4E879D7347A6 /* InstagramWebView+Coordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebView/InstagramWebView+Coordinator.swift"; sourceTree = "<group>"; };
-		62AC5BB73DBB42DDAEE9BA5C /* InstagramWebView+Coordinator+Bridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebView/Coordinator/InstagramWebView+Coordinator+Bridge.swift"; sourceTree = "<group>"; };
-		EDEF99B3F58E436399459041 /* InstagramWebView+Coordinator+Wikipedia.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebView/Coordinator/InstagramWebView+Coordinator+Wikipedia.swift"; sourceTree = "<group>"; };
-		9EE0775101FD47738723CCDC /* InstagramWebView+Coordinator+Guardian.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebView/Coordinator/InstagramWebView+Coordinator+Guardian.swift"; sourceTree = "<group>"; };
-		410A9BF37AE84904BC5B923F /* InstagramWebView+Coordinator+Navigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebView/Coordinator/InstagramWebView+Coordinator+Navigation.swift"; sourceTree = "<group>"; };
-		8CFE2B59D70B406ABCAE1821 /* InstagramWebView+Coordinator+Timer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebView/Coordinator/InstagramWebView+Coordinator+Timer.swift"; sourceTree = "<group>"; };
-		42E930E48F9248608B2EC422 /* InstagramView+Actions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Core/InstagramView+Actions.swift"; sourceTree = "<group>"; };
-		4F753773FB34419AB19782C2 /* NativeInstagramTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support/Components/NativeInstagramTabBar.swift; sourceTree = "<group>"; };
-		5689B23C1AF54C20978DD126 /* SurfaceRouting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support/Core/SurfaceRouting.swift; sourceTree = "<group>"; };
-		9B4FAD839023458C87E7EA20 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support/Components/DashboardView.swift; sourceTree = "<group>"; };
-		AC77F4CBE5FC44EFAA078872 /* XPProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support/Core/XPProgress.swift; sourceTree = "<group>"; };
-		C41D6FA073DE4585B532C0A7 /* LoadingBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support/Components/LoadingBar.swift; sourceTree = "<group>"; };
-		C61A44706D4243B09E49265F /* XPDynamicIsland.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support/Components/XPDynamicIsland.swift; sourceTree = "<group>"; };
-		E25A3F150F9840E88AC41A61 /* InstagramSecondaryRoute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support/Core/InstagramSecondaryRoute.swift; sourceTree = "<group>"; };
-		FA3DB3AC4BFB41FBA4AFEEC4 /* InstagramUsernamePromptSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support/Components/InstagramUsernamePromptSheet.swift; sourceTree = "<group>"; };
+		8F97DFD9CFF9430EA3498C0F /* Settings/BookReaderDataTransfer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings/BookReaderDataTransfer.swift; sourceTree = "<group>"; };
+		98D36FB79C7EDDFDA593A7C9 /* WebView/InstagramWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebView/InstagramWebView.swift; sourceTree = "<group>"; };
 		9A79C980F9AD98BD101601E9 /* dorian-gray.epub */ = {isa = PBXFileReference; lastKnownFileType = file; path = "dorian-gray.epub"; sourceTree = "<group>"; };
-		9BA157D7898D2DA526AFDCB1 /* top-menu.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = navigation/top-menu.js; sourceTree = "<group>"; };
+		9B4FAD839023458C87E7EA20 /* Support/Components/DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support/Components/DashboardView.swift; sourceTree = "<group>"; };
+		9BA157D7898D2DA526AFDCB1 /* navigation/top-menu.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "navigation/top-menu.js"; sourceTree = "<group>"; };
+		9EE0775101FD47738723CCDC /* WebView/Coordinator/InstagramWebView+Coordinator+Guardian.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebView/Coordinator/InstagramWebView+Coordinator+Guardian.swift"; sourceTree = "<group>"; };
+		AC77F4CBE5FC44EFAA078872 /* Support/Core/XPProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support/Core/XPProgress.swift; sourceTree = "<group>"; };
 		AE258A5A7FBD16C1374360DC /* build_block_reels.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = build_block_reels.sh; sourceTree = "<group>"; };
+		AFFE44BA493845B1A7C140B7 /* Core/BookReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/BookReaderView.swift; sourceTree = "<group>"; };
+		B6B54E5928F746F2B3A5E4B3 /* Settings/BookDetailSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings/BookDetailSheet.swift; sourceTree = "<group>"; };
 		C1396E0D9C909791D84E4FC3 /* StopScrollTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = StopScrollTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C41D6FA073DE4585B532C0A7 /* Support/Components/LoadingBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support/Components/LoadingBar.swift; sourceTree = "<group>"; };
+		C61A44706D4243B09E49265F /* Support/Components/XPDynamicIsland.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support/Components/XPDynamicIsland.swift; sourceTree = "<group>"; };
 		CAF2D46EF1C6E4B340BA1FC8 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		CB01F00000000000000000A1 /* card-builder-helpers.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "card-builder-helpers.js"; sourceTree = "<group>"; };
 		CB01F00000000000000000A2 /* card-metrics.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "card-metrics.js"; sourceTree = "<group>"; };
@@ -194,26 +196,48 @@
 		D72F7704B8A034E5CC1CF8D2 /* BookParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookParser.swift; sourceTree = "<group>"; };
 		DC4274BB75882A985CB5C0BE /* l-etranger.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "l-etranger.json"; sourceTree = "<group>"; };
 		E19848A043D0CF43AB8B195A /* l-etranger.epub */ = {isa = PBXFileReference; lastKnownFileType = file; path = "l-etranger.epub"; sourceTree = "<group>"; };
-		E2ECEDAD8271AE991EADE90C /* card-injection.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = feed/card-injection.js; sourceTree = "<group>"; };
+		E25A3F150F9840E88AC41A61 /* Support/Core/InstagramSecondaryRoute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support/Core/InstagramSecondaryRoute.swift; sourceTree = "<group>"; };
+		E2ECEDAD8271AE991EADE90C /* feed/card-injection.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "feed/card-injection.js"; sourceTree = "<group>"; };
+		E361622F5CF84183A150FE88 /* Components/TextCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/TextCardView.swift; sourceTree = "<group>"; };
 		E4CD51E6F16178205EDAB216 /* runtime-scan.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "runtime-scan.js"; sourceTree = "<group>"; };
+		E51684E30BE740D9B3A4474F /* BookReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookReaderTests.swift; sourceTree = "<group>"; };
+		E6935BB4BFEE4AB89277C884 /* Settings/SettingsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings/SettingsSheet.swift; sourceTree = "<group>"; };
 		E8B9D70AE41E090020003432 /* block_reels.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = block_reels.js; sourceTree = "<group>"; };
+		EDEF99B3F58E436399459041 /* WebView/Coordinator/InstagramWebView+Coordinator+Wikipedia.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebView/Coordinator/InstagramWebView+Coordinator+Wikipedia.swift"; sourceTree = "<group>"; };
 		F1AFCEC8E424892E0BC875EC /* dynamic_feed_config.yaml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = dynamic_feed_config.yaml; sourceTree = "<group>"; };
-		F37A75B1FDB803D6858E0529 /* config.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = core/config.js; sourceTree = "<group>"; };
+		F37A75B1FDB803D6858E0529 /* core/config.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = core/config.js; sourceTree = "<group>"; };
 		F5264B0892789360AAE52D0D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F6C771D48DF469657B4736F9 /* build_block_reels.mjs */ = {isa = PBXFileReference; lastKnownFileType = text; path = build_block_reels.mjs; sourceTree = "<group>"; };
-		F7458C392340CA051B9872EA /* InstagramView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/InstagramView.swift; sourceTree = "<group>"; };
-		06E1D5530CDF4C7CA6BEA71F /* InstagramViewSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support/InstagramViewSupport.swift; sourceTree = "<group>"; };
+		F7458C392340CA051B9872EA /* Core/InstagramView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/InstagramView.swift; sourceTree = "<group>"; };
+		FA3DB3AC4BFB41FBA4AFEEC4 /* Support/Components/InstagramUsernamePromptSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support/Components/InstagramUsernamePromptSheet.swift; sourceTree = "<group>"; };
 		FCC3507A23B2C8EF5C9F1582 /* runtime-state.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "runtime-state.js"; sourceTree = "<group>"; };
 		GA01F000000000000000C001 /* GuardianAPITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuardianAPITests.swift; sourceTree = "<group>"; };
+		GD01F000000000000000C001 /* knowledge/guardian.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = knowledge/guardian.js; sourceTree = "<group>"; };
 		IH01F000000000000000C001 /* InjectedCardHoleRegressionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InjectedCardHoleRegressionTests.swift; sourceTree = "<group>"; };
 		IJ01F000000000000000C001 /* InjectedCardJavaScriptTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InjectedCardJavaScriptTests.swift; sourceTree = "<group>"; };
 		RG01F000000000000000C001 /* RegressionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegressionTests.swift; sourceTree = "<group>"; };
 		SW01F000000000000000C001 /* SwipeFromExploreRegressionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeFromExploreRegressionTests.swift; sourceTree = "<group>"; };
-					E51684E30BE740D9B3A4474F /* BookReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookReaderTests.swift; sourceTree = "<group>"; };
 		UI01F000000000000000C001 /* InstagramViewUIStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstagramViewUIStateTests.swift; sourceTree = "<group>"; };
-		GD01F000000000000000C001 /* guardian.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = knowledge/guardian.js; sourceTree = "<group>"; };
-		WK01F000000000000000B001 /* wikipedia.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = knowledge/wikipedia.js; sourceTree = "<group>"; };
+		WK01F000000000000000B001 /* knowledge/wikipedia.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = knowledge/wikipedia.js; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		1BC40A232F95342B002C7492 /* StopScrollUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = StopScrollUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1BC40A1F2F95342B002C7492 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		002F22D747E63E13E20EF310 /* Fixtures */ = {
@@ -259,7 +283,7 @@
 			isa = PBXGroup;
 			children = (
 				49830F744711A2144EE7185B /* BookParserEPUBTests.swift */,
-									E51684E30BE740D9B3A4474F /* BookReaderTests.swift */,
+				E51684E30BE740D9B3A4474F /* BookReaderTests.swift */,
 				GA01F000000000000000C001 /* GuardianAPITests.swift */,
 				IH01F000000000000000C001 /* InjectedCardHoleRegressionTests.swift */,
 				IJ01F000000000000000C001 /* InjectedCardJavaScriptTests.swift */,
@@ -328,6 +352,26 @@
 			path = BookParsing;
 			sourceTree = "<group>";
 		};
+		6BC79B240C3A4CCE9D14C8A2 /* BookReader */ = {
+			isa = PBXGroup;
+			children = (
+				AFFE44BA493845B1A7C140B7 /* Core/BookReaderView.swift */,
+				6040F693CA68422E87FC610B /* Core/BookReaderTypes.swift */,
+				5D820FA81FBD40B4AF55275C /* Models/StoredChapter.swift */,
+				89B12E342316493C8C23892B /* Models/LibraryBook.swift */,
+				3ABC52A2B03C4E9A86B34D97 /* Progress/ProgressViews.swift */,
+				83A39E668085493CBDF58849 /* Details/BookCoverViews.swift */,
+				E361622F5CF84183A150FE88 /* Components/TextCardView.swift */,
+				1879AAEFA6274D458828501A /* Components/ChapterCard.swift */,
+				6B88D37C8BEA4C82B214B1D7 /* Details/PassageDetailView.swift */,
+				2E09F44D5F1C4D7FB5DB2504 /* Completion/BookCompletionView.swift */,
+				E6935BB4BFEE4AB89277C884 /* Settings/SettingsSheet.swift */,
+				8F97DFD9CFF9430EA3498C0F /* Settings/BookReaderDataTransfer.swift */,
+				B6B54E5928F746F2B3A5E4B3 /* Settings/BookDetailSheet.swift */,
+			);
+			path = BookReader;
+			sourceTree = "<group>";
+		};
 		6FDCC71C7D34FFCBA9E6F6A3 /* Cards */ = {
 			isa = PBXGroup;
 			children = (
@@ -356,6 +400,7 @@
 			children = (
 				86AF0E37D9B2DA48FC635A6D /* StopScroll.app */,
 				C1396E0D9C909791D84E4FC3 /* StopScrollTests.xctest */,
+				1BC40A222F95342B002C7492 /* StopScrollUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -363,69 +408,23 @@
 		9978C351ACAEE57C6284633C /* modules */ = {
 			isa = PBXGroup;
 			children = (
-				5C66F51A6E14B547DFE57A28 /* ad-detection.js */,
+				5C66F51A6E14B547DFE57A28 /* feed/ad-detection.js */,
 				CB01G00000000000000000A0 /* card-builder */,
-				E2ECEDAD8271AE991EADE90C /* card-injection.js */,
-				25FF4AF8D9F7E63AB024811A /* card-logic.js */,
-				F37A75B1FDB803D6858E0529 /* config.js */,
-				426826A738B07C445AB3F826 /* constants.js */,
-				0629F99C39F502C163050F96 /* dom-utils.js */,
-				5B8AD3F66D765FAD4883A275 /* nav-management.js */,
-				3E2D1A03E4BE037A0217B8E1 /* page-manager.js */,
-				47C612B0F7A1DCD29ADBEEF9 /* scroll-lock.js */,
-				9BA157D7898D2DA526AFDCB1 /* top-menu.js */,
-				459D5381A32D4A489B570713 /* session-stats.js */,
-				2AE21283A700ADC65F40A964 /* tracking.js */,
-				WK01F000000000000000B001 /* wikipedia.js */,
-				GD01F000000000000000C001 /* guardian.js */,
+				E2ECEDAD8271AE991EADE90C /* feed/card-injection.js */,
+				25FF4AF8D9F7E63AB024811A /* feed/card-logic.js */,
+				F37A75B1FDB803D6858E0529 /* core/config.js */,
+				426826A738B07C445AB3F826 /* core/constants.js */,
+				0629F99C39F502C163050F96 /* core/dom-utils.js */,
+				5B8AD3F66D765FAD4883A275 /* navigation/nav-management.js */,
+				3E2D1A03E4BE037A0217B8E1 /* navigation/page-manager.js */,
+				47C612B0F7A1DCD29ADBEEF9 /* navigation/scroll-lock.js */,
+				9BA157D7898D2DA526AFDCB1 /* navigation/top-menu.js */,
+				459D5381A32D4A489B570713 /* analytics/session-stats.js */,
+				2AE21283A700ADC65F40A964 /* analytics/tracking.js */,
+				WK01F000000000000000B001 /* knowledge/wikipedia.js */,
+				GD01F000000000000000C001 /* knowledge/guardian.js */,
 			);
 			path = modules;
-			sourceTree = "<group>";
-		};
-		6BC79B240C3A4CCE9D14C8A2 /* BookReader */ = {
-			isa = PBXGroup;
-			children = (
-				AFFE44BA493845B1A7C140B7 /* BookReaderView.swift */,
-				6040F693CA68422E87FC610B /* BookReaderTypes.swift */,
-				5D820FA81FBD40B4AF55275C /* StoredChapter.swift */,
-				89B12E342316493C8C23892B /* LibraryBook.swift */,
-				3ABC52A2B03C4E9A86B34D97 /* ProgressViews.swift */,
-				83A39E668085493CBDF58849 /* BookCoverViews.swift */,
-				E361622F5CF84183A150FE88 /* TextCardView.swift */,
-				1879AAEFA6274D458828501A /* ChapterCard.swift */,
-				6B88D37C8BEA4C82B214B1D7 /* PassageDetailView.swift */,
-				2E09F44D5F1C4D7FB5DB2504 /* BookCompletionView.swift */,
-				E6935BB4BFEE4AB89277C884 /* SettingsSheet.swift */,
-				8F97DFD9CFF9430EA3498C0F /* BookReaderDataTransfer.swift */,
-				B6B54E5928F746F2B3A5E4B3 /* BookDetailSheet.swift */,
-			);
-			path = BookReader;
-			sourceTree = "<group>";
-		};
-		ECF3F63126B24E53B4214A39 /* Instagram */ = {
-			isa = PBXGroup;
-			children = (
-				F7458C392340CA051B9872EA /* InstagramView.swift */,
-				42E930E48F9248608B2EC422 /* InstagramView+Actions.swift */,
-				06E1D5530CDF4C7CA6BEA71F /* InstagramViewSupport.swift */,
-				AC77F4CBE5FC44EFAA078872 /* XPProgress.swift */,
-				5689B23C1AF54C20978DD126 /* SurfaceRouting.swift */,
-				E25A3F150F9840E88AC41A61 /* InstagramSecondaryRoute.swift */,
-				FA3DB3AC4BFB41FBA4AFEEC4 /* InstagramUsernamePromptSheet.swift */,
-				4F753773FB34419AB19782C2 /* NativeInstagramTabBar.swift */,
-				C41D6FA073DE4585B532C0A7 /* LoadingBar.swift */,
-				C61A44706D4243B09E49265F /* XPDynamicIsland.swift */,
-				9B4FAD839023458C87E7EA20 /* DashboardView.swift */,
-				98D36FB79C7EDDFDA593A7C9 /* InstagramWebView.swift */,
-				36FCB25113904961B1510777 /* InstagramWebViewScripts.swift */,
-				2BCC673054FD4E879D7347A6 /* InstagramWebView+Coordinator.swift */,
-				62AC5BB73DBB42DDAEE9BA5C /* InstagramWebView+Coordinator+Bridge.swift */,
-				EDEF99B3F58E436399459041 /* InstagramWebView+Coordinator+Wikipedia.swift */,
-				9EE0775101FD47738723CCDC /* InstagramWebView+Coordinator+Guardian.swift */,
-				410A9BF37AE84904BC5B923F /* InstagramWebView+Coordinator+Navigation.swift */,
-				8CFE2B59D70B406ABCAE1821 /* InstagramWebView+Coordinator+Timer.swift */,
-			);
-			path = Instagram;
 			sourceTree = "<group>";
 		};
 		A9AA752D3FE8FA725F1FA8CB /* Views */ = {
@@ -444,6 +443,7 @@
 			children = (
 				DB3CE55B0E0A22345CD06982 /* StopScroll */,
 				1FAF7B9B73AB4621AB2A3F76 /* Tests */,
+				1BC40A232F95342B002C7492 /* StopScrollUITests */,
 				83AF0653200CABF4733EE477 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -495,6 +495,32 @@
 			path = StopScroll;
 			sourceTree = "<group>";
 		};
+		ECF3F63126B24E53B4214A39 /* Instagram */ = {
+			isa = PBXGroup;
+			children = (
+				F7458C392340CA051B9872EA /* Core/InstagramView.swift */,
+				42E930E48F9248608B2EC422 /* Core/InstagramView+Actions.swift */,
+				06E1D5530CDF4C7CA6BEA71F /* Support/InstagramViewSupport.swift */,
+				AC77F4CBE5FC44EFAA078872 /* Support/Core/XPProgress.swift */,
+				5689B23C1AF54C20978DD126 /* Support/Core/SurfaceRouting.swift */,
+				E25A3F150F9840E88AC41A61 /* Support/Core/InstagramSecondaryRoute.swift */,
+				FA3DB3AC4BFB41FBA4AFEEC4 /* Support/Components/InstagramUsernamePromptSheet.swift */,
+				4F753773FB34419AB19782C2 /* Support/Components/NativeInstagramTabBar.swift */,
+				C41D6FA073DE4585B532C0A7 /* Support/Components/LoadingBar.swift */,
+				C61A44706D4243B09E49265F /* Support/Components/XPDynamicIsland.swift */,
+				9B4FAD839023458C87E7EA20 /* Support/Components/DashboardView.swift */,
+				98D36FB79C7EDDFDA593A7C9 /* WebView/InstagramWebView.swift */,
+				36FCB25113904961B1510777 /* WebView/InstagramWebViewScripts.swift */,
+				2BCC673054FD4E879D7347A6 /* WebView/InstagramWebView+Coordinator.swift */,
+				62AC5BB73DBB42DDAEE9BA5C /* WebView/Coordinator/InstagramWebView+Coordinator+Bridge.swift */,
+				EDEF99B3F58E436399459041 /* WebView/Coordinator/InstagramWebView+Coordinator+Wikipedia.swift */,
+				9EE0775101FD47738723CCDC /* WebView/Coordinator/InstagramWebView+Coordinator+Guardian.swift */,
+				410A9BF37AE84904BC5B923F /* WebView/Coordinator/InstagramWebView+Coordinator+Navigation.swift */,
+				8CFE2B59D70B406ABCAE1821 /* WebView/Coordinator/InstagramWebView+Coordinator+Timer.swift */,
+			);
+			path = Instagram;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -515,6 +541,29 @@
 			productName = StopScroll;
 			productReference = 86AF0E37D9B2DA48FC635A6D /* StopScroll.app */;
 			productType = "com.apple.product-type.application";
+		};
+		1BC40A212F95342B002C7492 /* StopScrollUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1BC40A2C2F95342B002C7492 /* Build configuration list for PBXNativeTarget "StopScrollUITests" */;
+			buildPhases = (
+				1BC40A1E2F95342B002C7492 /* Sources */,
+				1BC40A1F2F95342B002C7492 /* Frameworks */,
+				1BC40A202F95342B002C7492 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1BC40A292F95342B002C7492 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				1BC40A232F95342B002C7492 /* StopScrollUITests */,
+			);
+			name = StopScrollUITests;
+			packageProductDependencies = (
+			);
+			productName = StopScrollUITests;
+			productReference = 1BC40A222F95342B002C7492 /* StopScrollUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 		B62CF5372B78E51D7DDC87EF /* StopScrollTests */ = {
 			isa = PBXNativeTarget;
@@ -542,10 +591,15 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
+				LastSwiftUpdateCheck = 2600;
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {
 					180F3B4834C9782D757B939A = {
 						ProvisioningStyle = Automatic;
+					};
+					1BC40A212F95342B002C7492 = {
+						CreatedOnToolsVersion = 26.0.1;
+						TestTargetID = 180F3B4834C9782D757B939A;
 					};
 				};
 			};
@@ -565,11 +619,19 @@
 			targets = (
 				180F3B4834C9782D757B939A /* StopScroll */,
 				B62CF5372B78E51D7DDC87EF /* StopScrollTests */,
+				1BC40A212F95342B002C7492 /* StopScrollUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		1BC40A202F95342B002C7492 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		7C28CB8DAF98DD6390EF9D5F /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -590,7 +652,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A31410EE5D6322D2100BC284 /* Assets.xcassets in Resources */,
-				AE82571374B15A67AD8769CF /* ad-detection.js in Resources */,
+				AE82571374B15A67AD8769CF /* feed/ad-detection.js in Resources */,
 				0E0A5E093DD39A3D6BA043CC /* block_reels.js in Resources */,
 				720A7F23F1DF3E1DB2B8AA31 /* block_reels_entry.js in Resources */,
 				87D5B5C7224D6580853F46AC /* build_block_reels.mjs in Resources */,
@@ -604,29 +666,36 @@
 				CB01A00000000000000000A8 /* card-book.js in Resources */,
 				CB01A00000000000000000A9 /* card-culture.js in Resources */,
 				CB01A00000000000000000A7 /* card-builder.js in Resources */,
-				C8CD3BDC6ADADE184817FBB1 /* card-injection.js in Resources */,
-				E6D38C57ACFC342FFCE57D67 /* card-logic.js in Resources */,
-				CE148C2C2BC7651AE31FC005 /* config.js in Resources */,
-				26286AE36E3383D42914218D /* constants.js in Resources */,
-				B968E8762E78B55C46861445 /* dom-utils.js in Resources */,
+				C8CD3BDC6ADADE184817FBB1 /* feed/card-injection.js in Resources */,
+				E6D38C57ACFC342FFCE57D67 /* feed/card-logic.js in Resources */,
+				CE148C2C2BC7651AE31FC005 /* core/config.js in Resources */,
+				26286AE36E3383D42914218D /* core/constants.js in Resources */,
+				B968E8762E78B55C46861445 /* core/dom-utils.js in Resources */,
 				24151CCC554C18A28694D3EC /* dynamic_feed_config.yaml in Resources */,
-				11757E0E955326E948703CF4 /* nav-management.js in Resources */,
-				A08075D69A4203AFCA89DB8D /* page-manager.js in Resources */,
+				11757E0E955326E948703CF4 /* navigation/nav-management.js in Resources */,
+				A08075D69A4203AFCA89DB8D /* navigation/page-manager.js in Resources */,
 				60D2C4E49811A72D0BDC744D /* runtime-scan.js in Resources */,
 				9AEDCF87B455004504649DF7 /* runtime-state.js in Resources */,
 				072134CAB4546F774C9B15EF /* runtime-ui.js in Resources */,
-				81C4BF166B93D00B3D6765B9 /* scroll-lock.js in Resources */,
-				F0AA0D272D88F462AF10C5A0 /* top-menu.js in Resources */,
-				7484628AC4F24FC3A62D0BEE /* session-stats.js in Resources */,
-				2656A10B9F5D592B94197708 /* tracking.js in Resources */,
-				WK01A000000000000000B001 /* wikipedia.js in Resources */,
-				GD01A000000000000000C001 /* guardian.js in Resources */,
+				81C4BF166B93D00B3D6765B9 /* navigation/scroll-lock.js in Resources */,
+				F0AA0D272D88F462AF10C5A0 /* navigation/top-menu.js in Resources */,
+				7484628AC4F24FC3A62D0BEE /* analytics/session-stats.js in Resources */,
+				2656A10B9F5D592B94197708 /* analytics/tracking.js in Resources */,
+				WK01A000000000000000B001 /* knowledge/wikipedia.js in Resources */,
+				GD01A000000000000000C001 /* knowledge/guardian.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		1BC40A1E2F95342B002C7492 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		69C05C2932070CE1B469AE22 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -635,40 +704,40 @@
 				1BCF5AD52F94EB120042FC96 /* ConsoleView.swift in Sources */,
 				596CA626D098C5B97511B1FA /* BookCard.swift in Sources */,
 				D9C99F5FA0994BBFE0BD0DB5 /* BookParser.swift in Sources */,
-								8CBA6AF60C764CAEBAE7612A /* BookReaderView.swift in Sources */,
-								1862791F43FE4589B467F8FE /* StoredChapter.swift in Sources */,
-								F40845A473F547639E52988F /* LibraryBook.swift in Sources */,
-								11B6E904AA844DB3963CA7A7 /* ProgressViews.swift in Sources */,
-								7604A0536BC84429AE01C39E /* BookCoverViews.swift in Sources */,
-								B62FD808D930445BA9838117 /* TextCardView.swift in Sources */,
-								9E01600C3ECD45C3AA3686AE /* ChapterCard.swift in Sources */,
-								AF1B6B94B11D470F84145A42 /* PassageDetailView.swift in Sources */,
-								1F811CDC56344198A7715383 /* BookCompletionView.swift in Sources */,
-								8E5C825F83C64B2EA113802F /* SettingsSheet.swift in Sources */,
-								28A1756D01E742EAB8ADF22B /* BookReaderDataTransfer.swift in Sources */,
-								5021167BBE92475F90182A3C /* BookDetailSheet.swift in Sources */,
-								4E641A105B104AEE8F257207 /* BookReaderTypes.swift in Sources */,
+				8CBA6AF60C764CAEBAE7612A /* Core/BookReaderView.swift in Sources */,
+				1862791F43FE4589B467F8FE /* Models/StoredChapter.swift in Sources */,
+				F40845A473F547639E52988F /* Models/LibraryBook.swift in Sources */,
+				11B6E904AA844DB3963CA7A7 /* Progress/ProgressViews.swift in Sources */,
+				7604A0536BC84429AE01C39E /* Details/BookCoverViews.swift in Sources */,
+				B62FD808D930445BA9838117 /* Components/TextCardView.swift in Sources */,
+				9E01600C3ECD45C3AA3686AE /* Components/ChapterCard.swift in Sources */,
+				AF1B6B94B11D470F84145A42 /* Details/PassageDetailView.swift in Sources */,
+				1F811CDC56344198A7715383 /* Completion/BookCompletionView.swift in Sources */,
+				8E5C825F83C64B2EA113802F /* Settings/SettingsSheet.swift in Sources */,
+				28A1756D01E742EAB8ADF22B /* Settings/BookReaderDataTransfer.swift in Sources */,
+				5021167BBE92475F90182A3C /* Settings/BookDetailSheet.swift in Sources */,
+				4E641A105B104AEE8F257207 /* Core/BookReaderTypes.swift in Sources */,
 				9041891F5A55383856E0C868 /* CardType.swift in Sources */,
 				3DFB4A28B148B1DFFC2C66EA /* EPUBParser.swift in Sources */,
-				767CD5C99713E1A7FABA3036 /* InstagramView.swift in Sources */,
-				A099AE2021064A6297458DDC /* InstagramView+Actions.swift in Sources */,
-				57218583F1444C87A92909F2 /* InstagramViewSupport.swift in Sources */,
-				0364D7499DF64538BCB34083 /* XPProgress.swift in Sources */,
-				13106EBB3137418E9E2213D2 /* SurfaceRouting.swift in Sources */,
-				BBE7D1DFBF514814BB184E50 /* InstagramSecondaryRoute.swift in Sources */,
-				079F3B7CB3E14559A5BDA00B /* InstagramUsernamePromptSheet.swift in Sources */,
-				B0850E3C96CF4059AFEDF811 /* NativeInstagramTabBar.swift in Sources */,
-				16FB9CE04FB0416C949F6797 /* LoadingBar.swift in Sources */,
-				5555B4A386F244848BAD3F43 /* XPDynamicIsland.swift in Sources */,
-				6CF6E661E46A4AB09C19F2B2 /* DashboardView.swift in Sources */,
-				83F82C06AE917D7565F44576 /* InstagramWebView.swift in Sources */,
-				1711C7E266074EFFAD963692 /* InstagramWebViewScripts.swift in Sources */,
-				008D33F44B7045A0A722948C /* InstagramWebView+Coordinator.swift in Sources */,
-				70824C0999C14284A27E6D44 /* InstagramWebView+Coordinator+Bridge.swift in Sources */,
-				7275A51006C34C45B8E43E10 /* InstagramWebView+Coordinator+Wikipedia.swift in Sources */,
-				4E74A11777094E7FA5F1CE0F /* InstagramWebView+Coordinator+Guardian.swift in Sources */,
-				6FF35D953846418192B6DB0A /* InstagramWebView+Coordinator+Navigation.swift in Sources */,
-				A0854E164ED14BB5B58B0C64 /* InstagramWebView+Coordinator+Timer.swift in Sources */,
+				767CD5C99713E1A7FABA3036 /* Core/InstagramView.swift in Sources */,
+				A099AE2021064A6297458DDC /* Core/InstagramView+Actions.swift in Sources */,
+				57218583F1444C87A92909F2 /* Support/InstagramViewSupport.swift in Sources */,
+				0364D7499DF64538BCB34083 /* Support/Core/XPProgress.swift in Sources */,
+				13106EBB3137418E9E2213D2 /* Support/Core/SurfaceRouting.swift in Sources */,
+				BBE7D1DFBF514814BB184E50 /* Support/Core/InstagramSecondaryRoute.swift in Sources */,
+				079F3B7CB3E14559A5BDA00B /* Support/Components/InstagramUsernamePromptSheet.swift in Sources */,
+				B0850E3C96CF4059AFEDF811 /* Support/Components/NativeInstagramTabBar.swift in Sources */,
+				16FB9CE04FB0416C949F6797 /* Support/Components/LoadingBar.swift in Sources */,
+				5555B4A386F244848BAD3F43 /* Support/Components/XPDynamicIsland.swift in Sources */,
+				6CF6E661E46A4AB09C19F2B2 /* Support/Components/DashboardView.swift in Sources */,
+				83F82C06AE917D7565F44576 /* WebView/InstagramWebView.swift in Sources */,
+				1711C7E266074EFFAD963692 /* WebView/InstagramWebViewScripts.swift in Sources */,
+				008D33F44B7045A0A722948C /* WebView/InstagramWebView+Coordinator.swift in Sources */,
+				70824C0999C14284A27E6D44 /* WebView/Coordinator/InstagramWebView+Coordinator+Bridge.swift in Sources */,
+				7275A51006C34C45B8E43E10 /* WebView/Coordinator/InstagramWebView+Coordinator+Wikipedia.swift in Sources */,
+				4E74A11777094E7FA5F1CE0F /* WebView/Coordinator/InstagramWebView+Coordinator+Guardian.swift in Sources */,
+				6FF35D953846418192B6DB0A /* WebView/Coordinator/InstagramWebView+Coordinator+Navigation.swift in Sources */,
+				A0854E164ED14BB5B58B0C64 /* WebView/Coordinator/InstagramWebView+Coordinator+Timer.swift in Sources */,
 				4DE917A22D9B670A345EBF68 /* MiniZIP.swift in Sources */,
 				4730F705C47912493598425B /* ReadingMode.swift in Sources */,
 				1BCF5AD12F94EAF70042FC96 /* LogManager.swift in Sources */,
@@ -690,7 +759,7 @@
 				IJ01B000000000000000C001 /* InjectedCardJavaScriptTests.swift in Sources */,
 				RG01B000000000000000C001 /* RegressionTests.swift in Sources */,
 				SW01B000000000000000C001 /* SwipeFromExploreRegressionTests.swift in Sources */,
-									63D06DA8C46945C58DDCD9E5 /* BookReaderTests.swift in Sources */,
+				63D06DA8C46945C58DDCD9E5 /* BookReaderTests.swift in Sources */,
 				UI01B000000000000000C001 /* InstagramViewUIStateTests.swift in Sources */,
 				FF2BE8CECF7504888ABD0C9D /* TestHelpers.swift in Sources */,
 			);
@@ -699,6 +768,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		1BC40A292F95342B002C7492 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 180F3B4834C9782D757B939A /* StopScroll */;
+			targetProxy = 1BC40A282F95342B002C7492 /* PBXContainerItemProxy */;
+		};
 		CA185402572118F1603A0C0D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 180F3B4834C9782D757B939A /* StopScroll */;
@@ -707,6 +781,64 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		1BC40A2A2F95342B002C7492 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = C7DKBX3YUF;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = test.StopScrollUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = StopScroll;
+			};
+			name = Debug;
+		};
+		1BC40A2B2F95342B002C7492 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = C7DKBX3YUF;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = test.StopScrollUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = StopScroll;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		371973AE47E4B15D7A980A40 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -909,6 +1041,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		1BC40A2C2F95342B002C7492 /* Build configuration list for PBXNativeTarget "StopScrollUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1BC40A2A2F95342B002C7492 /* Debug */,
+				1BC40A2B2F95342B002C7492 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		6D42E09C0FB37CC250A52978 /* Build configuration list for PBXNativeTarget "StopScrollTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

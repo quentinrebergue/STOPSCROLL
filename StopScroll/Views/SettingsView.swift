@@ -219,6 +219,7 @@ struct SettingsView: View {
                     .foregroundColor(.blue)
                 }
             }
+            .accessibilityIdentifier("appsettings.list")
             .navigationTitle("StopScroll Settings")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

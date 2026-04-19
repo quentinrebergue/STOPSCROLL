@@ -16,6 +16,7 @@ struct NativeInstagramTabBar: View {
         .padding(.horizontal, 10)
         .padding(.top, 10)
         .padding(.bottom, 10)
+        .accessibilityIdentifier("native.tabbar")
         .background(
             .ultraThinMaterial,
             in: RoundedRectangle(cornerRadius: 22, style: .continuous)
@@ -52,6 +53,8 @@ struct NativeInstagramTabBar: View {
             }
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier("native.tab.\(id)")
+        .accessibilityLabel("native-tab-\(id)")
     }
 
     private func badgeLabel(for count: Int) -> String {

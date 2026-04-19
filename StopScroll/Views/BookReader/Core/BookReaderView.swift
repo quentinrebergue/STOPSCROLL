@@ -33,6 +33,10 @@ struct BookReaderView: View {
     @AppStorage("savedBookTitle") private var savedBookTitle: String = ""
     @AppStorage("readingMode") private var readingModeRaw: String = ReadingMode.flow.rawValue
 
+    private var isUITestBootstrapEnabled: Bool {
+        ProcessInfo.processInfo.arguments.contains("-uiTestBootstrapBook")
+    }
+
     private var mode: ReadingMode {
         ReadingMode(rawValue: readingModeRaw) ?? .flow
     }
@@ -124,6 +128,9 @@ struct BookReaderView: View {
             }
         }
         .onAppear {
+            if isUITestBootstrapEnabled && cards.isEmpty {
+                bootstrapUITestBookIfNeeded()
+            }
             if !resolvedCurrentArticleId.isEmpty {
                 loadCurrentArticle()
             } else {
@@ -219,6 +226,7 @@ struct BookReaderView: View {
                         .font(.system(size: 16))
                         .foregroundColor(palette.secondaryText)
                 }
+                .accessibilityIdentifier("bookreader.openSettings")
             }
             .padding(.horizontal, 16)
             .padding(.top, 10)
@@ -809,5 +817,41 @@ struct BookReaderView: View {
                 lastPage = 0
             }
         }
+    }
+
+    private func bootstrapUITestBookIfNeeded() {
+        let seededCards = [
+            BookCard(
+                id: 1,
+                text: "StopScroll UI test bootstrap card one.",
+                cardNumber: 1,
+                totalCards: 2,
+                page: 1,
+                chapter: 1,
+                type: .text,
+                chapterTitle: "UI Test Chapter",
+                cardIndexInPage: 1
+            ),
+            BookCard(
+                id: 2,
+                text: "StopScroll UI test bootstrap card two.",
+                cardNumber: 2,
+                totalCards: 2,
+                page: 1,
+                chapter: 1,
+                type: .text,
+                chapterTitle: "UI Test Chapter",
+                cardIndexInPage: 2
+            )
+        ]
+
+        cards = seededCards
+        cachedChapters = [(title: "UI Test Chapter", text: seededCards.map(\.text).joined(separator: " "))]
+        currentIndex = 0
+        bookTitle = "UI Test Book"
+        savedBookTitle = bookTitle
+        currentBookId = "ui-test-book"
+        savedCardIndex = 0
+        showSettings = false
     }
 }
