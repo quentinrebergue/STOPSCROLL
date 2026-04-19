@@ -21,18 +21,49 @@ enum XPProgress {
     }
 }
 
-struct InstagramView: View {
-    private enum WebSurface {
-        case main
-        case messages
+enum WebSurface {
+    case main
+    case messages
+    case search
+    case profile
+}
+
+/// Extracted routing logic — isolated here so it can be unit-tested.
+enum SurfaceRouter {
+    static func surface(for tab: String, webViewCount: Int) -> WebSurface {
+        let normalized = min(max(webViewCount, 1), 4)
+        guard tab == "home" || tab == "search" || tab == "messages" || tab == "profile" else {
+            return .main
+        }
+        switch normalized {
+        case 1:
+            return .main
+        case 2:
+            return tab == "home" ? .main : .messages
+        case 3:
+            if tab == "home" { return .main }
+            if tab == "search" { return .search }
+            return .messages // messages + profile share this surface
+        default:
+            if tab == "home" { return .main }
+            if tab == "search" { return .search }
+            if tab == "profile" { return .profile }
+            return .messages
+        }
     }
+}
+
+struct InstagramView: View {
 
     @State private var isLoadingMain = true
     @State private var isLoadingMessages = true
+    @State private var isLoadingSearch = true
+    @State private var isLoadingProfile = true
     @State private var showingReader = false
     @State private var reloadToken = 0
     @State private var showingSettings = false
     @State private var showingDashboard = false
+    @State private var returnToDashboardAfterSettings = false
     /// Incremented when the user closes Settings so the WebView re-injects the updated label list.
     @State private var labelsToken = 0
     @AppStorage("ss_xp_total") private var totalXP = 0
@@ -47,13 +78,20 @@ struct InstagramView: View {
     @State private var nativeSelectedTab: String = "home"
     @State private var nativeMessageBadgeCount: Int = 0
     @State private var nativeNavCommandToken: Int = 0
-    @State private var secondaryNavigationURL: String? = nil
-    @State private var secondaryNavigationToken: Int = 0
+    @State private var messagesNavigationURL: String? = nil
+    @State private var messagesNavigationToken: Int = 0
+    @State private var searchNavigationURL: String? = nil
+    @State private var searchNavigationToken: Int = 0
+    @State private var profileNavigationURL: String? = nil
+    @State private var profileNavigationToken: Int = 0
     @State private var showControlCenterChooser = false
     @State private var activeSurface: WebSurface = .main
     @State private var hasMainSurface = true
-    @State private var hasMessagesSurface = true
+    @State private var hasMessagesSurface = false
+    @State private var hasSearchSurface = false
+    @State private var hasProfileSurface = false
     @AppStorage("ss_instagram_username") private var instagramUsername = ""
+    @AppStorage("ss_webview_count") private var webViewCount = 2
     @State private var showInstagramUsernamePrompt = false
     @State private var instagramUsernameDraft = ""
     @AppStorage("ss_instagram_theme_dark") private var instagramThemeIsDark = true
@@ -62,7 +100,13 @@ struct InstagramView: View {
         switch activeSurface {
         case .main: return isLoadingMain
         case .messages: return isLoadingMessages
+        case .search: return isLoadingSearch
+        case .profile: return isLoadingProfile
         }
+    }
+
+    private var normalizedWebViewCount: Int {
+        min(max(webViewCount, 1), 4)
     }
 
     private let webViewBottomOverscan: CGFloat = 116
@@ -89,7 +133,7 @@ struct InstagramView: View {
                     isActive: activeSurface == .main,
                     tracksLoading: true,
                     scriptProfile: .full,
-                    handlesInstagramNavigation: false,
+                    handlesInstagramNavigation: normalizedWebViewCount == 1,
                     requestedURLString: nil,
                     requestedURLToken: 0,
                     instagramThemeIsDark: $instagramThemeIsDark,
@@ -101,11 +145,12 @@ struct InstagramView: View {
                 // stays outside of the visible area behind our native bar.
                 .padding(.bottom, -webViewBottomOverscan)
                 .ignoresSafeArea(edges: .bottom)
-                .opacity(activeSurface == .main ? 1 : 0)
-                .allowsHitTesting(activeSurface == .main)
+                .opacity(activeSurface == .main && !showingReader && !showingDashboard ? 1 : 0)
+                .allowsHitTesting(activeSurface == .main && !showingReader && !showingDashboard)
+                .id("surface-main")
             }
 
-            if hasMessagesSurface {
+            if normalizedWebViewCount >= 2 && hasMessagesSurface {
                 InstagramWebView(
                     isLoading: $isLoadingMessages,
                     showingReader: $showingReader,
@@ -119,10 +164,10 @@ struct InstagramView: View {
                     initialURLString: "https://www.instagram.com/direct/inbox/",
                     isActive: activeSurface == .messages,
                     tracksLoading: true,
-                    scriptProfile: .navigationLite,
+                    scriptProfile: .reelBlocker,
                     handlesInstagramNavigation: true,
-                    requestedURLString: secondaryNavigationURL,
-                    requestedURLToken: secondaryNavigationToken,
+                    requestedURLString: messagesNavigationURL,
+                    requestedURLToken: messagesNavigationToken,
                     instagramThemeIsDark: $instagramThemeIsDark,
                     onGrantXP: { amount, source in
                         grantXP(amount: amount, source: source)
@@ -130,15 +175,89 @@ struct InstagramView: View {
                 )
                 .padding(.bottom, -webViewBottomOverscan)
                 .ignoresSafeArea(edges: .bottom)
-                .opacity(activeSurface == .messages ? 1 : 0)
-                .allowsHitTesting(activeSurface == .messages)
+                .opacity(activeSurface == .messages && !showingReader && !showingDashboard ? 1 : 0)
+                .allowsHitTesting(activeSurface == .messages && !showingReader && !showingDashboard)
+                .id("surface-messages")
             }
 
-            BookReaderView(onDismiss: { showingReader = false })
+            if normalizedWebViewCount >= 3 && hasSearchSurface {
+                InstagramWebView(
+                    isLoading: $isLoadingSearch,
+                    showingReader: $showingReader,
+                    showingSettings: $showingSettings,
+                    showingDashboard: $showingDashboard,
+                    reloadToken: $reloadToken,
+                    labelsToken: $labelsToken,
+                    selectedNativeTab: $nativeSelectedTab,
+                    nativeMessageBadgeCount: $nativeMessageBadgeCount,
+                    nativeNavCommandToken: $nativeNavCommandToken,
+                    initialURLString: "https://www.instagram.com/explore/",
+                    isActive: activeSurface == .search,
+                    tracksLoading: true,
+                    scriptProfile: .reelBlocker,
+                    handlesInstagramNavigation: true,
+                    requestedURLString: searchNavigationURL,
+                    requestedURLToken: searchNavigationToken,
+                    instagramThemeIsDark: $instagramThemeIsDark,
+                    onGrantXP: { amount, source in
+                        grantXP(amount: amount, source: source)
+                    }
+                )
+                .padding(.bottom, -webViewBottomOverscan)
+                .ignoresSafeArea(edges: .bottom)
+                .opacity(activeSurface == .search && !showingReader && !showingDashboard ? 1 : 0)
+                .allowsHitTesting(activeSurface == .search && !showingReader && !showingDashboard)
+                .id("surface-search")
+            }
+
+            if normalizedWebViewCount == 4 && hasProfileSurface {
+                InstagramWebView(
+                    isLoading: $isLoadingProfile,
+                    showingReader: $showingReader,
+                    showingSettings: $showingSettings,
+                    showingDashboard: $showingDashboard,
+                    reloadToken: $reloadToken,
+                    labelsToken: $labelsToken,
+                    selectedNativeTab: $nativeSelectedTab,
+                    nativeMessageBadgeCount: $nativeMessageBadgeCount,
+                    nativeNavCommandToken: $nativeNavCommandToken,
+                    initialURLString: "https://www.instagram.com/",
+                    isActive: activeSurface == .profile,
+                    tracksLoading: true,
+                    scriptProfile: .none,
+                    handlesInstagramNavigation: true,
+                    requestedURLString: profileNavigationURL,
+                    requestedURLToken: profileNavigationToken,
+                    instagramThemeIsDark: $instagramThemeIsDark,
+                    onGrantXP: { amount, source in
+                        grantXP(amount: amount, source: source)
+                    }
+                )
+                .padding(.bottom, -webViewBottomOverscan)
+                .ignoresSafeArea(edges: .bottom)
+                .opacity(activeSurface == .profile && !showingReader && !showingDashboard ? 1 : 0)
+                .allowsHitTesting(activeSurface == .profile && !showingReader && !showingDashboard)
+                .id("surface-profile")
+            }
+
+            BookReaderView(onDismiss: { showingReader = false }, bottomInset: sharedBottomNavReservedHeight)
                 .opacity(showingReader ? 1 : 0)
                 .allowsHitTesting(showingReader)
-                .padding(.bottom, sharedBottomNavReservedHeight)
                 .ignoresSafeArea(edges: .bottom)
+
+            DashboardView(onDismiss: {
+                showingDashboard = false
+            }, onOpenSettings: {
+                returnToDashboardAfterSettings = true
+                showingDashboard = false
+                DispatchQueue.main.async {
+                    showingSettings = true
+                }
+            })
+            .opacity(showingDashboard ? 1 : 0)
+            .allowsHitTesting(showingDashboard)
+            .ignoresSafeArea(edges: .bottom)
+            .zIndex(12)
 
             GeometryReader { geo in
                 instagramSurfaceColor
@@ -149,7 +268,7 @@ struct InstagramView: View {
             .allowsHitTesting(false)
             .zIndex(5)
 
-            if isActiveSurfaceLoading {
+            if isActiveSurfaceLoading && !showingReader && !showingDashboard {
                 VStack(spacing: 0) {
                     LoadingBar()
                     Spacer()
@@ -196,42 +315,23 @@ struct InstagramView: View {
                     selectedTab: nativeSelectedTab,
                     messageBadgeCount: nativeMessageBadgeCount,
                     onSelectTab: { tab in
+                        // Any tab switch away from dashboard should reveal the target page.
+                        if tab != "dashboard" {
+                            showingDashboard = false
+                        }
                         if tab == "book" {
                             showingReader = true
+                            nativeSelectedTab = "book"
                             return
                         }
                         if tab == "dashboard" {
-                            showControlCenterChooser = true
+                            showingDashboard = true
+                            nativeSelectedTab = "dashboard"
                             return
                         }
-                        if tab == "home" {
+                        if tab == "home" || tab == "messages" || tab == "search" || tab == "profile" {
                             showingReader = false
-                            if !hasMainSurface {
-                                hasMainSurface = true
-                                isLoadingMain = true
-                            }
-                            activeSurface = .main
-                            nativeSelectedTab = "home"
-                            return
-                        }
-                        if tab == "messages" {
-                            showingReader = false
-                            openInstagramSecondary(tab: "messages")
-                            return
-                        }
-                        if tab == "search" {
-                            showingReader = false
-                            openInstagramSecondary(tab: "search")
-                            return
-                        }
-                        if tab == "profile" {
-                            showingReader = false
-                            if instagramUsername.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                                instagramUsernameDraft = ""
-                                showInstagramUsernamePrompt = true
-                                return
-                            }
-                            openInstagramSecondary(tab: "profile")
+                            openInstagramTab(tab)
                             return
                         }
                     }
@@ -241,18 +341,21 @@ struct InstagramView: View {
             .zIndex(15)
         }
         .background(instagramSurfaceColor.ignoresSafeArea())
-        .sheet(isPresented: $showingSettings) {
+        .fullScreenCover(isPresented: $showingSettings) {
             SettingsView(onDismiss: {
                 showingSettings = false
                 labelsToken += 1  // triggers label re-injection into the live WebView
+                if returnToDashboardAfterSettings {
+                    returnToDashboardAfterSettings = false
+                    DispatchQueue.main.async {
+                        showingDashboard = true
+                        nativeSelectedTab = "dashboard"
+                    }
+                }
             }, onOpenDashboard: {
+                returnToDashboardAfterSettings = false
                 showingSettings = false
                 showingDashboard = true
-            })
-        }
-        .sheet(isPresented: $showingDashboard) {
-            DashboardView(onDismiss: {
-                showingDashboard = false
             })
         }
         .confirmationDialog("StopScroll", isPresented: $showControlCenterChooser, titleVisibility: .visible) {
@@ -260,6 +363,7 @@ struct InstagramView: View {
                 showingDashboard = true
             }
             Button("Parametres") {
+                returnToDashboardAfterSettings = false
                 showingSettings = true
             }
             Button("Cancel", role: .cancel) {}
@@ -281,44 +385,157 @@ struct InstagramView: View {
                     instagramUsername = cleaned
                     labelsToken += 1
                     showInstagramUsernamePrompt = false
-                    openInstagramSecondary(tab: "profile")
+                    openInstagramTab("profile")
                 }
             )
         }
         .onChange(of: instagramUsername) { _ in
             labelsToken += 1
         }
+        .onChange(of: webViewCount) { newValue in
+            let clamped = min(max(newValue, 1), 4)
+            if clamped != newValue {
+                webViewCount = clamped
+            }
+            reconfigureSurfacesForCurrentMode()
+        }
+        .onAppear {
+            reconfigureSurfacesForCurrentMode()
+        }
     }
 
-    private func openInstagramSecondary(tab: String) {
-        if !hasMessagesSurface {
-            hasMessagesSurface = true
-            isLoadingMessages = true
-        }
-
-        guard let targetURL = InstagramSecondaryRoute.url(for: tab, username: instagramUsername) else {
+    private func openInstagramTab(_ tab: String) {
+        LogManager.shared.log("🔗 Tab selected: \(tab), mode: \(normalizedWebViewCount), surface: \(surfaceFor(tab: tab))", category: "Navigation", level: .info)
+        
+        if tab == "home" {
+            ensureSurfaceAvailable(.main)
+            activeSurface = .main
+            nativeSelectedTab = "home"
+            LogManager.shared.log("→ Home: activeSurface = main", category: "Navigation", level: .debug)
             return
         }
 
-        activeSurface = .messages
+        if normalizedWebViewCount == 1 {
+            ensureSurfaceAvailable(.main)
+            activeSurface = .main
+            nativeSelectedTab = tab
+            nativeNavCommandToken += 1
+            LogManager.shared.log("→ Mode 1: all tabs on main surface", category: "Navigation", level: .debug)
+            return
+        }
+
+        if tab == "profile" && instagramUsername.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            instagramUsernameDraft = ""
+            showInstagramUsernamePrompt = true
+            LogManager.shared.log("⚠️ Profile tab: no username set, prompting", category: "Navigation", level: .warning)
+            return
+        }
+
+        guard let targetURL = InstagramSecondaryRoute.url(for: tab, username: instagramUsername) else {
+            LogManager.shared.log("❌ Failed to generate URL for tab: \(tab)", category: "Navigation", level: .error)
+            return
+        }
+
+        let targetSurface = surfaceFor(tab: tab)
+        ensureSurfaceAvailable(targetSurface)
+        activeSurface = targetSurface
         nativeSelectedTab = tab
-        isLoadingMessages = true
-        secondaryNavigationURL = targetURL
-        secondaryNavigationToken += 1
+        LogManager.shared.log("→ Target surface: \(targetSurface), URL: \(targetURL)", category: "Navigation", level: .debug)
+
+        switch targetSurface {
+        case .main:
+            break
+        case .messages:
+            isLoadingMessages = true
+            messagesNavigationURL = targetURL
+            messagesNavigationToken += 1
+            LogManager.shared.log("→ Messages: loading started", category: "Navigation", level: .debug)
+        case .search:
+            isLoadingSearch = true
+            searchNavigationURL = targetURL
+            searchNavigationToken += 1
+            LogManager.shared.log("→ Search: loading started", category: "Navigation", level: .debug)
+        case .profile:
+            isLoadingProfile = true
+            profileNavigationURL = targetURL
+            profileNavigationToken += 1
+            LogManager.shared.log("→ Profile: loading started", category: "Navigation", level: .debug)
+        }
+    }
+
+    private func surfaceFor(tab: String) -> WebSurface {
+        SurfaceRouter.surface(for: tab, webViewCount: normalizedWebViewCount)
+    }
+
+    private func ensureSurfaceAvailable(_ surface: WebSurface) {
+        switch surface {
+        case .main:
+            if !hasMainSurface {
+                hasMainSurface = true
+                isLoadingMain = true
+            }
+        case .messages:
+            if !hasMessagesSurface {
+                hasMessagesSurface = true
+                isLoadingMessages = true
+            }
+        case .search:
+            if !hasSearchSurface {
+                hasSearchSurface = true
+                isLoadingSearch = true
+            }
+        case .profile:
+            if !hasProfileSurface {
+                hasProfileSurface = true
+                isLoadingProfile = true
+            }
+        }
+    }
+
+    private func reconfigureSurfacesForCurrentMode() {
+        LogManager.shared.log("🔄 Reconfiguring surfaces for mode \(normalizedWebViewCount)", category: "Routing", level: .info)
+        
+        activeSurface = surfaceFor(tab: nativeSelectedTab)
+
+        // Lazy mode: keep only the active surface mounted after config changes.
+        hasMainSurface = false
+        hasMessagesSurface = false
+        hasSearchSurface = false
+        hasProfileSurface = false
+
+        ensureSurfaceAvailable(activeSurface)
+
+        if normalizedWebViewCount < 2 {
+            hasMessagesSurface = false
+        }
+        if normalizedWebViewCount < 3 {
+            hasSearchSurface = false
+        }
+        if normalizedWebViewCount < 4 {
+            hasProfileSurface = false
+        }
     }
 
     private func evictInactiveSurface() {
-        switch activeSurface {
-        case .main:
-            if hasMessagesSurface {
-                hasMessagesSurface = false
-                isLoadingMessages = true
-            }
-        case .messages:
-            if hasMainSurface {
-                hasMainSurface = false
-                isLoadingMain = true
-            }
+        if normalizedWebViewCount < 2 {
+            return
+        }
+
+        if activeSurface != .main {
+            hasMainSurface = false
+            isLoadingMain = true
+        }
+        if normalizedWebViewCount >= 2, activeSurface != .messages {
+            hasMessagesSurface = false
+            isLoadingMessages = true
+        }
+        if normalizedWebViewCount >= 3, activeSurface != .search {
+            hasSearchSurface = false
+            isLoadingSearch = true
+        }
+        if normalizedWebViewCount == 4, activeSurface != .profile {
+            hasProfileSurface = false
+            isLoadingProfile = true
         }
     }
 
@@ -664,13 +881,13 @@ private extension AnyTransition {
 
 struct DashboardView: View {
     let onDismiss: () -> Void
+    var onOpenSettings: (() -> Void)? = nil
 
     @AppStorage("ss_xp_total") private var totalXP = 0
     @AppStorage("ss_goal_sessions_per_day") private var goalSessionsPerDay = 3
     @AppStorage("ss_goal_minutes_per_day") private var goalMinutesPerDay = 30
     @AppStorage("ss_usage_sessions_today") private var sessionsToday = 0
     @AppStorage("ss_usage_minutes_today") private var minutesToday = 0
-    @AppStorage("ss_instagram_username") private var instagramUsername = ""
 
     private var xpLevel: Int {
         XPProgress.level(for: totalXP)
@@ -689,16 +906,23 @@ struct DashboardView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     goalsCard
-                    accountCard
                     usageCard
                     progressionCard
                 }
                 .padding(16)
+                .padding(.bottom, 104)
             }
             .background(Color(white: 0.06).ignoresSafeArea())
             .navigationTitle("Dashboard")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        onOpenSettings?()
+                    } label: {
+                        Image(systemName: "gearshape")
+                    }
+                }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") { onDismiss() }
                 }
@@ -753,36 +977,6 @@ struct DashboardView: View {
 
             ProgressView(value: usageProgress)
                 .tint(Color(red: 0.35, green: 0.85, blue: 0.45))
-        }
-        .padding(14)
-        .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(Color(white: 0.1)))
-        .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(Color.white.opacity(0.08), lineWidth: 1))
-    }
-
-    private var accountCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("Compte Instagram")
-                .font(.headline)
-                .foregroundColor(.white)
-
-            Text("Pseudo utilise pour la navigation profil (ex: quentin_rebergue)")
-                .font(.caption)
-                .foregroundColor(.gray)
-
-            TextField("pseudo_instagram", text: $instagramUsername)
-                .textInputAutocapitalization(.never)
-                .autocorrectionDisabled()
-                .foregroundColor(.white)
-                .padding(10)
-                .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(Color.white.opacity(0.06)))
-                .onChange(of: instagramUsername) { value in
-                    let cleaned = value
-                        .trimmingCharacters(in: .whitespacesAndNewlines)
-                        .replacingOccurrences(of: "@", with: "")
-                    if cleaned != value {
-                        instagramUsername = cleaned
-                    }
-                }
         }
         .padding(14)
         .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(Color(white: 0.1)))

@@ -56,6 +56,9 @@ final class GuardianAPITests: XCTestCase {
 
         let (data, response) = try await URLSession.shared.data(from: url)
         let httpResponse = try XCTUnwrap(response as? HTTPURLResponse)
+        if httpResponse.statusCode == 429 {
+            throw XCTSkip("Guardian API rate limit exceeded — skipping live test")
+        }
         XCTAssertEqual(httpResponse.statusCode, 200, "API should return 200 OK")
 
         let json = try XCTUnwrap(
@@ -86,7 +89,10 @@ final class GuardianAPITests: XCTestCase {
         ]
         let url = try XCTUnwrap(components.url)
 
-        let (data, _) = try await URLSession.shared.data(from: url)
+        let (data, response) = try await URLSession.shared.data(from: url)
+        if let http = response as? HTTPURLResponse, http.statusCode == 429 {
+            throw XCTSkip("Guardian API rate limit exceeded — skipping live test")
+        }
         let json = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
         let apiResponse = try XCTUnwrap(json["response"] as? [String: Any])
         let results = try XCTUnwrap(apiResponse["results"] as? [[String: Any]])
@@ -189,7 +195,10 @@ final class GuardianAPITests: XCTestCase {
             URLQueryItem(name: "api-key", value: apiKey)
         ]
         let searchURL = try XCTUnwrap(searchComponents.url)
-        let (searchData, _) = try await URLSession.shared.data(from: searchURL)
+        let (searchData, searchNetworkResponse) = try await URLSession.shared.data(from: searchURL)
+        if let http = searchNetworkResponse as? HTTPURLResponse, http.statusCode == 429 {
+            throw XCTSkip("Guardian API rate limit exceeded — skipping live test")
+        }
         let searchJSON = try XCTUnwrap(JSONSerialization.jsonObject(with: searchData) as? [String: Any])
         let searchResponse = try XCTUnwrap(searchJSON["response"] as? [String: Any])
         let results = try XCTUnwrap(searchResponse["results"] as? [[String: Any]])

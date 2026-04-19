@@ -6,6 +6,8 @@ struct InstagramWebView: UIViewRepresentable {
     enum ScriptProfile {
         case full
         case navigationLite
+        case reelBlocker     // Blocks reel scrolling but allows viewing shared reels
+        case none            // No injection for secondary surfaces
     }
 
     @Binding var isLoading: Bool
@@ -29,7 +31,7 @@ struct InstagramWebView: UIViewRepresentable {
     var onGrantXP: (Int, String) -> Void = { _, _ in }
 
     /// Full runtime scripts injected in dependency order before the bootstrap.
-    private static let fullModuleScripts: [String] = [
+    static let fullModuleScripts: [String] = [
         "constants",
         "config",
         "dom-utils",
@@ -61,15 +63,28 @@ struct InstagramWebView: UIViewRepresentable {
     ]
 
     /// Lightweight scripts used by non-feed surfaces (messages/search/profile).
-    private static let navigationLiteScripts: [String] = [
+    static let navigationLiteScripts: [String] = [
         "constants",
         "dom-utils",
         "nav-management",
     ]
 
+    /// Reel-blocking scripts for messages/search - prevent scroll to next reel but allow viewing.
+    static let reelBlockerScripts: [String] = [
+        "constants",
+        "dom-utils",
+        "scroll-lock",
+        "page-manager",
+    ]
+
+    /// No scripts for secondary surfaces - prevent unnecessary injection.
+    static let noScripts: [String] = []
+
     func makeCoordinator() -> Coordinator { Coordinator(self) }
 
     func makeUIView(context: Context) -> WKWebView {
+        LogManager.shared.log("📱 WebView mounting: profile=\(scriptProfile), initialURL=\(initialURLString)", category: "WebView", level: .info)
+        
         let config = WKWebViewConfiguration()
         config.allowsInlineMediaPlayback = true
         config.mediaTypesRequiringUserActionForPlayback = []
@@ -162,12 +177,22 @@ struct InstagramWebView: UIViewRepresentable {
                let requestedURL = URL(string: requestedURLString) {
                 let currentURL = uiView.url?.absoluteString ?? ""
                 if currentURL != requestedURL.absoluteString {
+                    LogManager.shared.log("🌍 Requested URL applied: \(requestedURLString)", category: "WebView", level: .debug)
                     uiView.load(URLRequest(url: requestedURL))
+                } else {
+                    // Already on the correct URL — no navigation needed, clear loading state.
+                    DispatchQueue.main.async {
+                        guard self.tracksLoading else { return }
+                        withAnimation(.easeOut(duration: 0.3)) {
+                            self.isLoading = false
+                        }
+                    }
                 }
             }
         }
         if context.coordinator.lastIsActive != isActive {
             context.coordinator.lastIsActive = isActive
+            LogManager.shared.log("👁️ Surface active state: \(isActive)", category: "WebView", level: .debug)
             context.coordinator.applyRuntimeActiveState(isActive)
         }
     }
@@ -230,6 +255,10 @@ struct InstagramWebView: UIViewRepresentable {
             names = fullModuleScripts
         case .navigationLite:
             names = navigationLiteScripts
+        case .reelBlocker:
+            names = reelBlockerScripts
+        case .none:
+            names = noScripts
         }
 
         var scripts: [String] = []
@@ -245,9 +274,10 @@ struct InstagramWebView: UIViewRepresentable {
                let src = try? String(contentsOf: url, encoding: .utf8) {
                 scripts.append(src)
             }
-        } else {
+        } else if profile == .navigationLite {
             scripts.append(navigationSyncBootstrapScript())
         }
+        // .none profile: no bootstrap needed
         return scripts
     }
 
@@ -310,7 +340,9 @@ struct InstagramWebView: UIViewRepresentable {
             self.lastLabelsToken = parent.labelsToken
             self.lastWikipediaTitle = ""
             self.lastNativeNavCommandToken = parent.nativeNavCommandToken
-            self.lastRequestedURLToken = parent.requestedURLToken
+            // Force the first updateUIView pass to process requestedURLString/token.
+            // This is important for lazily created secondary surfaces.
+            self.lastRequestedURLToken = Int.min
             self.lastIsActive = parent.isActive
             self.didSendInitialActiveNavCommand = false
         }
@@ -487,10 +519,7 @@ struct InstagramWebView: UIViewRepresentable {
             guard let data = try? JSONSerialization.data(withJSONObject: payload),
                   let json = String(data: data, encoding: .utf8) else { return }
 
-            let escaped = json
-                .replacingOccurrences(of: "\\", with: "\\\\")
-                .replacingOccurrences(of: "'", with: "\\'")
-            let js = "(function(){var ns=window.StopScroll;if(ns&&ns.dom&&ns.dom._onNativeBridgeResult){ns.dom._onNativeBridgeResult(JSON.parse('\\(escaped)'));}})();"
+            let js = "(function(){var ns=window.StopScroll;if(ns&&ns.dom&&ns.dom._onNativeBridgeResult){ns.dom._onNativeBridgeResult(JSON.parse('\(json.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "'", with: "\\'"))'));}})();"
 
             DispatchQueue.main.async {
                 self.webView?.evaluateJavaScript(js)
@@ -885,21 +914,105 @@ struct InstagramWebView: UIViewRepresentable {
         }
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-            if let yamlInjection = parent.buildYAMLInjectionScript() {
-                webView.evaluateJavaScript(yamlInjection)
+            LogManager.shared.log("✅ WebView didFinish: \(webView.url?.absoluteString ?? "unknown")", category: "WebView", level: .info)
+            
+            // Track injection sequence
+            var injectionStep = 0
+            
+            // Only inject StopScroll-specific data on main feed (.full profile)
+            if parent.scriptProfile == .full {
+                if let yamlInjection = parent.buildYAMLInjectionScript() {
+                    injectionStep += 1
+                    let stepNum = injectionStep
+                    webView.evaluateJavaScript(yamlInjection) { result, error in
+                        if let error = error {
+                            LogManager.shared.log("❌ Step \(stepNum) - YAML: \(error.localizedDescription)", category: "ScriptInjection", level: .error)
+                        } else {
+                            LogManager.shared.log("✅ Step \(stepNum) - YAML: success", category: "ScriptInjection", level: .debug)
+                        }
+                    }
+                }
+                
+                // Refresh book reading state
+                injectionStep += 1
+                let bookStateStepNum = injectionStep
+                webView.evaluateJavaScript(parent.buildBookStateScript()) { result, error in
+                    if let error = error {
+                        LogManager.shared.log("❌ Step \(bookStateStepNum) - BookState: \(error.localizedDescription)", category: "ScriptInjection", level: .error)
+                    } else {
+                        LogManager.shared.log("✅ Step \(bookStateStepNum) - BookState: success", category: "ScriptInjection", level: .debug)
+                    }
+                }
+                
+                // Inject user label list (UserDefaults) so JS picks up any edits.
+                injectionStep += 1
+                let labelsStepNum = injectionStep
+                webView.evaluateJavaScript(parent.buildLabelsInjectionScript()) { result, error in
+                    if let error = error {
+                        LogManager.shared.log("❌ Step \(labelsStepNum) - Labels: \(error.localizedDescription)", category: "ScriptInjection", level: .error)
+                    } else {
+                        LogManager.shared.log("✅ Step \(labelsStepNum) - Labels: success", category: "ScriptInjection", level: .debug)
+                    }
+                }
             }
-            // Refresh book reading state
-            webView.evaluateJavaScript(parent.buildBookStateScript())
-            // Inject user label list (UserDefaults) so JS picks up any edits.
-            webView.evaluateJavaScript(parent.buildLabelsInjectionScript())
+            
             // Re-inject scripts profile after each navigation.
-            for script in InstagramWebView.loadScripts(profile: parent.scriptProfile) {
-                webView.evaluateJavaScript(script)
+            let scripts = InstagramWebView.loadScripts(profile: parent.scriptProfile)
+            let scriptCount = scripts.count
+            LogManager.shared.log("📜 Starting injection of \(scriptCount) scripts (profile: \(parent.scriptProfile))", category: "ScriptInjection", level: .info)
+            
+            for (index, script) in scripts.enumerated() {
+                injectionStep += 1
+                let stepNum = injectionStep
+                let scriptSize = script.count
+                
+                // Wrap script with error tracking
+                let wrappedScript = """
+                (function() {
+                  try {
+                    \(script)
+                  } catch (e) {
+                    console.error('[StopScroll Script #\(index + 1) Error]', e.message, e.stack);
+                    throw e;
+                  }
+                })();
+                """
+                
+                webView.evaluateJavaScript(wrappedScript) { result, error in
+                    if let error = error {
+                        LogManager.shared.log("❌ Step \(stepNum) - Script #\(index + 1) (\(scriptSize) bytes): \(error.localizedDescription)", category: "ScriptInjection", level: .error)
+                    } else {
+                        LogManager.shared.log("✅ Step \(stepNum) - Script #\(index + 1) (\(scriptSize) bytes): success", category: "ScriptInjection", level: .debug)
+                    }
+                }
             }
+            
             applyRuntimeActiveState(parent.isActive)
             DispatchQueue.main.async {
                 guard self.parent.tracksLoading else { return }
                 withAnimation(.easeOut(duration: 0.3)) {
+                    self.parent.isLoading = false
+                }
+            }
+        }
+
+        func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+            LogManager.shared.log("❌ WebView didFail: \(error.localizedDescription)", category: "WebView", level: .error)
+            
+            DispatchQueue.main.async {
+                guard self.parent.tracksLoading else { return }
+                withAnimation(.easeOut(duration: 0.2)) {
+                    self.parent.isLoading = false
+                }
+            }
+        }
+
+        func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+            LogManager.shared.log("❌ WebView didFailProvisionalNavigation: \(error.localizedDescription)", category: "WebView", level: .error)
+            
+            DispatchQueue.main.async {
+                guard self.parent.tracksLoading else { return }
+                withAnimation(.easeOut(duration: 0.2)) {
                     self.parent.isLoading = false
                 }
             }

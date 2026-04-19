@@ -2,6 +2,8 @@ import SwiftUI
 
 struct SettingsView: View {
     @ObservedObject private var settings = AppSettings.shared
+    @AppStorage("ss_instagram_username") private var instagramUsername = ""
+    @AppStorage("ss_webview_count") private var webViewCount = 2
     @State private var newLabel = ""
     @State private var showResetAlert = false
     let onDismiss: () -> Void
@@ -13,6 +15,7 @@ struct SettingsView: View {
 
     /// Slider index (0..steps.count-1) mapped to the actual frequency value.
     @State private var freqSliderIndex: Double = 0
+    @State private var showConsole = false
 
     private var langDisplay: String {
         settings.detectedLanguage.isEmpty ? "unknown" : settings.detectedLanguage
@@ -80,6 +83,53 @@ struct SettingsView: View {
                     .padding(.vertical, 4)
                 }
 
+                Section(header: Text("Instagram WebViews")) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Text("Nombre de WebViews")
+                            Spacer()
+                            Text("\(webViewCount)")
+                                .foregroundColor(.secondary)
+                        }
+
+                        Slider(
+                            value: Binding(
+                                get: { Double(webViewCount) },
+                                set: { webViewCount = Int($0.rounded()) }
+                            ),
+                            in: 1...4,
+                            step: 1
+                        )
+
+                        Text("1: navigation classique, 2: feed + secondaire, 3: feed + search + (messages/profile), 4: une WebView par section")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding(.vertical, 4)
+                }
+
+                // Instagram account used by native profile tab fallback
+                Section(header: Text("Instagram account")) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Username used for profile navigation (ex: quentin_rebergue)")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+
+                        TextField("instagram_username", text: $instagramUsername)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
+                            .onChange(of: instagramUsername) { value in
+                                let cleaned = value
+                                    .trimmingCharacters(in: .whitespacesAndNewlines)
+                                    .replacingOccurrences(of: "@", with: "")
+                                if cleaned != value {
+                                    instagramUsername = cleaned
+                                }
+                            }
+                    }
+                    .padding(.vertical, 4)
+                }
+
                 // Article source
                 Section(header: Text("Article sources")) {
                     Toggle("Wikipedia", isOn: Binding(
@@ -137,6 +187,10 @@ struct SettingsView: View {
                 // Developer
                 Section(header: Text("Developer")) {
                     Toggle("Dev mode", isOn: $settings.devMode)
+                    Button("Debug Console") {
+                        showConsole = true
+                    }
+                    .foregroundColor(.blue)
                 }
             }
             .navigationTitle("StopScroll Settings")
@@ -159,6 +213,9 @@ struct SettingsView: View {
             }
         }
         .preferredColorScheme(.dark)
+        .fullScreenCover(isPresented: $showConsole) {
+            ConsoleView(isPresented: $showConsole)
+        }
         .onAppear {
             if let idx = Self.frequencySteps.firstIndex(of: settings.injectionFrequency) {
                 freqSliderIndex = Double(idx)
