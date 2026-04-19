@@ -13,7 +13,8 @@ struct TextCardView: View {
     @ObservedObject private var settings = AppSettings.shared
     private var palette: AppSettings.AdaptivePalette { settings.adaptivePalette }
     private var cardBackground: Color {
-        settings.preferredColorScheme == .light ? palette.surface : palette.elevatedSurface
+        // Keep cards closer to the app background in dark mode.
+        palette.surface
     }
 
     private var highlightedText: AttributedString {

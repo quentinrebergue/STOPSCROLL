@@ -23,6 +23,7 @@ struct SettingsSheet: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject private var settings = AppSettings.shared
     private var palette: AppSettings.AdaptivePalette { settings.adaptivePalette }
+    private var readCardSurface: Color { palette.surface }
 
     private func exportDataAsJSON() -> Data? {
         BookReaderDataTransfer.exportDataAsJSON(library: loadLibraryForExport())
@@ -95,6 +96,7 @@ struct SettingsSheet: View {
                         }
                     }
                 }
+                .listRowBackground(readCardSurface)
 
                 Section("Library") {
                     Button {
@@ -169,6 +171,7 @@ struct SettingsSheet: View {
                         }
                     }
                 }
+                .listRowBackground(readCardSurface)
 
                 let articles = library.filter { $0.isArticle }
                 if !articles.isEmpty {
@@ -237,6 +240,7 @@ struct SettingsSheet: View {
                             }
                         }
                     }
+                    .listRowBackground(readCardSurface)
                 }
 
                 let allMarked = allBookmarkedCards
@@ -283,10 +287,11 @@ struct SettingsSheet: View {
                         }
                     }
                 }
+                .listRowBackground(readCardSurface)
             }
             .listStyle(.insetGrouped)
             .scrollContentBackground(.hidden)
-            .background(palette.surface)
+            .background(palette.background)
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
