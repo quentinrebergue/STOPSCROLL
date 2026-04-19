@@ -45,8 +45,10 @@
 		741C3867BFC8FD6966C495D0 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAF2D46EF1C6E4B340BA1FC8 /* SettingsView.swift */; };
 		7484628AC4F24FC3A62D0BEE /* session-stats.js in Resources */ = {isa = PBXBuildFile; fileRef = 459D5381A32D4A489B570713 /* session-stats.js */; };
 		767CD5C99713E1A7FABA3036 /* InstagramView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7458C392340CA051B9872EA /* InstagramView.swift */; };
+		57218583F1444C87A92909F2 /* InstagramViewSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06E1D5530CDF4C7CA6BEA71F /* InstagramViewSupport.swift */; };
 		81C4BF166B93D00B3D6765B9 /* scroll-lock.js in Resources */ = {isa = PBXBuildFile; fileRef = 47C612B0F7A1DCD29ADBEEF9 /* scroll-lock.js */; };
 		83F82C06AE917D7565F44576 /* InstagramWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98D36FB79C7EDDFDA593A7C9 /* InstagramWebView.swift */; };
+		1711C7E266074EFFAD963692 /* InstagramWebViewScripts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36FCB25113904961B1510777 /* InstagramWebViewScripts.swift */; };
 		87D5B5C7224D6580853F46AC /* build_block_reels.mjs in Resources */ = {isa = PBXBuildFile; fileRef = F6C771D48DF469657B4736F9 /* build_block_reels.mjs */; };
 		9041891F5A55383856E0C868 /* CardType.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC266854481DCE0687F62A4A /* CardType.swift */; };
 		9AEDCF87B455004504649DF7 /* runtime-state.js in Resources */ = {isa = PBXBuildFile; fileRef = FCC3507A23B2C8EF5C9F1582 /* runtime-state.js */; };
@@ -136,7 +138,8 @@
 		7EF2D7B2839CD4D31A83AA97 /* le-petit-prince.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "le-petit-prince.json"; sourceTree = "<group>"; };
 		86AF0E37D9B2DA48FC635A6D /* StopScroll.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StopScroll.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D621B9E95F4CDC4E78C462C /* TestHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestHelpers.swift; sourceTree = "<group>"; };
-		98D36FB79C7EDDFDA593A7C9 /* InstagramWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstagramWebView.swift; sourceTree = "<group>"; };
+		98D36FB79C7EDDFDA593A7C9 /* InstagramWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebView/InstagramWebView.swift; sourceTree = "<group>"; };
+		36FCB25113904961B1510777 /* InstagramWebViewScripts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebView/InstagramWebViewScripts.swift; sourceTree = "<group>"; };
 		9A79C980F9AD98BD101601E9 /* dorian-gray.epub */ = {isa = PBXFileReference; lastKnownFileType = file; path = "dorian-gray.epub"; sourceTree = "<group>"; };
 		9BA157D7898D2DA526AFDCB1 /* top-menu.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "top-menu.js"; sourceTree = "<group>"; };
 		AE258A5A7FBD16C1374360DC /* build_block_reels.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = build_block_reels.sh; sourceTree = "<group>"; };
@@ -165,7 +168,8 @@
 		F37A75B1FDB803D6858E0529 /* config.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = config.js; sourceTree = "<group>"; };
 		F5264B0892789360AAE52D0D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F6C771D48DF469657B4736F9 /* build_block_reels.mjs */ = {isa = PBXFileReference; lastKnownFileType = text; path = build_block_reels.mjs; sourceTree = "<group>"; };
-		F7458C392340CA051B9872EA /* InstagramView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstagramView.swift; sourceTree = "<group>"; };
+		F7458C392340CA051B9872EA /* InstagramView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/InstagramView.swift; sourceTree = "<group>"; };
+		06E1D5530CDF4C7CA6BEA71F /* InstagramViewSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support/InstagramViewSupport.swift; sourceTree = "<group>"; };
 		FCC3507A23B2C8EF5C9F1582 /* runtime-state.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "runtime-state.js"; sourceTree = "<group>"; };
 		GA01F000000000000000C001 /* GuardianAPITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuardianAPITests.swift; sourceTree = "<group>"; };
 		RG01F000000000000000C001 /* RegressionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegressionTests.swift; sourceTree = "<group>"; };
@@ -359,13 +363,23 @@
 			path = BookReader;
 			sourceTree = "<group>";
 		};
+		ECF3F63126B24E53B4214A39 /* Instagram */ = {
+			isa = PBXGroup;
+			children = (
+				F7458C392340CA051B9872EA /* InstagramView.swift */,
+				06E1D5530CDF4C7CA6BEA71F /* InstagramViewSupport.swift */,
+				98D36FB79C7EDDFDA593A7C9 /* InstagramWebView.swift */,
+				36FCB25113904961B1510777 /* InstagramWebViewScripts.swift */,
+			);
+			path = Instagram;
+			sourceTree = "<group>";
+		};
 		A9AA752D3FE8FA725F1FA8CB /* Views */ = {
 			isa = PBXGroup;
 			children = (
 				1BCF5AD32F94EB120042FC96 /* ConsoleView.swift */,
 				6BC79B240C3A4CCE9D14C8A2 /* BookReader */,
-				F7458C392340CA051B9872EA /* InstagramView.swift */,
-				98D36FB79C7EDDFDA593A7C9 /* InstagramWebView.swift */,
+				ECF3F63126B24E53B4214A39 /* Instagram */,
 				CAF2D46EF1C6E4B340BA1FC8 /* SettingsView.swift */,
 			);
 			path = Views;
@@ -583,7 +597,9 @@
 				9041891F5A55383856E0C868 /* CardType.swift in Sources */,
 				3DFB4A28B148B1DFFC2C66EA /* EPUBParser.swift in Sources */,
 				767CD5C99713E1A7FABA3036 /* InstagramView.swift in Sources */,
+				57218583F1444C87A92909F2 /* InstagramViewSupport.swift in Sources */,
 				83F82C06AE917D7565F44576 /* InstagramWebView.swift in Sources */,
+				1711C7E266074EFFAD963692 /* InstagramWebViewScripts.swift in Sources */,
 				4DE917A22D9B670A345EBF68 /* MiniZIP.swift in Sources */,
 				4730F705C47912493598425B /* ReadingMode.swift in Sources */,
 				1BCF5AD12F94EAF70042FC96 /* LogManager.swift in Sources */,
