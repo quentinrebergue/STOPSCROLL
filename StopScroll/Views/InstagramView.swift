@@ -56,7 +56,7 @@ struct InstagramView: View {
     @AppStorage("ss_instagram_username") private var instagramUsername = ""
     @State private var showInstagramUsernamePrompt = false
     @State private var instagramUsernameDraft = ""
-    @State private var instagramThemeIsDark = true
+    @AppStorage("ss_instagram_theme_dark") private var instagramThemeIsDark = true
 
     private var isActiveSurfaceLoading: Bool {
         switch activeSurface {
@@ -67,6 +67,10 @@ struct InstagramView: View {
 
     private let webViewBottomOverscan: CGFloat = 116
     private let sharedBottomNavReservedHeight: CGFloat = 92
+
+    private var instagramSurfaceColor: Color {
+        instagramThemeIsDark ? .black : .white
+    }
 
     var body: some View {
         ZStack {
@@ -137,7 +141,7 @@ struct InstagramView: View {
                 .ignoresSafeArea(edges: .bottom)
 
             GeometryReader { geo in
-                (instagramThemeIsDark ? Color.black : Color.white)
+                instagramSurfaceColor
                     .frame(height: geo.safeAreaInsets.top)
                     .ignoresSafeArea(edges: .top)
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -150,7 +154,7 @@ struct InstagramView: View {
                     LoadingBar()
                     Spacer()
                 }
-                .background(Color.black.ignoresSafeArea())
+                .background(instagramSurfaceColor.ignoresSafeArea())
                 .transition(.opacity)
             }
 
@@ -236,6 +240,7 @@ struct InstagramView: View {
             .ignoresSafeArea(edges: .bottom)
             .zIndex(15)
         }
+        .background(instagramSurfaceColor.ignoresSafeArea())
         .sheet(isPresented: $showingSettings) {
             SettingsView(onDismiss: {
                 showingSettings = false

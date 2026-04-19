@@ -205,6 +205,11 @@ Destination de test recommandee dans ce repo:
 - safe area haute conservee; son fond est synchronise avec le theme Instagram detecte (dark/light)
 - navbar native commune affichee egalement pendant le mode BookReader
 
+18. Theme padding/loader persistant
+- etat theme Instagram persiste localement (`ss_instagram_theme_dark`)
+- au demarrage (avant bridge JS), padding haut et loader utilisent la derniere valeur connue
+- en runtime, la detection theme met a jour cette valeur et rafraichit l UI
+
 16. Reader alignment avec navbar commune
 - reserve d espace basse appliquee au BookReader pour eviter chevauchement visuel avec la navbar native globale
 
