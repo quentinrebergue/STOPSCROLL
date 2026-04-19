@@ -42,6 +42,11 @@
         return path.startsWith('/accounts/') || path.startsWith('/settings/');
     }
 
+    function isDirectPath() {
+        const path = normalizePath(global.location.pathname);
+        return path.startsWith('/direct/');
+    }
+
     function isAccountsEditPage() {
         return normalizePath(global.location.pathname) === '/accounts/edit/';
     }
@@ -240,6 +245,7 @@
         isSingleContentPage: isSingleContentPage,
         isReelsTab: isReelsTab,
         isSettingsPage: isSettingsPage,
+        isDirectPath: isDirectPath,
         isAccountsEditPage: isAccountsEditPage,
         postToNative: postToNative,
         postToBridge: postToBridge,

@@ -118,6 +118,32 @@ final class InjectedCardJavaScriptTests: XCTestCase {
         XCTAssertEqual(reloadCalls, 1)
     }
 
+    func testPageManager_skipsReelLockOnDirectPath() throws {
+        let context = try makeJSContext()
+        context.evaluateScript("""
+        window.__lockEvents = [];
+        window.StopScroll = {
+          dom: {
+            isReelsTab: function(){ return false; },
+            isDirectPath: function(){ return true; },
+            isReelPage: function(){ return false; },
+            isSingleContentPage: function(){ return false; },
+            postToBridge: function(){}
+          },
+          scrollLock: {
+            applyScrollLock: function(){ window.__lockEvents.push('apply'); },
+            removeScrollLock: function(){ window.__lockEvents.push('remove'); }
+          }
+        };
+        """)
+
+        try evaluateScript(atRelativePath: "StopScroll/Scripts/modules/navigation/page-manager.js", in: context)
+        context.evaluateScript("window.StopScroll.pageManager.manageReelPageRestrictions({});")
+
+        let lockEvents = context.evaluateScript("window.__lockEvents.join(',')")?.toString()
+        XCTAssertEqual(lockEvents, "remove")
+    }
+
     private func makeJSContext() throws -> JSContext {
         guard let context = JSContext() else {
             throw NSError(domain: "InjectedCardJavaScriptTests", code: 1)

@@ -39,10 +39,39 @@
 
   function manageReelPageRestrictions(state) {
     if (dom.isReelsTab()) { global.location.href = '/'; return; }
+    if (dom.isDirectPath && dom.isDirectPath()) {
+      scrollLock.removeScrollLock(state);
+      if (dom.postToBridge) {
+        dom.postToBridge({
+          type: 'debugLog',
+          category: 'ScrollLock',
+          level: 'DEBUG',
+          message: 'skip_reel_lock_on_direct_path'
+        });
+      }
+      return;
+    }
+
     if (dom.isReelPage()) {
       scrollLock.applyScrollLock(state, dom.isReelPage);
+      if (dom.postToBridge) {
+        dom.postToBridge({
+          type: 'debugLog',
+          category: 'ScrollLock',
+          level: 'DEBUG',
+          message: 'apply_reel_lock'
+        });
+      }
     } else {
       scrollLock.removeScrollLock(state);
+      if (dom.postToBridge) {
+        dom.postToBridge({
+          type: 'debugLog',
+          category: 'ScrollLock',
+          level: 'DEBUG',
+          message: 'remove_reel_lock_non_reel_path'
+        });
+      }
     }
     hideExtraContent();
   }

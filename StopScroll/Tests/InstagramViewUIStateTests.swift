@@ -260,8 +260,17 @@ final class InstagramViewUIStateTests: XCTestCase {
         let showingBookReaderSettings = true
         let tab = "book"
 
-        let isInteractive = !showingSettings && !showingBookReaderSettings && tab == "book"
-        XCTAssertFalse(isInteractive)
+        let isInteractive = !showingSettings && tab == "book"
+        XCTAssertTrue(isInteractive)
+
+        let allowsHorizontalSwipe = !showingSettings && !showingBookReaderSettings
+        XCTAssertFalse(allowsHorizontalSwipe)
+    }
+
+    /// **Test 20e**: Messages section swipe is fully disabled at policy level.
+    func testMessagesSectionSwipeIsExplicitlyDisabled() {
+        XCTAssertFalse(HorizontalSwipeRecognizerPolicy.shouldAllowSectionSwipe(activeTab: "messages"))
+        XCTAssertTrue(HorizontalSwipeRecognizerPolicy.shouldAllowSectionSwipe(activeTab: "home"))
     }
 
     /// **Test 21**: Le preview de swipe anime la page cible depuis le bord oppose.

@@ -212,7 +212,22 @@ struct InstagramWebView: UIViewRepresentable {
                         (function(){
                             try {
                                 if (!location.pathname || location.pathname.indexOf('/direct') !== 0) return;
-                                var nodes = document.querySelectorAll('header a[href="/direct/inbox/"], header a[href="/direct/inbox"]');
+                                var nodes = document.querySelectorAll(
+                                    'header a[href="/direct/inbox/"], ' +
+                                    'header a[href="/direct/inbox"], ' +
+                                    'header a[aria-label*="Back" i], ' +
+                                    'header button[aria-label*="Back" i]'
+                                );
+                                if (location.pathname.indexOf('/direct/t/') === 0) {
+                                    var header = document.querySelector('header');
+                                    if (header) {
+                                        var firstAction = header.querySelector('a,button');
+                                        if (firstAction) {
+                                            firstAction.style.setProperty('display', 'none', 'important');
+                                            firstAction.style.setProperty('pointer-events', 'none', 'important');
+                                        }
+                                    }
+                                }
                                 for (var i = 0; i < nodes.length; i++) {
                                     nodes[i].style.setProperty('display', 'none', 'important');
                                     nodes[i].style.setProperty('pointer-events', 'none', 'important');

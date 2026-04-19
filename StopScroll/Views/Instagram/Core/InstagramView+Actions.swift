@@ -3,6 +3,10 @@ import UIKit
 
 extension InstagramView {
     func selectSection(_ tab: String) {
+        if tab != "book" {
+            showingBookReaderSettings = false
+        }
+
         if showingSettings {
             showingSettings = false
         }
@@ -13,6 +17,7 @@ extension InstagramView {
            !showingDashboard,
            !showingSettings,
            !showingBookReaderSettings {
+            LogManager.shared.log("🏠 Home re-tap: dispatch native command", category: "Navigation", level: .debug)
             nativeSelectedTab = "home"
             nativeNavCommandToken += 1
             return
@@ -214,7 +219,7 @@ extension InstagramView {
     }
 
     func isInteractiveSection(_ tab: String) -> Bool {
-        !showingSettings && !showingBookReaderSettings && tab == currentSectionTab
+        !showingSettings && tab == currentSectionTab
         }
 
     func consumePendingLazyReloadIfNeeded(for surface: WebSurface) {

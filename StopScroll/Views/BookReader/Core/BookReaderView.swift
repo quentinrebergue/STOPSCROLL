@@ -130,6 +130,10 @@ struct BookReaderView: View {
                 loadLastBook()
             }
             loadBookmarks()
+            onSettingsVisibilityChanged?(showSettings)
+        }
+        .onChange(of: showSettings) { isVisible in
+            onSettingsVisibilityChanged?(isVisible)
         }
         .onChange(of: currentBookId) { _ in
             if !resolvedCurrentArticleId.isEmpty {
