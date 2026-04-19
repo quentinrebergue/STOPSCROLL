@@ -41,6 +41,7 @@
 | SS-029 | P0 | Bug | Navigation surfaces bloquee | Routage URL deterministe sur WebView 2 + tests unitaires mapping pour prevenir regressions | Done |
 | SS-030 | P1 | Improvement | Reader UI cleanup | Retirer la bottom bar du reader pour aligner avec la navbar native globale | Done |
 | SS-031 | P0 | Bug | Residus UI Instagram | Masquer residu navbar en bas, supprimer bande noire haute, conserver navbar native commune en reader | Done |
+| SS-032 | P0 | Bug | Padding top + alignement reader | Garder safe area haute avec couleur Instagram detectee + ajuster espace reader sous navbar commune | Done |
 | SS-023 | P0 | Bug | Navigation native sans reload | Simuler interaction SPA sur boutons tab Instagram et fallback history local sans hard reload | Done |
 
 ## Idees d amelioration produit

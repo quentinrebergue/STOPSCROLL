@@ -163,7 +163,7 @@
     } else {
       teardownPullToRefresh();
     }
-    injectSettingsRow();
+    removeSettingsRow();
   }
 
   ns.topMenu = {

@@ -25,6 +25,7 @@ struct InstagramWebView: UIViewRepresentable {
     var handlesInstagramNavigation: Bool = true
     var requestedURLString: String? = nil
     var requestedURLToken: Int = 0
+    @Binding var instagramThemeIsDark: Bool
     var onGrantXP: (Int, String) -> Void = { _, _ in }
 
     /// Full runtime scripts injected in dependency order before the bootstrap.
@@ -260,6 +261,9 @@ struct InstagramWebView: UIViewRepresentable {
                 if (ns && ns.nav && ns.nav.syncNativeNavState) {
                     ns.nav.syncNativeNavState();
                 }
+                if (ns && ns.dom && ns.dom.detectTheme) {
+                    ns.dom.detectTheme();
+                }
             };
             tick();
             window.addEventListener('popstate', tick);
@@ -427,6 +431,22 @@ struct InstagramWebView: UIViewRepresentable {
                     guard self.parent.isActive else { return }
                     self.parent.selectedNativeTab = tab
                     self.parent.nativeMessageBadgeCount = max(0, badgeCount)
+                }
+                return true
+            }
+            if type == "instagramTheme" {
+                let isDark: Bool
+                if let dark = payload["dark"] as? Bool {
+                    isDark = dark
+                } else if let darkInt = payload["dark"] as? Int {
+                    isDark = darkInt != 0
+                } else if let darkString = payload["dark"] as? String {
+                    isDark = darkString == "1" || darkString.lowercased() == "true"
+                } else {
+                    isDark = true
+                }
+                DispatchQueue.main.async {
+                    self.parent.instagramThemeIsDark = isDark
                 }
                 return true
             }

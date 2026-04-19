@@ -129,6 +129,22 @@
         postToBridge({ type: 'language', value: lang });
     }
 
+    function detectTheme() {
+        var el = document.body || document.documentElement;
+        if (!el) return;
+        var bg = global.getComputedStyle(el).backgroundColor || '';
+        var m = bg.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
+        var dark = true;
+        if (m) {
+            var r = parseInt(m[1], 10);
+            var g = parseInt(m[2], 10);
+            var b = parseInt(m[3], 10);
+            var luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b);
+            dark = luminance < 140;
+        }
+        postToBridge({ type: 'instagramTheme', dark: dark });
+    }
+
     ns.dom = {
         isMainFeed: isMainFeed,
         isReelPage: isReelPage,
@@ -140,6 +156,7 @@
         postToBridge: postToBridge,
         postToBridgeWithCallback: postToBridgeWithCallback,
         _onNativeBridgeResult: _onNativeBridgeResult,
-        detectLanguage: detectLanguage
+        detectLanguage: detectLanguage,
+        detectTheme: detectTheme
     };
 })(window);

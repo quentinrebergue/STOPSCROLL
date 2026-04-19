@@ -202,8 +202,14 @@ Destination de test recommandee dans ce repo:
 
 15. Ajustements layout WebView et navbar commune
 - overscan bas augmente pour masquer completement la barre Instagram residuelle en bas
-- webviews etendues aussi sur la safe area haute pour supprimer la bande noire en haut
+- safe area haute conservee; son fond est synchronise avec le theme Instagram detecte (dark/light)
 - navbar native commune affichee egalement pendant le mode BookReader
+
+16. Reader alignment avec navbar commune
+- reserve d espace basse appliquee au BookReader pour eviter chevauchement visuel avec la navbar native globale
+
+17. Settings row Instagram
+- injection JS de la ligne StopScroll dans les parametres Instagram desactivee
 
 12. Strategie 2 WebView (main + messages)
 - deux surfaces `WKWebView` sont maintenues: principale (`/`) et messages (`/direct/inbox/`)

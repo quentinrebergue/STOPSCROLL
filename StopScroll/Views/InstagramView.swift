@@ -56,6 +56,7 @@ struct InstagramView: View {
     @AppStorage("ss_instagram_username") private var instagramUsername = ""
     @State private var showInstagramUsernamePrompt = false
     @State private var instagramUsernameDraft = ""
+    @State private var instagramThemeIsDark = true
 
     private var isActiveSurfaceLoading: Bool {
         switch activeSurface {
@@ -65,6 +66,7 @@ struct InstagramView: View {
     }
 
     private let webViewBottomOverscan: CGFloat = 116
+    private let sharedBottomNavReservedHeight: CGFloat = 92
 
     var body: some View {
         ZStack {
@@ -86,6 +88,7 @@ struct InstagramView: View {
                     handlesInstagramNavigation: false,
                     requestedURLString: nil,
                     requestedURLToken: 0,
+                    instagramThemeIsDark: $instagramThemeIsDark,
                     onGrantXP: { amount, source in
                         grantXP(amount: amount, source: source)
                     }
@@ -93,7 +96,7 @@ struct InstagramView: View {
                 // Extend the webview below the bottom edge so Instagram's bottom nav
                 // stays outside of the visible area behind our native bar.
                 .padding(.bottom, -webViewBottomOverscan)
-                .ignoresSafeArea(edges: [.top, .bottom])
+                .ignoresSafeArea(edges: .bottom)
                 .opacity(activeSurface == .main ? 1 : 0)
                 .allowsHitTesting(activeSurface == .main)
             }
@@ -116,12 +119,13 @@ struct InstagramView: View {
                     handlesInstagramNavigation: true,
                     requestedURLString: secondaryNavigationURL,
                     requestedURLToken: secondaryNavigationToken,
+                    instagramThemeIsDark: $instagramThemeIsDark,
                     onGrantXP: { amount, source in
                         grantXP(amount: amount, source: source)
                     }
                 )
                 .padding(.bottom, -webViewBottomOverscan)
-                .ignoresSafeArea(edges: [.top, .bottom])
+                .ignoresSafeArea(edges: .bottom)
                 .opacity(activeSurface == .messages ? 1 : 0)
                 .allowsHitTesting(activeSurface == .messages)
             }
@@ -129,7 +133,17 @@ struct InstagramView: View {
             BookReaderView(onDismiss: { showingReader = false })
                 .opacity(showingReader ? 1 : 0)
                 .allowsHitTesting(showingReader)
+                .padding(.bottom, sharedBottomNavReservedHeight)
                 .ignoresSafeArea(edges: .bottom)
+
+            GeometryReader { geo in
+                (instagramThemeIsDark ? Color.black : Color.white)
+                    .frame(height: geo.safeAreaInsets.top)
+                    .ignoresSafeArea(edges: .top)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            }
+            .allowsHitTesting(false)
+            .zIndex(5)
 
             if isActiveSurfaceLoading {
                 VStack(spacing: 0) {

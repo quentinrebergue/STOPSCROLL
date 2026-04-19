@@ -11,6 +11,7 @@
   function initializeRuntimeState(state) {
     state.config = ns.config.loadConfig();
     ns.dom.detectLanguage();
+    if (ns.dom.detectTheme) ns.dom.detectTheme();
     // Pre-fetch articles from all enabled sources
     var sources = global.__STOPSCROLL_ARTICLE_SOURCES || ['wikipedia'];
     for (var i = 0; i < sources.length; i++) {
