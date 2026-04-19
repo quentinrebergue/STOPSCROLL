@@ -130,9 +130,7 @@
     }
 
     function detectTheme() {
-        var el = document.body || document.documentElement;
-        if (!el) return;
-        var bg = global.getComputedStyle(el).backgroundColor || '';
+        var bg = detectInstagramBackgroundColor();
         var m = bg.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
         var dark = true;
         if (m) {
@@ -142,7 +140,31 @@
             var luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b);
             dark = luminance < 140;
         }
-        postToBridge({ type: 'instagramTheme', dark: dark });
+        postToBridge({ type: 'instagramTheme', dark: dark, background: bg });
+    }
+
+    function detectInstagramBackgroundColor() {
+        var bg = 'rgb(0, 0, 0)';
+        try {
+            var articles = document.querySelectorAll('article:not([data-ss-replaced])');
+            for (var i = 0; i < articles.length; i++) {
+                var articleBg = global.getComputedStyle(articles[i]).backgroundColor;
+                if (articleBg && articleBg !== 'rgba(0, 0, 0, 0)' && articleBg !== 'transparent') {
+                    bg = articleBg;
+                }
+                break;
+            }
+
+            if (bg === 'rgb(0, 0, 0)') {
+                var bodyBg = global.getComputedStyle(document.body).backgroundColor;
+                if (bodyBg && bodyBg !== 'rgba(0, 0, 0, 0)' && bodyBg !== 'transparent') {
+                    bg = bodyBg;
+                }
+            }
+        } catch (_) {
+            // Ignore color probing failures.
+        }
+        return bg;
     }
 
     ns.dom = {

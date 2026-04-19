@@ -130,6 +130,32 @@ struct SettingsView: View {
                     .padding(.vertical, 4)
                 }
 
+                Section(header: Text("Appearance")) {
+                    HStack {
+                        Text("App background")
+                        Spacer()
+                        Text(settings.instagramBackgroundCSS)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .lineLimit(1)
+                    }
+
+                    HStack {
+                        Text("Derived mode")
+                        Spacer()
+                        Text(settings.preferredColorScheme == .dark ? "Dark" : "Light")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+
+                    Button {
+                        settings.requestBackgroundRefresh()
+                    } label: {
+                        Label("Update app background", systemImage: "paintbrush.pointed")
+                    }
+                    .foregroundColor(.blue)
+                }
+
                 // Article source
                 Section(header: Text("Article sources")) {
                     Toggle("Wikipedia", isOn: Binding(
@@ -212,7 +238,6 @@ struct SettingsView: View {
                 Text("This replaces your custom labels with the defaults for \"\(langDisplay)\".")
             }
         }
-        .preferredColorScheme(.dark)
         .fullScreenCover(isPresented: $showConsole) {
             ConsoleView(isPresented: $showConsole)
         }

@@ -170,14 +170,26 @@
     }
   }
 
+  // ── Detect whether a CSS color is dark (for border adaptation) ──
+  function isDarkColor(cssColor) {
+    try {
+      var m = cssColor.match(/\d+/g);
+      if (!m || m.length < 3) return true;
+      return (parseInt(m[0]) * 299 + parseInt(m[1]) * 587 + parseInt(m[2]) * 114) / 1000 < 128;
+    } catch (e) { return true; }
+  }
+
   // ── Apply native Instagram colors to non-media sections ───
   function applyNativeColors(card, colors) {
     // Outer card background (header + caption area)
     card.style.background = colors.bg;
     card.style.color = colors.text;
+    // Border color adapts to background luminance
+    var borderColor = isDarkColor(colors.bg) ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
     // Header: first child
     var header = card.children[0];
     if (header) {
+      header.style.borderBottom = '1px solid ' + borderColor;
       var divs = header.querySelectorAll('div');
       for (var i = 0; i < divs.length; i++) {
         var d = divs[i];
@@ -189,6 +201,7 @@
     // Action bar: last child
     var actionBar = card.children[card.children.length - 1];
     if (actionBar) {
+      actionBar.style.borderTop = '1px solid ' + borderColor;
       var btns = actionBar.querySelectorAll('button');
       for (var j = 0; j < btns.length; j++) btns[j].style.color = colors.text;
     }

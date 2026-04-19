@@ -20,6 +20,8 @@ struct SettingsSheet: View {
     @State private var renameTarget: LibraryBook?
     @State private var renameText: String = ""
     @Environment(\.dismiss) private var dismiss
+    @ObservedObject private var settings = AppSettings.shared
+    private var palette: AppSettings.AdaptivePalette { settings.adaptivePalette }
 
     private func exportDataAsJSON() -> Data? {
         BookReaderDataTransfer.exportDataAsJSON(library: loadLibraryForExport())
@@ -75,13 +77,13 @@ struct SettingsSheet: View {
                                 Image(systemName: m.icon)
                                     .font(.system(size: 18))
                                     .frame(width: 28)
-                                    .foregroundColor(m == mode ? .white : .gray)
+                                    .foregroundColor(m == mode ? palette.primaryText : palette.secondaryText)
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(m.label)
-                                        .foregroundColor(.white)
+                                        .foregroundColor(palette.primaryText)
                                     Text("\(m.charsPerCard) chars")
                                         .font(.caption)
-                                        .foregroundColor(.gray)
+                                        .foregroundColor(palette.secondaryText)
                                 }
                                 Spacer()
                                 if m == mode {
@@ -114,12 +116,12 @@ struct SettingsSheet: View {
 
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text(book.title)
-                                        .foregroundColor(.white)
+                                        .foregroundColor(palette.primaryText)
                                         .lineLimit(1)
                                     HStack(spacing: 8) {
                                         Text("\(Int(book.progressPercent))%")
                                             .font(.caption)
-                                            .foregroundColor(.gray)
+                                            .foregroundColor(palette.secondaryText)
                                         ProgressView(value: book.progressPercent, total: 100)
                                             .tint(book.progressPercent >= 100 ? .green : .blue)
                                             .frame(width: 80)
@@ -137,7 +139,7 @@ struct SettingsSheet: View {
                                 }
                                 Image(systemName: "chevron.right")
                                     .font(.caption)
-                                    .foregroundColor(Color(white: 0.3))
+                                    .foregroundColor(palette.secondaryText)
                             }
                         }
                         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
@@ -182,12 +184,12 @@ struct SettingsSheet: View {
 
                                     VStack(alignment: .leading, spacing: 4) {
                                         Text(article.title)
-                                            .foregroundColor(.white)
+                                            .foregroundColor(palette.primaryText)
                                             .lineLimit(1)
                                         HStack(spacing: 8) {
                                             Text("\(Int(article.progressPercent))%")
                                                 .font(.caption)
-                                                .foregroundColor(.gray)
+                                                .foregroundColor(palette.secondaryText)
                                             ProgressView(value: article.progressPercent, total: 100)
                                                 .tint(article.progressPercent >= 100 ? .green : .orange)
                                                 .frame(width: 80)
@@ -205,7 +207,7 @@ struct SettingsSheet: View {
                                     }
                                     Image(systemName: "chevron.right")
                                         .font(.caption)
-                                        .foregroundColor(Color(white: 0.3))
+                                        .foregroundColor(palette.secondaryText)
                                 }
                             }
                             .swipeActions(edge: .trailing, allowsFullSwipe: false) {
@@ -246,7 +248,7 @@ struct SettingsSheet: View {
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text(String(card.text.prefix(120)) + "...")
                                         .font(.system(size: 14, design: .serif))
-                                        .foregroundColor(Color(white: 0.7))
+                                        .foregroundColor(palette.secondaryText)
                                         .lineLimit(3)
                                     HStack(spacing: 4) {
                                         Text(card.chapterTitle.isEmpty ? "Page \(card.page)" : card.chapterTitle)
@@ -254,7 +256,7 @@ struct SettingsSheet: View {
                                         Text("p.\(card.page), Card \(card.cardIndexInPage)")
                                     }
                                     .font(.system(size: 11, design: .monospaced))
-                                    .foregroundColor(Color(white: 0.35))
+                                    .foregroundColor(palette.secondaryText)
                                 }
                             }
                         }
@@ -283,7 +285,7 @@ struct SettingsSheet: View {
             }
             .listStyle(.insetGrouped)
             .scrollContentBackground(.hidden)
-            .background(Color(white: 0.08))
+            .background(palette.surface)
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -322,6 +324,5 @@ struct SettingsSheet: View {
                 onCompletion: handleImportedFile
             )
         }
-        .preferredColorScheme(.dark)
     }
 }

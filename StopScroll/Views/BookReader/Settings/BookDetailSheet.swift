@@ -15,6 +15,8 @@ struct BookDetailSheet: View {
     @State private var showRenamePrompt = false
     @State private var renameText = ""
     @Environment(\.dismiss) private var dismiss
+    @ObservedObject private var settings = AppSettings.shared
+    private var palette: AppSettings.AdaptivePalette { settings.adaptivePalette }
 
     var body: some View {
         NavigationView {
@@ -23,17 +25,17 @@ struct BookDetailSheet: View {
 
                 Text(book.title)
                     .font(.title2.bold())
-                    .foregroundColor(.white)
+                    .foregroundColor(palette.primaryText)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal)
 
                 VStack(spacing: 12) {
                     HStack {
                         Text("Progress")
-                            .foregroundColor(.gray)
+                            .foregroundColor(palette.secondaryText)
                         Spacer()
                         Text("\(Int(book.progressPercent))%")
-                            .foregroundColor(.white)
+                            .foregroundColor(palette.primaryText)
                             .fontWeight(.semibold)
                     }
                     ProgressView(value: book.progressPercent, total: 100)
@@ -45,10 +47,10 @@ struct BookDetailSheet: View {
                         Label("Chapter \(book.currentChapter)", systemImage: "book")
                     }
                     .font(.caption)
-                    .foregroundColor(.gray)
+                    .foregroundColor(palette.secondaryText)
                 }
                 .padding()
-                .background(Color(white: 0.12))
+                .background(palette.elevatedSurface)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
                 .padding(.horizontal)
 
@@ -106,7 +108,7 @@ struct BookDetailSheet: View {
                 .padding(.horizontal)
                 .padding(.bottom, 30)
             }
-            .background(Color(white: 0.08))
+            .background(palette.surface)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -137,6 +139,5 @@ struct BookDetailSheet: View {
                 Text("This will remove \"\(book.title)\" and all saved passages from your library.")
             }
         }
-        .preferredColorScheme(.dark)
     }
 }

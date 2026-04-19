@@ -17,6 +17,8 @@ struct InstagramWebView: UIViewRepresentable {
     @Binding var reloadToken: Int
     /// Incremented by InstagramView when AppSettings.adLabels changes; triggers re-injection.
     @Binding var labelsToken: Int
+    /// Incremented to force JS-side Instagram background re-detection.
+    @Binding var themeRefreshToken: Int
     @Binding var selectedNativeTab: String
     @Binding var nativeMessageBadgeCount: Int
     @Binding var nativeNavCommandToken: Int
@@ -163,6 +165,12 @@ struct InstagramWebView: UIViewRepresentable {
             })();
             """
             uiView.evaluateJavaScript(reloadScript)
+        }
+        if context.coordinator.lastThemeRefreshToken != themeRefreshToken {
+            context.coordinator.lastThemeRefreshToken = themeRefreshToken
+            if isActive {
+                uiView.evaluateJavaScript("(function(){var ns=window.StopScroll;if(ns&&ns.dom&&ns.dom.detectTheme){ns.dom.detectTheme();}})();")
+            }
         }
         if context.coordinator.lastNativeNavCommandToken != nativeNavCommandToken {
             context.coordinator.lastNativeNavCommandToken = nativeNavCommandToken

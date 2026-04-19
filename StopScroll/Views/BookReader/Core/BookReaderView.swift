@@ -5,6 +5,7 @@ import SwiftUI
 struct BookReaderView: View {
     let onDismiss: () -> Void
     var bottomInset: CGFloat = 0
+    @ObservedObject private var settings = AppSettings.shared
 
     @State private var cards: [BookCard] = []
     @State private var cachedChapters: [(title: String, text: String)] = []
@@ -35,6 +36,8 @@ struct BookReaderView: View {
         ReadingMode(rawValue: readingModeRaw) ?? .flow
     }
 
+    private var palette: AppSettings.AdaptivePalette { settings.adaptivePalette }
+
     private var resolvedCurrentArticleId: String {
         Self.resolveCurrentArticleId(
             appStorageValue: currentArticleId,
@@ -54,6 +57,19 @@ struct BookReaderView: View {
         return cards[currentIndex].chapter
     }
 
+    private var appBackgroundColor: Color {
+        if let rgba = settings.instagramBackgroundRGBA {
+            return Color(
+                .sRGB,
+                red: max(0, min(255, rgba.red)) / 255.0,
+                green: max(0, min(255, rgba.green)) / 255.0,
+                blue: max(0, min(255, rgba.blue)) / 255.0,
+                opacity: max(0, min(1, rgba.alpha))
+            )
+        }
+        return .black
+    }
+
     var body: some View {
         ZStack {
             VStack(spacing: 0) {
@@ -65,7 +81,7 @@ struct BookReaderView: View {
             }
         }
         .ignoresSafeArea(edges: .bottom)
-        .background(Color.black)
+        .background(appBackgroundColor)
         .fileImporter(
             isPresented: $showFilePicker,
             allowedContentTypes: Self.allowedTypes
@@ -137,11 +153,11 @@ struct BookReaderView: View {
 
             Image(systemName: "book.closed")
                 .font(.system(size: 60))
-                .foregroundColor(Color(white: 0.35))
+                .foregroundColor(palette.secondaryText)
 
             Text("No book loaded")
                 .font(.title2)
-                .foregroundColor(.white)
+                .foregroundColor(palette.primaryText)
 
             Button {
                 showFilePicker = true
@@ -160,7 +176,7 @@ struct BookReaderView: View {
 
             Text("Supports EPUB and TXT files")
                 .font(.caption)
-                .foregroundColor(Color(white: 0.55))
+                .foregroundColor(palette.secondaryText)
 
             Spacer()
         }
@@ -174,20 +190,20 @@ struct BookReaderView: View {
             HStack {
                 Text(bookTitle)
                     .font(.headline)
-                    .foregroundColor(.white)
+                    .foregroundColor(palette.primaryText)
                     .lineLimit(1)
 
                 Spacer()
 
                 Text("\(sessionCardsRead) cards")
                     .font(.system(size: 12, weight: .medium, design: .monospaced))
-                    .foregroundColor(Color(white: 0.4))
+                    .foregroundColor(palette.secondaryText)
                     .padding(.trailing, 8)
 
                 Button { showSettings = true } label: {
                     Image(systemName: "gearshape")
                         .font(.system(size: 16))
-                        .foregroundColor(Color(white: 0.55))
+                        .foregroundColor(palette.secondaryText)
                 }
             }
             .padding(.horizontal, 16)

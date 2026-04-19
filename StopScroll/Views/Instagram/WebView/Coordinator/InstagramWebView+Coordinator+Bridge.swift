@@ -133,8 +133,10 @@ extension InstagramWebView.Coordinator {
             } else {
                 isDark = true
             }
+            let background = (payload["background"] as? String) ?? (payload["bg"] as? String)
             DispatchQueue.main.async {
                 self.parent.instagramThemeIsDark = isDark
+                AppSettings.shared.updateInstagramBackgroundColor(background)
             }
             return true
         }

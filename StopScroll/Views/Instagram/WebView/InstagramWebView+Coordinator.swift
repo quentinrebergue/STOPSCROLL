@@ -26,6 +26,7 @@ extension InstagramWebView {
         weak var webView: WKWebView?
         var lastReloadToken: Int
         var lastLabelsToken: Int
+        var lastThemeRefreshToken: Int
         var lastWikipediaTitle: String
         var lastNativeNavCommandToken: Int
         var lastRequestedURLToken: Int
@@ -36,6 +37,7 @@ extension InstagramWebView {
             self.parent = parent
             self.lastReloadToken = parent.reloadToken
             self.lastLabelsToken = parent.labelsToken
+            self.lastThemeRefreshToken = parent.themeRefreshToken
             self.lastWikipediaTitle = ""
             self.lastNativeNavCommandToken = parent.nativeNavCommandToken
             // Force the first updateUIView pass to process requestedURLString/token.

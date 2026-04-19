@@ -3,6 +3,7 @@ import SwiftUI
 struct DashboardView: View {
     let onDismiss: () -> Void
     var onOpenSettings: (() -> Void)? = nil
+    @ObservedObject private var settings = AppSettings.shared
 
     @AppStorage("ss_xp_total") private var totalXP = 0
     @AppStorage("ss_goal_sessions_per_day") private var goalSessionsPerDay = 3
@@ -22,6 +23,14 @@ struct DashboardView: View {
         XPProgress.xpInCurrentLevel(for: totalXP)
     }
 
+    private var appBackgroundColor: Color {
+        settings.adaptivePalette.background
+    }
+
+    private var palette: AppSettings.AdaptivePalette {
+        settings.adaptivePalette
+    }
+
     var body: some View {
         NavigationView {
             ScrollView {
@@ -33,7 +42,7 @@ struct DashboardView: View {
                 .padding(16)
                 .padding(.bottom, 104)
             }
-            .background(Color(white: 0.06).ignoresSafeArea())
+            .background(appBackgroundColor.ignoresSafeArea())
             .navigationTitle("Dashboard")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -44,52 +53,48 @@ struct DashboardView: View {
                         Image(systemName: "gearshape")
                     }
                 }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") { onDismiss() }
-                }
             }
         }
-        .preferredColorScheme(.dark)
     }
 
     private var goalsCard: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Objectifs")
                 .font(.headline)
-                .foregroundColor(.white)
+                .foregroundColor(palette.primaryText)
 
             HStack(spacing: 12) {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Sessions / jour")
                         .font(.caption)
-                        .foregroundColor(.gray)
+                        .foregroundColor(palette.secondaryText)
                     Stepper(value: $goalSessionsPerDay, in: 1...12) {
                         Text("\(goalSessionsPerDay)")
-                            .foregroundColor(.white)
+                            .foregroundColor(palette.primaryText)
                     }
                 }
 
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Minutes / jour")
                         .font(.caption)
-                        .foregroundColor(.gray)
+                        .foregroundColor(palette.secondaryText)
                     Stepper(value: $goalMinutesPerDay, in: 5...180, step: 5) {
                         Text("\(goalMinutesPerDay) min")
-                            .foregroundColor(.white)
+                            .foregroundColor(palette.primaryText)
                     }
                 }
             }
         }
         .padding(14)
-        .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(Color(white: 0.1)))
-        .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(Color.white.opacity(0.08), lineWidth: 1))
+        .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(palette.surface))
+        .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(palette.border, lineWidth: 1))
     }
 
     private var usageCard: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Usage du jour")
                 .font(.headline)
-                .foregroundColor(.white)
+                .foregroundColor(palette.primaryText)
 
             HStack(spacing: 12) {
                 dashboardMetric(title: "Sessions", value: "\(sessionsToday)", target: "Objectif \(goalSessionsPerDay)")
@@ -100,24 +105,24 @@ struct DashboardView: View {
                 .tint(Color(red: 0.35, green: 0.85, blue: 0.45))
         }
         .padding(14)
-        .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(Color(white: 0.1)))
-        .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(Color.white.opacity(0.08), lineWidth: 1))
+        .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(palette.surface))
+        .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(palette.border, lineWidth: 1))
     }
 
     private var progressionCard: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Progression")
                 .font(.headline)
-                .foregroundColor(.white)
+                .foregroundColor(palette.primaryText)
 
             HStack(alignment: .firstTextBaseline) {
                 Text("Niveau \(xpLevel)")
                     .font(.system(size: 20, weight: .bold, design: .rounded))
-                    .foregroundColor(.white)
+                    .foregroundColor(palette.primaryText)
                 Spacer()
                 Text("\(xpInLevel) / \(XPProgress.xpPerLevel) XP")
                     .font(.caption)
-                    .foregroundColor(.gray)
+                    .foregroundColor(palette.secondaryText)
             }
 
             ProgressView(value: xpProgress)
@@ -125,11 +130,11 @@ struct DashboardView: View {
 
             Text("Total XP: \(totalXP)")
                 .font(.caption)
-                .foregroundColor(.gray)
+                .foregroundColor(palette.secondaryText)
         }
         .padding(14)
-        .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(Color(white: 0.1)))
-        .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(Color.white.opacity(0.08), lineWidth: 1))
+        .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(palette.surface))
+        .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(palette.border, lineWidth: 1))
     }
 
     private var usageProgress: Double {
@@ -142,16 +147,16 @@ struct DashboardView: View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
                 .font(.caption)
-                .foregroundColor(.gray)
+                .foregroundColor(palette.secondaryText)
             Text(value)
                 .font(.system(size: 22, weight: .bold, design: .rounded))
-                .foregroundColor(.white)
+                .foregroundColor(palette.primaryText)
             Text(target)
                 .font(.caption2)
-                .foregroundColor(.gray)
+                .foregroundColor(palette.secondaryText)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(10)
-        .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(Color.white.opacity(0.03)))
+        .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(palette.elevatedSurface))
     }
 }

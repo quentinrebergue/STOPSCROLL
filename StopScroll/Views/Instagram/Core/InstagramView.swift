@@ -3,6 +3,8 @@ import UIKit
 
 struct InstagramView: View {
 
+    @ObservedObject private var settings = AppSettings.shared
+
     @State var isLoadingMain = true
     @State var isLoadingMessages = true
     @State var isLoadingSearch = true
@@ -43,6 +45,7 @@ struct InstagramView: View {
     @State var showInstagramUsernamePrompt = false
     @State var instagramUsernameDraft = ""
     @AppStorage("ss_instagram_theme_dark") var instagramThemeIsDark = true
+    @State var themeRefreshToken = 0
 
     var isActiveSurfaceLoading: Bool {
         switch activeSurface {
@@ -61,7 +64,16 @@ struct InstagramView: View {
     let sharedBottomNavReservedHeight: CGFloat = 92
 
     var instagramSurfaceColor: Color {
-        instagramThemeIsDark ? .black : .white
+        if let rgba = settings.instagramBackgroundRGBA {
+            return Color(
+                .sRGB,
+                red: max(0, min(255, rgba.red)) / 255.0,
+                green: max(0, min(255, rgba.green)) / 255.0,
+                blue: max(0, min(255, rgba.blue)) / 255.0,
+                opacity: max(0, min(1, rgba.alpha))
+            )
+        }
+        return instagramThemeIsDark ? .black : .white
     }
 
     var body: some View {
@@ -74,6 +86,7 @@ struct InstagramView: View {
                     showingDashboard: $showingDashboard,
                     reloadToken: $reloadToken,
                     labelsToken: $labelsToken,
+                    themeRefreshToken: $themeRefreshToken,
                     selectedNativeTab: $nativeSelectedTab,
                     nativeMessageBadgeCount: $nativeMessageBadgeCount,
                     nativeNavCommandToken: $nativeNavCommandToken,
@@ -106,6 +119,7 @@ struct InstagramView: View {
                     showingDashboard: $showingDashboard,
                     reloadToken: $reloadToken,
                     labelsToken: $labelsToken,
+                    themeRefreshToken: $themeRefreshToken,
                     selectedNativeTab: $nativeSelectedTab,
                     nativeMessageBadgeCount: $nativeMessageBadgeCount,
                     nativeNavCommandToken: $nativeNavCommandToken,
@@ -136,6 +150,7 @@ struct InstagramView: View {
                     showingDashboard: $showingDashboard,
                     reloadToken: $reloadToken,
                     labelsToken: $labelsToken,
+                    themeRefreshToken: $themeRefreshToken,
                     selectedNativeTab: $nativeSelectedTab,
                     nativeMessageBadgeCount: $nativeMessageBadgeCount,
                     nativeNavCommandToken: $nativeNavCommandToken,
@@ -166,6 +181,7 @@ struct InstagramView: View {
                     showingDashboard: $showingDashboard,
                     reloadToken: $reloadToken,
                     labelsToken: $labelsToken,
+                    themeRefreshToken: $themeRefreshToken,
                     selectedNativeTab: $nativeSelectedTab,
                     nativeMessageBadgeCount: $nativeMessageBadgeCount,
                     nativeNavCommandToken: $nativeNavCommandToken,
@@ -346,6 +362,9 @@ struct InstagramView: View {
                 webViewCount = clamped
             }
             reconfigureSurfacesForCurrentMode()
+        }
+        .onReceive(settings.$backgroundRefreshToken) { _ in
+            themeRefreshToken += 1
         }
         .onAppear {
             reconfigureSurfacesForCurrentMode()

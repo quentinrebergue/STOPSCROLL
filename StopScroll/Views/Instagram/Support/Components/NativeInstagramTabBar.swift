@@ -4,6 +4,8 @@ struct NativeInstagramTabBar: View {
     let selectedTab: String
     let messageBadgeCount: Int
     let onSelectTab: (String) -> Void
+    @ObservedObject private var settings = AppSettings.shared
+    private var palette: AppSettings.AdaptivePalette { settings.adaptivePalette }
 
     var body: some View {
         HStack(spacing: 2) {
@@ -23,7 +25,7 @@ struct NativeInstagramTabBar: View {
         )
         .overlay(
             RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .stroke(Color.white.opacity(0.12), lineWidth: 1)
+                .stroke(palette.border, lineWidth: 1)
         )
         .padding(.horizontal, 12)
         .padding(.bottom, 10)
@@ -36,7 +38,7 @@ struct NativeInstagramTabBar: View {
             ZStack(alignment: .topTrailing) {
                 Image(systemName: icon)
                     .font(.system(size: 18, weight: .semibold))
-                    .foregroundColor(selectedTab == id ? .white : Color.white.opacity(0.65))
+                    .foregroundColor(selectedTab == id ? palette.primaryText : palette.secondaryText)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 10)
 

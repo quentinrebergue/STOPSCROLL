@@ -34,6 +34,5 @@ struct InstagramUsernamePromptSheet: View {
                 }
             }
         }
-        .preferredColorScheme(.dark)
     }
 }

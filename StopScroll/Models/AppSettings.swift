@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import SwiftUI
 
 /// Persistent user-editable settings for StopScroll, stored in UserDefaults.
 final class AppSettings: ObservableObject {
@@ -29,6 +30,14 @@ final class AppSettings: ObservableObject {
 
     /// Most recent Instagram UI language reported by the WebView (BCP-47, e.g. "fr", "en-US").
     @Published private(set) var detectedLanguage: String = ""
+
+    /// Last detected Instagram app background color (CSS format, e.g. rgb(18, 18, 18)).
+    @Published private(set) var instagramBackgroundCSS: String {
+        didSet { UserDefaults.standard.set(instagramBackgroundCSS, forKey: Keys.instagramBackgroundCSS) }
+    }
+
+    /// Increments when the user requests a manual background refresh from Settings.
+    @Published private(set) var backgroundRefreshToken: Int = 0
 
     // MARK: - Built-in defaults per language prefix
 
@@ -61,6 +70,7 @@ final class AppSettings: ObservableObject {
             articleSources = ["wikipedia"]
         }
         devMode = UserDefaults.standard.bool(forKey: Keys.devMode)
+        instagramBackgroundCSS = UserDefaults.standard.string(forKey: Keys.instagramBackgroundCSS) ?? "rgb(0, 0, 0)"
     }
 
     // MARK: - Language seeding
@@ -93,6 +103,141 @@ final class AppSettings: ObservableObject {
         adLabels = AppSettings.defaultLabels[prefix] ?? []
     }
 
+    // MARK: - Instagram background color
+
+    func requestBackgroundRefresh() {
+        DispatchQueue.main.async {
+            self.backgroundRefreshToken += 1
+        }
+    }
+
+    func updateInstagramBackgroundColor(_ cssColor: String?) {
+        guard let cssColor = cssColor?.trimmingCharacters(in: .whitespacesAndNewlines),
+              let normalized = Self.normalizedCSSColor(cssColor) else {
+            return
+        }
+
+        DispatchQueue.main.async {
+            self.instagramBackgroundCSS = normalized
+        }
+    }
+
+    var instagramBackgroundRGBA: (red: Double, green: Double, blue: Double, alpha: Double)? {
+        Self.parseCSSColor(instagramBackgroundCSS)
+    }
+
+    struct AdaptivePalette {
+        let background: Color
+        let surface: Color
+        let elevatedSurface: Color
+        let primaryText: Color
+        let secondaryText: Color
+        let border: Color
+    }
+
+    var adaptivePalette: AdaptivePalette {
+        let rgba = instagramBackgroundRGBA ?? (red: 0, green: 0, blue: 0, alpha: 1)
+        let base = (
+            red: Self.clamp01(rgba.red / 255.0),
+            green: Self.clamp01(rgba.green / 255.0),
+            blue: Self.clamp01(rgba.blue / 255.0)
+        )
+
+        let background = Color(.sRGB, red: base.red, green: base.green, blue: base.blue, opacity: 1)
+
+        if isInstagramBackgroundDarkByRGBSum {
+            let surface = Self.mix(base, with: (1, 1, 1), amount: 0.08)
+            let elevated = Self.mix(base, with: (1, 1, 1), amount: 0.14)
+            return AdaptivePalette(
+                background: background,
+                surface: Color(.sRGB, red: surface.red, green: surface.green, blue: surface.blue, opacity: 1),
+                elevatedSurface: Color(.sRGB, red: elevated.red, green: elevated.green, blue: elevated.blue, opacity: 1),
+                primaryText: Color.white.opacity(0.96),
+                secondaryText: Color.white.opacity(0.68),
+                border: Color.white.opacity(0.12)
+            )
+        }
+
+        let surface = Self.mix(base, with: (0, 0, 0), amount: 0.04)
+        let elevated = Self.mix(base, with: (0, 0, 0), amount: 0.1)
+        return AdaptivePalette(
+            background: background,
+            surface: Color(.sRGB, red: surface.red, green: surface.green, blue: surface.blue, opacity: 1),
+            elevatedSurface: Color(.sRGB, red: elevated.red, green: elevated.green, blue: elevated.blue, opacity: 1),
+            primaryText: Color.black.opacity(0.9),
+            secondaryText: Color.black.opacity(0.58),
+            border: Color.black.opacity(0.12)
+        )
+    }
+
+    /// Global app mode derived from Instagram background color using RGB sum.
+    var preferredColorScheme: ColorScheme {
+        isInstagramBackgroundDarkByRGBSum ? .dark : .light
+    }
+
+    var isInstagramBackgroundDarkByRGBSum: Bool {
+        guard let rgba = instagramBackgroundRGBA else { return true }
+        let rgbSum = rgba.red + rgba.green + rgba.blue
+        return rgbSum < Self.darkModeRGBSumThreshold
+    }
+
+    private static let darkModeRGBSumThreshold: Double = 382.5
+
+    private static func clamp01(_ value: Double) -> Double {
+        max(0, min(1, value))
+    }
+
+    private static func mix(
+        _ lhs: (red: Double, green: Double, blue: Double),
+        with rhs: (Double, Double, Double),
+        amount: Double
+    ) -> (red: Double, green: Double, blue: Double) {
+        let t = clamp01(amount)
+        return (
+            red: lhs.red + (rhs.0 - lhs.red) * t,
+            green: lhs.green + (rhs.1 - lhs.green) * t,
+            blue: lhs.blue + (rhs.2 - lhs.blue) * t
+        )
+    }
+
+    private static func normalizedCSSColor(_ cssColor: String) -> String? {
+        guard let parsed = parseCSSColor(cssColor) else { return nil }
+        if parsed.alpha < 0.999 {
+            return "rgba(\(parsed.red), \(parsed.green), \(parsed.blue), \(parsed.alpha))"
+        }
+        return "rgb(\(parsed.red), \(parsed.green), \(parsed.blue))"
+    }
+
+    private static func parseCSSColor(_ cssColor: String) -> (red: Double, green: Double, blue: Double, alpha: Double)? {
+        let input = cssColor.replacingOccurrences(of: " ", with: "")
+        if input.hasPrefix("rgb(") {
+            guard input.hasSuffix(")") else { return nil }
+            let body = String(input.dropFirst(4).dropLast())
+            let values = body.split(separator: ",")
+            guard values.count == 3,
+                  let r = Double(values[0]),
+                  let g = Double(values[1]),
+                  let b = Double(values[2]) else {
+                return nil
+            }
+            return (red: r, green: g, blue: b, alpha: 1.0)
+        }
+        if input.hasPrefix("rgba(") {
+            guard input.hasSuffix(")") else { return nil }
+            let body = String(input.dropFirst(5).dropLast())
+            let values = body.split(separator: ",")
+            guard values.count == 4,
+                  let r = Double(values[0]),
+                  let g = Double(values[1]),
+                  let b = Double(values[2]),
+                  let a = Double(values[3]) else {
+                return nil
+            }
+            return (red: r, green: g, blue: b, alpha: a)
+        }
+        return nil
+    }
+
     // MARK: - UserDefaults keys
 
     private enum Keys {
@@ -100,5 +245,6 @@ final class AppSettings: ObservableObject {
         static let injectionFrequency = "ss_injection_frequency"
         static let articleSources = "ss_article_sources"
         static let devMode = "ss_dev_mode"
+        static let instagramBackgroundCSS = "ss_instagram_background_css"
     }
 }

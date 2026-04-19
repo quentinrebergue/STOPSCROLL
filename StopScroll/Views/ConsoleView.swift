@@ -118,7 +118,6 @@ struct ConsoleView: View {
                 }
             }
         }
-        .preferredColorScheme(.dark)
     }
 }
 
