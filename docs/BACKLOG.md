@@ -37,6 +37,8 @@
 | SS-025 | P1 | Improvement | Eviction memoire 2 WebView | Sur memory warning, detruire la surface inactive puis recreation lazy a la demande | Done |
 | SS-026 | P0 | Bug | Search/Profile inactifs | Fallback URL search/profile + pseudo Instagram dashboard + renvoi commande nav apres recreation | Done |
 | SS-027 | P1 | Improvement | Profil onboarding + nav secondaire | Prompt pseudo Instagram si vide + routing search/profile/messages via WebView secondaire legere | Done |
+| SS-028 | P0 | Bug | Routage navigation entre surfaces | Forcer toutes les actions insta sur WebView 2 et desactiver la nav insta sur WebView 1 | Done |
+| SS-029 | P0 | Bug | Navigation surfaces bloquee | Routage URL deterministe sur WebView 2 + tests unitaires mapping pour prevenir regressions | Done |
 | SS-023 | P0 | Bug | Navigation native sans reload | Simuler interaction SPA sur boutons tab Instagram et fallback history local sans hard reload | Done |
 
 ## Idees d amelioration produit

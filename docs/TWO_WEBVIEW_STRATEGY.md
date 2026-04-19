@@ -25,6 +25,15 @@ Eviter la navigation fragile via simulation de clics DOM entre sections Instagra
 - WebView 2 est la surface de navigation Instagram secondaire.
 - Home affiche la surface feed.
 - Messages/Search/Profile affichent la surface secondaire.
+- Garantie de routage: les commandes de navigation Instagram sont desactivees sur WebView 1 et autorisees uniquement sur WebView 2.
+- Ordre de transition: la surface secondaire est rendue active/visible puis la commande de navigation est envoyee.
+
+7. Routage deterministe URL sur surface secondaire
+- Messages: `https://www.instagram.com/direct/inbox/`
+- Search: `https://www.instagram.com/explore/`
+- Profile: `https://www.instagram.com/<pseudo>/`
+- Le mapping est centralise dans `InstagramSecondaryRoute` (Swift), teste en unit tests.
+- Objectif: eviter les regressions de navigation liees aux changements DOM Instagram.
 
 5. Optimisation JS par surface
 - WebView 1 (feed): runtime complet StopScroll.

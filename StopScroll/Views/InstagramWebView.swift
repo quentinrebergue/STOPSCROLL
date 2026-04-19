@@ -22,6 +22,9 @@ struct InstagramWebView: UIViewRepresentable {
     var isActive: Bool = true
     var tracksLoading: Bool = true
     var scriptProfile: ScriptProfile = .full
+    var handlesInstagramNavigation: Bool = true
+    var requestedURLString: String? = nil
+    var requestedURLToken: Int = 0
     var onGrantXP: (Int, String) -> Void = { _, _ in }
 
     /// Full runtime scripts injected in dependency order before the bootstrap.
@@ -151,6 +154,16 @@ struct InstagramWebView: UIViewRepresentable {
         } else if !context.coordinator.didSendInitialActiveNavCommand, isActive {
             context.coordinator.didSendInitialActiveNavCommand = true
             context.coordinator.sendNativeNavigationCommand(tab: selectedNativeTab, onlyIfActive: true)
+        }
+        if context.coordinator.lastRequestedURLToken != requestedURLToken {
+            context.coordinator.lastRequestedURLToken = requestedURLToken
+            if let requestedURLString,
+               let requestedURL = URL(string: requestedURLString) {
+                let currentURL = uiView.url?.absoluteString ?? ""
+                if currentURL != requestedURL.absoluteString {
+                    uiView.load(URLRequest(url: requestedURL))
+                }
+            }
         }
         if context.coordinator.lastIsActive != isActive {
             context.coordinator.lastIsActive = isActive
@@ -283,6 +296,7 @@ struct InstagramWebView: UIViewRepresentable {
         var lastLabelsToken: Int
         var lastWikipediaTitle: String
         var lastNativeNavCommandToken: Int
+        var lastRequestedURLToken: Int
         var lastIsActive: Bool
         var didSendInitialActiveNavCommand: Bool
 
@@ -292,12 +306,14 @@ struct InstagramWebView: UIViewRepresentable {
             self.lastLabelsToken = parent.labelsToken
             self.lastWikipediaTitle = ""
             self.lastNativeNavCommandToken = parent.nativeNavCommandToken
+            self.lastRequestedURLToken = parent.requestedURLToken
             self.lastIsActive = parent.isActive
             self.didSendInitialActiveNavCommand = false
         }
 
         func sendNativeNavigationCommand(tab: String, onlyIfActive: Bool) {
             if onlyIfActive && !parent.isActive { return }
+            if !parent.handlesInstagramNavigation { return }
             guard tab != "book", tab != "dashboard" else { return }
             let escapedTab = tab
                 .replacingOccurrences(of: "\\", with: "\\\\")

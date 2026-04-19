@@ -363,3 +363,31 @@ final class XPProgressTests: XCTestCase {
         XCTAssertEqual(InstagramWebView.Coordinator.parseXPAmount(nil), 10)
     }
 }
+
+final class InstagramSecondaryRouteTests: XCTestCase {
+
+    func testMessagesRouteURL() {
+        XCTAssertEqual(
+            InstagramSecondaryRoute.url(for: "messages", username: "any"),
+            "https://www.instagram.com/direct/inbox/"
+        )
+    }
+
+    func testSearchRouteURL() {
+        XCTAssertEqual(
+            InstagramSecondaryRoute.url(for: "search", username: "any"),
+            "https://www.instagram.com/explore/"
+        )
+    }
+
+    func testProfileRouteUsesSanitizedUsername() {
+        XCTAssertEqual(
+            InstagramSecondaryRoute.url(for: "profile", username: "@john.doe_42"),
+            "https://www.instagram.com/john.doe_42/"
+        )
+    }
+
+    func testProfileRouteReturnsNilWhenUsernameMissing() {
+        XCTAssertNil(InstagramSecondaryRoute.url(for: "profile", username: "   "))
+    }
+}

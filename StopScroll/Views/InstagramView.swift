@@ -47,6 +47,8 @@ struct InstagramView: View {
     @State private var nativeSelectedTab: String = "home"
     @State private var nativeMessageBadgeCount: Int = 0
     @State private var nativeNavCommandToken: Int = 0
+    @State private var secondaryNavigationURL: String? = nil
+    @State private var secondaryNavigationToken: Int = 0
     @State private var showControlCenterChooser = false
     @State private var activeSurface: WebSurface = .main
     @State private var hasMainSurface = true
@@ -79,6 +81,9 @@ struct InstagramView: View {
                     isActive: activeSurface == .main,
                     tracksLoading: true,
                     scriptProfile: .full,
+                    handlesInstagramNavigation: false,
+                    requestedURLString: nil,
+                    requestedURLToken: 0,
                     onGrantXP: { amount, source in
                         grantXP(amount: amount, source: source)
                     }
@@ -106,6 +111,9 @@ struct InstagramView: View {
                     isActive: activeSurface == .messages,
                     tracksLoading: true,
                     scriptProfile: .navigationLite,
+                    handlesInstagramNavigation: true,
+                    requestedURLString: secondaryNavigationURL,
+                    requestedURLToken: secondaryNavigationToken,
                     onGrantXP: { amount, source in
                         grantXP(amount: amount, source: source)
                     }
@@ -177,6 +185,15 @@ struct InstagramView: View {
                                 showControlCenterChooser = true
                                 return
                             }
+                            if tab == "home" {
+                                if !hasMainSurface {
+                                    hasMainSurface = true
+                                    isLoadingMain = true
+                                }
+                                activeSurface = .main
+                                nativeSelectedTab = "home"
+                                return
+                            }
                             if tab == "messages" {
                                 openInstagramSecondary(tab: "messages")
                                 return
@@ -194,13 +211,6 @@ struct InstagramView: View {
                                 openInstagramSecondary(tab: "profile")
                                 return
                             }
-                            if !hasMainSurface {
-                                hasMainSurface = true
-                                isLoadingMain = true
-                            }
-                            activeSurface = .main
-                            nativeSelectedTab = tab
-                            nativeNavCommandToken += 1
                         }
                     )
                 }
@@ -262,9 +272,16 @@ struct InstagramView: View {
             hasMessagesSurface = true
             isLoadingMessages = true
         }
+
+        guard let targetURL = InstagramSecondaryRoute.url(for: tab, username: instagramUsername) else {
+            return
+        }
+
         activeSurface = .messages
         nativeSelectedTab = tab
-        nativeNavCommandToken += 1
+        isLoadingMessages = true
+        secondaryNavigationURL = targetURL
+        secondaryNavigationToken += 1
     }
 
     private func evictInactiveSurface() {
@@ -345,6 +362,26 @@ struct InstagramView: View {
         }
         xpHideWorkItem = workItem
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.15, execute: workItem)
+    }
+}
+
+enum InstagramSecondaryRoute {
+    static func url(for tab: String, username: String) -> String? {
+        switch tab {
+        case "messages":
+            return "https://www.instagram.com/direct/inbox/"
+        case "search":
+            return "https://www.instagram.com/explore/"
+        case "profile":
+            let cleaned = username
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+                .replacingOccurrences(of: "@", with: "")
+                .filter { $0.isLetter || $0.isNumber || $0 == "." || $0 == "_" }
+            if cleaned.isEmpty { return nil }
+            return "https://www.instagram.com/\(cleaned)/"
+        default:
+            return nil
+        }
     }
 }
 
