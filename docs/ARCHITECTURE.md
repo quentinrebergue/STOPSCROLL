@@ -200,6 +200,11 @@ Destination de test recommandee dans ce repo:
 - icone coeur retiree de la barre native
 - reader: suppression de la bottom bar interne pour eviter une double navigation visuelle
 
+15. Ajustements layout WebView et navbar commune
+- overscan bas augmente pour masquer completement la barre Instagram residuelle en bas
+- webviews etendues aussi sur la safe area haute pour supprimer la bande noire en haut
+- navbar native commune affichee egalement pendant le mode BookReader
+
 12. Strategie 2 WebView (main + messages)
 - deux surfaces `WKWebView` sont maintenues: principale (`/`) et messages (`/direct/inbox/`)
 - une seule surface est visible/interactable a la fois (activation exclusive)

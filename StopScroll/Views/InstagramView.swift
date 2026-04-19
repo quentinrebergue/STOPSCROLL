@@ -64,6 +64,8 @@ struct InstagramView: View {
         }
     }
 
+    private let webViewBottomOverscan: CGFloat = 116
+
     var body: some View {
         ZStack {
             if hasMainSurface {
@@ -90,8 +92,8 @@ struct InstagramView: View {
                 )
                 // Extend the webview below the bottom edge so Instagram's bottom nav
                 // stays outside of the visible area behind our native bar.
-                .padding(.bottom, -76)
-                .ignoresSafeArea(edges: .bottom)
+                .padding(.bottom, -webViewBottomOverscan)
+                .ignoresSafeArea(edges: [.top, .bottom])
                 .opacity(activeSurface == .main ? 1 : 0)
                 .allowsHitTesting(activeSurface == .main)
             }
@@ -118,8 +120,8 @@ struct InstagramView: View {
                         grantXP(amount: amount, source: source)
                     }
                 )
-                .padding(.bottom, -76)
-                .ignoresSafeArea(edges: .bottom)
+                .padding(.bottom, -webViewBottomOverscan)
+                .ignoresSafeArea(edges: [.top, .bottom])
                 .opacity(activeSurface == .messages ? 1 : 0)
                 .allowsHitTesting(activeSurface == .messages)
             }
@@ -170,53 +172,55 @@ struct InstagramView: View {
                 .allowsHitTesting(false)
             }
 
-            if !showingReader {
-                VStack(spacing: 0) {
-                    Spacer()
-                    NativeInstagramTabBar(
-                        selectedTab: nativeSelectedTab,
-                        messageBadgeCount: nativeMessageBadgeCount,
-                        onSelectTab: { tab in
-                            if tab == "book" {
-                                showingReader = true
-                                return
-                            }
-                            if tab == "dashboard" {
-                                showControlCenterChooser = true
-                                return
-                            }
-                            if tab == "home" {
-                                if !hasMainSurface {
-                                    hasMainSurface = true
-                                    isLoadingMain = true
-                                }
-                                activeSurface = .main
-                                nativeSelectedTab = "home"
-                                return
-                            }
-                            if tab == "messages" {
-                                openInstagramSecondary(tab: "messages")
-                                return
-                            }
-                            if tab == "search" {
-                                openInstagramSecondary(tab: "search")
-                                return
-                            }
-                            if tab == "profile" {
-                                if instagramUsername.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                                    instagramUsernameDraft = ""
-                                    showInstagramUsernamePrompt = true
-                                    return
-                                }
-                                openInstagramSecondary(tab: "profile")
-                                return
-                            }
+            VStack(spacing: 0) {
+                Spacer()
+                NativeInstagramTabBar(
+                    selectedTab: nativeSelectedTab,
+                    messageBadgeCount: nativeMessageBadgeCount,
+                    onSelectTab: { tab in
+                        if tab == "book" {
+                            showingReader = true
+                            return
                         }
-                    )
-                }
-                .ignoresSafeArea(edges: .bottom)
-                .zIndex(15)
+                        if tab == "dashboard" {
+                            showControlCenterChooser = true
+                            return
+                        }
+                        if tab == "home" {
+                            showingReader = false
+                            if !hasMainSurface {
+                                hasMainSurface = true
+                                isLoadingMain = true
+                            }
+                            activeSurface = .main
+                            nativeSelectedTab = "home"
+                            return
+                        }
+                        if tab == "messages" {
+                            showingReader = false
+                            openInstagramSecondary(tab: "messages")
+                            return
+                        }
+                        if tab == "search" {
+                            showingReader = false
+                            openInstagramSecondary(tab: "search")
+                            return
+                        }
+                        if tab == "profile" {
+                            showingReader = false
+                            if instagramUsername.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                                instagramUsernameDraft = ""
+                                showInstagramUsernamePrompt = true
+                                return
+                            }
+                            openInstagramSecondary(tab: "profile")
+                            return
+                        }
+                    }
+                )
             }
+            .ignoresSafeArea(edges: .bottom)
+            .zIndex(15)
         }
         .sheet(isPresented: $showingSettings) {
             SettingsView(onDismiss: {
