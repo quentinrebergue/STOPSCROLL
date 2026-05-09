@@ -11,6 +11,12 @@
     var t      = config.card_templates || {};
     var accent = '#c4b5fd';
 
+    // Detect reel surface (flag set by Swift reel injection before buildCardFor)
+    var isReel = window.__STOPSCROLL_SURFACE === 'reels';
+    var reelStats = isReel && ns.sessionStats && ns.sessionStats.getReelStats
+      ? ns.sessionStats.getReelStats()
+      : null;
+
     function formatTime(secs) {
       if (secs < 1)  return t.stats_just_started || 'Just started';
       if (secs < 60) return secs + 's';
@@ -75,11 +81,16 @@
     var grid = document.createElement('div');
     grid.style.cssText = 'display:flex;gap:12px;width:100%;justify-content:center';
 
-    var statItems = [
-      { value: formatTime(stats.sessionSeconds), label: t.stats_label_time  || 'scrolling' },
-      { value: String(stats.posts),              label: t.stats_label_posts || 'posts seen' },
-      { value: String(stats.ads),                label: t.stats_label_ads   || 'ads seen' }
-    ];
+    var statItems = reelStats
+      ? [
+          { value: String(reelStats.reelCount),        label: t.stats_label_reels     || 'reels watched' },
+          { value: formatTime(reelStats.reelSeconds),  label: t.stats_label_reel_time || 'on reels' }
+        ]
+      : [
+          { value: formatTime(stats.sessionSeconds), label: t.stats_label_time  || 'scrolling' },
+          { value: String(stats.posts),              label: t.stats_label_posts || 'posts seen' },
+          { value: String(stats.ads),                label: t.stats_label_ads   || 'ads seen' }
+        ];
 
     statItems.forEach(function (item) {
       var cell = document.createElement('div');

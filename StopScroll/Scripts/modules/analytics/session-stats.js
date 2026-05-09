@@ -23,6 +23,10 @@
   var sessionPosts = 0;
   var sessionAds   = 0;
 
+  // Reel session tracking (separate counter — resets with the feed session)
+  var reelSessionStart = null;
+  var reelCount = 0;
+
   /**
    * Must be called on every scroll / touch-move event.
    * Starts a new session if the user was inactive for > 5 minutes.
@@ -34,6 +38,8 @@
       sessionStart = now;
       sessionPosts = 0;
       sessionAds   = 0;
+      reelSessionStart = null;
+      reelCount = 0;
     }
     lastScrollAt = now;
   }
@@ -59,6 +65,24 @@
   }
 
   /**
+   * Call each time a reel card is shown. Starts the reel session timer
+   * on first call and increments the reel counter.
+   */
+  function trackReel() {
+    if (!reelSessionStart) { reelSessionStart = Date.now(); }
+    reelCount += 1;
+  }
+
+  /**
+   * Returns reel-specific stats for the current session.
+   * @returns {{ reelCount: number, reelSeconds: number }}
+   */
+  function getReelStats() {
+    var secs = reelSessionStart ? Math.floor((Date.now() - reelSessionStart) / 1000) : 0;
+    return { reelCount: reelCount, reelSeconds: secs };
+  }
+
+  /**
    * Returns a snapshot of the current session stats.
    * @returns {{ sessionSeconds: number, posts: number, ads: number }}
    */
@@ -71,6 +95,8 @@
     onScrollActivity: onScrollActivity,
     trackPost: trackPost,
     trackAd: trackAd,
-    getStats: getStats
+    trackReel: trackReel,
+    getStats: getStats,
+    getReelStats: getReelStats
   };
 })(window);

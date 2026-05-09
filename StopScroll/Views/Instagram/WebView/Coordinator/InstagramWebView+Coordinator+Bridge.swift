@@ -385,13 +385,20 @@ extension InstagramWebView.Coordinator {
 
         return nativeCardHistoryQueue.sync {
             let lastShown = nativeCardHistory.first
-            var filtered = availableCards.filter { candidate in
-                candidate.type != lastShown
-            }
 
-            if filtered.isEmpty {
-                filtered = availableCards
+            // Hard-exclude the immediately previous type, then apply
+            // decreasing weight penalties for 2nd–4th in history.
+            let penalized: [(type: String, weight: Double)] = availableCards.compactMap { candidate in
+                guard candidate.type != lastShown else { return nil }
+                var w = candidate.weight
+                if let idx = nativeCardHistory.firstIndex(of: candidate.type) {
+                    if idx == 1 { w = max(w / 3.0, 0.1) }
+                    else if idx == 2 { w = max(w / 2.0, 0.1) }
+                    else if idx == 3 { w = max(w / 1.5, 0.1) }
+                }
+                return (type: candidate.type, weight: w)
             }
+            let filtered = penalized.isEmpty ? availableCards : penalized
 
             let chosen = weightedCardPick(filtered)
             nativeCardHistory.insert(chosen.type, at: 0)

@@ -54,8 +54,8 @@
                 floating_button_enabled: true
             },
             card_templates: {
-                metrics_title: 'Session snapshot',
-                metrics_body: 'You skipped {skipped} dopamine loops and protected {minutes} min of focus.',
+                metrics_title: 'Scroll check',
+                metrics_body: "You've been scrolling for {minutes} and seen {posts} posts — {ads} of which were ads.",
                 mood_title: 'How do you feel right now?',
                 mood_a1: "I'm enjoying the scroll",
                 mood_r1: 'Pleasure is valid — just stay aware of time.',

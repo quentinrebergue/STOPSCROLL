@@ -388,6 +388,9 @@ extension InstagramWebView {
 
                     try {
                         if (container.getAttribute('data-ss-reel-replaced')) return;
+                        // Signal reel surface so card-stats.js shows reel-specific data
+                        window.__STOPSCROLL_SURFACE = 'reels';
+                        if (ns.sessionStats && ns.sessionStats.trackReel) { ns.sessionStats.trackReel(); }
                         var feedCard = ns.cardBuilder.buildCardFor(nativeCard.type, cfg, nativeCard);
                         if (!feedCard) return;
                         injectReelChrome(container, feedCard);
