@@ -8,6 +8,7 @@ struct NativeInstagramTabBar: View {
 
     let selectedTab: String
     let messageBadgeCount: Int
+    let isLocked: Bool
     let onSelectTab: (String) -> Void
     let onSelectInstagramProfile: () -> Void
     let onSelectStopScrollProfile: () -> Void
@@ -58,7 +59,7 @@ struct NativeInstagramTabBar: View {
             
             // Tab bar
             HStack(spacing: 1) {
-                ForEach(NativeTabLayout.items, id: \.id) { item in
+                ForEach(isLocked ? NativeTabLayout.lockedItems : NativeTabLayout.items, id: \.id) { item in
                     tabButton(id: item.id, icon: item.icon, badge: item.id == "messages" ? messageBadgeCount : 0)
                 }
             }

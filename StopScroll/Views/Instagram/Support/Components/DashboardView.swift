@@ -5,6 +5,7 @@ struct DashboardView: View {
     var onOpenSettings: (() -> Void)? = nil
     var showsToolbarButton: Bool = true
     @ObservedObject private var settings = AppSettings.shared
+    @ObservedObject private var streak = ReadingStreakManager.shared
 
     @AppStorage("ss_xp_total") private var totalXP = 0
     @AppStorage("ss_goal_sessions_per_day") private var goalSessionsPerDay = 3
@@ -36,6 +37,8 @@ struct DashboardView: View {
         NavigationView {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
+                    streakCard
+                    sessionLimitsCard
                     goalsCard
                     usageCard
                     progressionCard
@@ -59,6 +62,110 @@ struct DashboardView: View {
                 }
             }
         }
+    }
+
+    private var streakCard: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(alignment: .center, spacing: 12) {
+                Text("🔥")
+                    .font(.system(size: 30))
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Reading Streak")
+                        .font(.headline)
+                        .foregroundColor(palette.primaryText)
+                    Text(streak.currentStreak == 0
+                         ? "Start your streak today"
+                         : "\(streak.currentStreak) day\(streak.currentStreak == 1 ? "" : "s") in a row")
+                        .font(.caption)
+                        .foregroundColor(palette.secondaryText)
+                }
+                Spacer()
+                Text("\(streak.currentStreak)")
+                    .font(.system(size: 38, weight: .bold, design: .rounded))
+                    .foregroundColor(streak.currentStreak > 0
+                                     ? Color(red: 1.0, green: 0.55, blue: 0.1)
+                                     : palette.secondaryText)
+            }
+
+            VStack(alignment: .leading, spacing: 6) {
+                HStack {
+                    Text("\(streak.pagesReadToday) / \(streak.dailyGoal) pages read today")
+                        .font(.caption)
+                        .foregroundColor(palette.secondaryText)
+                    Spacer()
+                    if streak.goalMet {
+                        Label("Goal met!", systemImage: "checkmark.circle.fill")
+                            .font(.caption)
+                            .foregroundColor(Color(red: 0.28, green: 0.85, blue: 0.46))
+                    }
+                }
+                ProgressView(value: Double(streak.pagesReadToday), total: Double(streak.dailyGoal))
+                    .tint(streak.goalMet
+                          ? Color(red: 0.28, green: 0.85, blue: 0.46)
+                          : Color(red: 1.0, green: 0.55, blue: 0.1))
+            }
+        }
+        .padding(14)
+        .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(palette.surface))
+        .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(palette.border, lineWidth: 1))
+    }
+
+    private var sessionLimitsCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Session Limits")
+                .font(.headline)
+                .foregroundColor(palette.primaryText)
+
+            VStack(spacing: 10) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Normal session")
+                            .font(.caption)
+                            .foregroundColor(palette.secondaryText)
+                        Text("Resets after 10 min away")
+                            .font(.caption2)
+                            .foregroundColor(palette.secondaryText.opacity(0.6))
+                    }
+                    Spacer()
+                    Stepper(value: $settings.normalSessionMaxMinutes, in: 5...120, step: 5) {
+                        Text("\(settings.normalSessionMaxMinutes) min")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(palette.primaryText)
+                    }
+                    .onChange(of: settings.normalSessionMaxMinutes) { newNormal in
+                        if settings.longSessionMaxMinutes < newNormal {
+                            settings.longSessionMaxMinutes = newNormal
+                        }
+                    }
+                }
+
+                Divider().background(palette.border)
+
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Long session")
+                            .font(.caption)
+                            .foregroundColor(palette.secondaryText)
+                        Text("Once per day credit")
+                            .font(.caption2)
+                            .foregroundColor(palette.secondaryText.opacity(0.6))
+                    }
+                    Spacer()
+                    Stepper(
+                        value: $settings.longSessionMaxMinutes,
+                        in: settings.normalSessionMaxMinutes...240,
+                        step: 5
+                    ) {
+                        Text("\(settings.longSessionMaxMinutes) min")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(palette.primaryText)
+                    }
+                }
+            }
+        }
+        .padding(14)
+        .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(palette.surface))
+        .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(palette.border, lineWidth: 1))
     }
 
     private var goalsCard: some View {

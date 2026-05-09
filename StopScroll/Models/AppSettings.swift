@@ -28,6 +28,16 @@ final class AppSettings: ObservableObject {
         didSet { UserDefaults.standard.set(devMode, forKey: Keys.devMode) }
     }
 
+    /// Maximum normal session duration in minutes (home/search/reels). Default 30 min.
+    @Published var normalSessionMaxMinutes: Int {
+        didSet { UserDefaults.standard.set(normalSessionMaxMinutes, forKey: Keys.normalSessionMax) }
+    }
+
+    /// Maximum long session duration in minutes (once per day). Default 60 min.
+    @Published var longSessionMaxMinutes: Int {
+        didSet { UserDefaults.standard.set(longSessionMaxMinutes, forKey: Keys.longSessionMax) }
+    }
+
     /// Most recent Instagram UI language reported by the WebView (BCP-47, e.g. "fr", "en-US").
     @Published private(set) var detectedLanguage: String = ""
 
@@ -74,6 +84,8 @@ final class AppSettings: ObservableObject {
         }
         devMode = UserDefaults.standard.bool(forKey: Keys.devMode)
         instagramBackgroundCSS = UserDefaults.standard.string(forKey: Keys.instagramBackgroundCSS) ?? "rgb(0, 0, 0)"
+        normalSessionMaxMinutes = (UserDefaults.standard.object(forKey: Keys.normalSessionMax) as? Int) ?? 30
+        longSessionMaxMinutes   = (UserDefaults.standard.object(forKey: Keys.longSessionMax) as? Int) ?? 60
     }
 
     // MARK: - Language seeding
@@ -251,10 +263,12 @@ final class AppSettings: ObservableObject {
     // MARK: - UserDefaults keys
 
     private enum Keys {
-        static let adLabels = "ss_ad_labels"
-        static let injectionFrequency = "ss_injection_frequency"
-        static let articleSources = "ss_article_sources"
-        static let devMode = "ss_dev_mode"
+        static let adLabels             = "ss_ad_labels"
+        static let injectionFrequency   = "ss_injection_frequency"
+        static let articleSources       = "ss_article_sources"
+        static let devMode              = "ss_dev_mode"
         static let instagramBackgroundCSS = "ss_instagram_background_css"
+        static let normalSessionMax     = "ss_normal_session_max"
+        static let longSessionMax       = "ss_long_session_max"
     }
 }

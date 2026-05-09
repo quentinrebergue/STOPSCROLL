@@ -4,6 +4,7 @@ import UIKit
 struct InstagramView: View {
 
     @ObservedObject private var settings = AppSettings.shared
+    @ObservedObject private var sessionLimiter = SessionLimitManager.shared
 
     @State var isLoadingMain = true
     @State var isLoadingMessages = true
@@ -368,6 +369,12 @@ struct InstagramView: View {
             .ignoresSafeArea(edges: .bottom)
             .zIndex(13)
 
+            TimerLockView()
+                .opacity(currentSectionTab == "timer" ? 1 : 0)
+                .allowsHitTesting(currentSectionTab == "timer")
+                .ignoresSafeArea(edges: .bottom)
+                .zIndex(11)
+
             if isActiveSurfaceLoading && !showingReader && !showingDashboard && !showingSettings {
                 VStack(spacing: 0) {
                     LoadingBar()
@@ -415,6 +422,7 @@ struct InstagramView: View {
                 NativeInstagramTabBar(
                     selectedTab: nativeSelectedTab,
                     messageBadgeCount: nativeMessageBadgeCount,
+                    isLocked: sessionLimiter.isLocked,
                     onSelectTab: { tab in
                         selectSection(tab)
                     },
@@ -500,6 +508,7 @@ struct InstagramView: View {
             reconfigureSurfacesForCurrentMode()
             consumePendingLazyReloadIfNeeded(for: activeSurface)
             DailyUsageTracker.shared.recordOpen()
+            SessionLimitManager.shared.notifyTabChange(to: nativeSelectedTab)
             showSessionBanner()
         }
         .onDisappear {
@@ -507,10 +516,19 @@ struct InstagramView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
             DailyUsageTracker.shared.recordOpen()
+            SessionLimitManager.shared.notifyTabChange(to: nativeSelectedTab)
             showSessionBanner()
         }
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)) { _ in
             DailyUsageTracker.shared.recordBackground()
+            SessionLimitManager.shared.notifyBackground()
+        }
+        .onChange(of: sessionLimiter.isLocked) { locked in
+            if locked {
+                withAnimation { selectSection("timer") }
+            } else if nativeSelectedTab == "timer" {
+                withAnimation { selectSection("home") }
+            }
         }
     }
 

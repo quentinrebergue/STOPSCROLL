@@ -277,6 +277,10 @@ struct BookReaderView: View {
                     sessionCardsRead += 1
                     checkPageTransition()
                     updateLibraryProgress()
+                    // Wire page reads to the reading streak
+                    if cards.indices.contains(newValue), case .text = cards[newValue].type {
+                        ReadingStreakManager.shared.recordPage(cards[newValue].page)
+                    }
                     // Clear highlight when user navigates to a different page
                     if highlightCardId >= 0,
                        let hlCard = cards.first(where: { $0.id == highlightCardId }),

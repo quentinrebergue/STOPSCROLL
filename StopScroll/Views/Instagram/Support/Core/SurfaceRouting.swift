@@ -8,12 +8,20 @@ struct NativeTabItem: Equatable {
 
 enum NativeTabLayout {
     static let items: [NativeTabItem] = [
-        NativeTabItem(id: "home", icon: "house"),
-        NativeTabItem(id: "search", icon: "magnifyingglass"),
-        NativeTabItem(id: "reels", icon: "play.square"),
-        NativeTabItem(id: "book", icon: "book.closed"),
+        NativeTabItem(id: "home",     icon: "house"),
+        NativeTabItem(id: "search",   icon: "magnifyingglass"),
+        NativeTabItem(id: "reels",    icon: "play.square"),
+        NativeTabItem(id: "book",     icon: "book.closed"),
         NativeTabItem(id: "messages", icon: "paperplane"),
-        NativeTabItem(id: "profile", icon: "person.crop.circle")
+        NativeTabItem(id: "profile",  icon: "person.crop.circle")
+    ]
+
+    /// Tab bar shown when the session limit is reached.
+    static let lockedItems: [NativeTabItem] = [
+        NativeTabItem(id: "book",     icon: "book.closed"),
+        NativeTabItem(id: "messages", icon: "paperplane"),
+        NativeTabItem(id: "profile",  icon: "person.crop.circle"),
+        NativeTabItem(id: "timer",    icon: "timer")
     ]
 
     static func index(of tab: String) -> Int? {
@@ -50,6 +58,7 @@ enum VisibleSectionPolicy {
     ) -> String {
         if showingReader { return "book" }
         if showingDashboard { return "dashboard" }
+        if nativeSelectedTab == "timer" { return "timer" }
         return SurfaceRouter.tab(for: activeSurface)
     }
 }

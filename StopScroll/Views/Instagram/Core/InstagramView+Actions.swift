@@ -3,6 +3,21 @@ import UIKit
 
 extension InstagramView {
     func selectSection(_ tab: String) {
+        // Redirect consuming tabs to timer when session is locked
+        if SessionLimitManager.isConsumingTab(tab) && SessionLimitManager.shared.isLocked {
+            nativeSelectedTab = "timer"
+            return
+        }
+
+        // Timer tab: show the lock screen
+        if tab == "timer" {
+            showingReader = false
+            showingDashboard = false
+            nativeSelectedTab = "timer"
+            SessionLimitManager.shared.notifyTabChange(to: "timer")
+            return
+        }
+
         if tab != "book" {
             showingBookReaderSettings = false
         }
@@ -59,6 +74,7 @@ extension InstagramView {
             showingDashboard = false
             profileMode = .instagram
             nativeSelectedTab = "book"
+            SessionLimitManager.shared.notifyTabChange(to: "book")
             return
         }
 
@@ -67,6 +83,7 @@ extension InstagramView {
             showingDashboard = true
             profileMode = .stopScroll
             nativeSelectedTab = "profile"
+            SessionLimitManager.shared.notifyTabChange(to: "dashboard")
             return
         }
 
@@ -88,6 +105,7 @@ extension InstagramView {
             activeSurface = .main
             profileMode = .instagram
             nativeSelectedTab = "home"
+            SessionLimitManager.shared.notifyTabChange(to: "home")
             LogManager.shared.log("→ Home: activeSurface = main", category: "Navigation", level: .debug)
             return
         }
@@ -109,6 +127,7 @@ extension InstagramView {
         ensureSurfaceAvailable(targetSurface)
         activeSurface = targetSurface
         nativeSelectedTab = tab
+        SessionLimitManager.shared.notifyTabChange(to: tab)
         LogManager.shared.log("→ Target surface: \(targetSurface), URL: \(targetURL)", category: "Navigation", level: .debug)
 
         switch targetSurface {
