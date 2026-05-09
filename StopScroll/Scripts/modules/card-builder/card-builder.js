@@ -324,8 +324,8 @@
     card.setAttribute('data-ss-theme-text', colors.text);
     // Border color adapts to background luminance
     var borderColor = isDarkColor(colors.bg) ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
-    // Header: first child
-    var header = card.children[0];
+    // Header: look up by attribute instead of children[0] (topLine is now children[0])
+    var header = card.querySelector('[data-ss-card-header]');
     if (header) {
       header.style.borderBottom = '1px solid ' + borderColor;
       header.style.color = colors.text;

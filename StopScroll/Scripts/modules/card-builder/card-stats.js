@@ -68,12 +68,9 @@
       'padding:20px 22px 10px', 'text-align:center', 'gap:16px'
     ].join(';');
 
-    var accentBar = document.createElement('div');
-    accentBar.style.cssText = 'width:36px;height:3px;border-radius:2px;background:' + accent;
-
     var titleEl = document.createElement('div');
     titleEl.textContent = t.stats_title || 'Your session';
-    titleEl.style.cssText = 'font-size:19px;font-weight:700;line-height:1.25;letter-spacing:0.1px';
+    titleEl.style.cssText = 'font-size:22px;font-weight:800;line-height:1.2;letter-spacing:-0.4px;color:#ffffff';
 
     var grid = document.createElement('div');
     grid.style.cssText = 'display:flex;gap:12px;width:100%;justify-content:center';
@@ -101,7 +98,6 @@
       grid.appendChild(cell);
     });
 
-    content.appendChild(accentBar);
     content.appendChild(titleEl);
     content.appendChild(grid);
 
