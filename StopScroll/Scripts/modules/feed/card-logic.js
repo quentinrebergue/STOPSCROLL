@@ -3,7 +3,7 @@
   'use strict';
 
   var ns = (global.StopScroll = global.StopScroll || {});
-  var TYPES = ['metrics', 'mood', 'timer', 'stop', 'stats', 'book', 'culture'];
+  var TYPES = ['mood', 'timer', 'stop', 'stats', 'book', 'culture'];
 
   // Rolling history of last shown card types (most recent first)
   var _history = [];

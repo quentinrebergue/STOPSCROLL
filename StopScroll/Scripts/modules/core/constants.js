@@ -35,7 +35,7 @@
             },
             cards: {
                 every_n_opportunities: 1,
-                metrics: { enabled: true, weight: 20 },
+                metrics: { enabled: false, weight: 0 },
                 mood:    { enabled: true, weight: 15 },
                 timer:   { enabled: true, weight: 10 },
                 stop:    { enabled: true, weight: 30 },

@@ -75,8 +75,16 @@
     ].join(';');
 
     var titleEl = document.createElement('div');
-    titleEl.textContent = t.stats_title || 'Your session';
+    titleEl.textContent = isReel
+      ? (t.stats_reel_title || 'Reel session')
+      : (t.stats_title || 'Your session');
     titleEl.style.cssText = 'font-size:22px;font-weight:800;line-height:1.2;letter-spacing:-0.4px;color:#ffffff';
+
+    var subtitleEl = document.createElement('div');
+    subtitleEl.textContent = isReel
+      ? (t.stats_reel_subtitle || 'Here\'s how long you\'ve been watching reels.')
+      : (t.stats_subtitle || 'Here\'s a snapshot of this scroll session.');
+    subtitleEl.style.cssText = 'font-size:13px;color:rgba(244,246,250,0.6);line-height:1.4;text-align:center';
 
     var grid = document.createElement('div');
     grid.style.cssText = 'display:flex;gap:12px;width:100%;justify-content:center';
@@ -88,8 +96,7 @@
         ]
       : [
           { value: formatTime(stats.sessionSeconds), label: t.stats_label_time  || 'scrolling' },
-          { value: String(stats.posts),              label: t.stats_label_posts || 'posts seen' },
-          { value: String(stats.ads),                label: t.stats_label_ads   || 'ads seen' }
+          { value: String(stats.posts),              label: t.stats_label_posts || 'posts seen' }
         ];
 
     statItems.forEach(function (item) {
@@ -110,10 +117,13 @@
     });
 
     content.appendChild(titleEl);
+    content.appendChild(subtitleEl);
     content.appendChild(grid);
 
-    var row = document.createElement('div');
-    row.style.cssText = 'padding:0 14px 14px';
+    var btnWrap = document.createElement('div');
+    btnWrap.style.cssText = 'padding:0 14px 14px';
+    var openBtn = cb.makeButton('Open reader', accent, function () { ns.dom.postToNative('stats-open-reader'); });
+    btnWrap.appendChild(openBtn);
 
     var actionBar = document.createElement('div');
     actionBar.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:10px 14px 12px;border-top:1px solid rgba(255,255,255,0.07)';
@@ -129,7 +139,7 @@
 
     post.appendChild(header);
     post.appendChild(content);
-    post.appendChild(row);
+    post.appendChild(btnWrap);
     post.appendChild(actionBar);
 
     return post;

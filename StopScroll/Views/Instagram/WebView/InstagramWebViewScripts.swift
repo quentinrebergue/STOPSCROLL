@@ -148,7 +148,7 @@ extension InstagramWebView {
             }
 
             function buildAvailableCards(cfg) {
-                var types = ['metrics', 'mood', 'timer', 'stop', 'stats', 'book', 'culture'];
+                var types = ['mood', 'timer', 'stop', 'stats', 'book', 'culture'];
                 var out = [];
                 for (var i = 0; i < types.length; i++) {
                     var t = types[i];
@@ -390,7 +390,6 @@ extension InstagramWebView {
                         if (container.getAttribute('data-ss-reel-replaced')) return;
                         // Signal reel surface so card-stats.js shows reel-specific data
                         window.__STOPSCROLL_SURFACE = 'reels';
-                        if (ns.sessionStats && ns.sessionStats.trackReel) { ns.sessionStats.trackReel(); }
                         var feedCard = ns.cardBuilder.buildCardFor(nativeCard.type, cfg, nativeCard);
                         if (!feedCard) return;
                         injectReelChrome(container, feedCard);
@@ -430,6 +429,11 @@ extension InstagramWebView {
                 if (!id || _seen[id]) return;
                 _seen[id] = true;
                 _count++;
+                // Count every reel viewed for the session stats card
+                try {
+                    var ss = window.StopScroll;
+                    if (ss && ss.sessionStats && ss.sessionStats.trackReel) { ss.sessionStats.trackReel(); }
+                } catch(_e) {}
                 try { webkit.messageHandlers.stopScrollBridge.postMessage({ type: 'reelViewed' }); } catch(_e) {}
                 if (_count % FREQ === 0) { tryInjectNext(); }
             }

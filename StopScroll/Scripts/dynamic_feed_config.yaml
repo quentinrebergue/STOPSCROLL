@@ -5,7 +5,7 @@ feed_injection:
 cards:
   every_n_opportunities: 8
   metrics:
-    enabled: true
+    enabled: false
     weight: 20
   mood:
     enabled: true
