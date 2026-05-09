@@ -25,12 +25,17 @@ StopScroll combine 2 couches:
 5. Les actions utilisateur passent par le bridge `stopScrollBridge`.
 6. Swift traite l action (ex: fetch article, open reader) puis reinjecte les donnees vers JS.
 
+Mise a jour (2026-05-08):
+- le choix de type de carte passe prioritairement par une decision native Swift (`requestCardForOpportunity`), puis JS injecte la carte.
+- en cas d indisponibilite bridge/timeout, JS conserve un fallback legacy local (`card-logic.js`) pour eviter les trous visuels.
+
 ## 3. Bridge natif <-> web
 
 ### JS -> Swift
 
 - Handler `openBookReader`: ouvre le lecteur
 - Handler `stopScrollBridge`: messages structures (`openArticle`, `fetchGuardianArticle`, `setTimer`, `openSettings`, `openDashboard`, etc.)
+- nouveau message `requestCardForOpportunity`: JS demande a Swift une decision de carte versionnee.
 
 Format bridge v1 (enveloppe unifiee):
 - `{ v: 1, id: string, type: string, payload: object, ts: number }`
@@ -51,6 +56,9 @@ Format bridge v1 (enveloppe unifiee):
 - Reponse bridge native (ack/erreur):
   - `window.StopScroll.dom._onNativeBridgeResult({ ok, requestId, type, code?, message?, ts })`
 
+- Reponse decision carte (payload versionne):
+  - `{ contractVersion: 1, decision: 'inject' | 'skip', reason: string, card?: { schemaVersion: 1, renderMode: 'legacy-builder-v1', type: string, content: object, meta: object } }`
+
 ## 4. Sous-systemes importants
 
 ### 4.1 Injection feed
@@ -59,7 +67,8 @@ Format bridge v1 (enveloppe unifiee):
   - `modules/ad-detection.js`
   - labels sponsorises + heuristiques follow/suggested
 - Choix carte:
-  - `modules/card-logic.js` (weighted random + anti-repetition)
+  - priorite native Swift via bridge `requestCardForOpportunity`
+  - fallback JS `modules/card-logic.js` (weighted random + anti-repetition)
 - Injection:
   - `modules/card-injection.js`
 

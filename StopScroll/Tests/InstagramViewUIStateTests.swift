@@ -80,51 +80,6 @@ final class InstagramViewUIStateTests: XCTestCase {
         XCTAssertFalse(mainWebViewVisible, "WebView ne doit pas être visible quand Dashboard est ouvert")
     }
 
-    /// **Test 7**: Configuration 3-WebView - le switch vers search devrait charger la bonne URL
-    func testThreeWebViewSearchRoute() {
-        // Simule le routage en mode 3 WebViews
-        let webViewCount = 3
-        let targetTab = "search"
-
-        let surfaceFor3: (String) -> String = { tab in
-            switch webViewCount {
-            case 1: return "main"
-            case 2: return tab == "home" ? "main" : "messages"
-            case 3:
-                if tab == "home" { return "main" }
-                if tab == "search" { return "search" }
-                return "messages"  // messages + profile partagées
-            default: return "main"
-            }
-        }
-
-        let targetSurface = surfaceFor3(targetTab)
-        XCTAssertEqual(targetSurface, "search", "Mode 3: search devrait être routé vers surface dedicate search")
-    }
-
-    /// **Test 8**: Configuration 3-WebView - profile et messages partagent la même surface
-    func testThreeWebViewProfileAndMessagesShared() {
-        let webViewCount = 3
-        
-        let surfaceFor3: (String) -> String = { tab in
-            switch webViewCount {
-            case 1: return "main"
-            case 2: return tab == "home" ? "main" : "messages"
-            case 3:
-                if tab == "home" { return "main" }
-                if tab == "search" { return "search" }
-                return "messages"  // messages + profile partagées
-            default: return "main"
-            }
-        }
-
-        let messagesSurface = surfaceFor3("messages")
-        let profileSurface = surfaceFor3("profile")
-
-        XCTAssertEqual(messagesSurface, profileSurface, "Mode 3: messages et profile doivent partager la même surface")
-        XCTAssertEqual(messagesSurface, "messages", "Mode 3: surface partagée doit être 'messages'")
-    }
-
     /// **Test 9**: LoadingBar cachée si Settings est ouvert
     func testLoadingBarHiddenWhenSettingsOpen() {
         let isActiveSurfaceLoading = true
@@ -178,7 +133,7 @@ final class InstagramViewUIStateTests: XCTestCase {
     func testRefreshPolicy_lazyReloadTargetsExcludeSourceSurface() {
         let targets = WebRefreshPolicy.lazyReloadTargets(excluding: .profile)
 
-        XCTAssertEqual(targets, Set([.main, .messages, .search]))
+        XCTAssertEqual(targets, Set([.main, .messages, .search, .reels]))
         XCTAssertFalse(targets.contains(.profile))
     }
 
@@ -190,12 +145,13 @@ final class InstagramViewUIStateTests: XCTestCase {
         XCTAssertFalse(WebRefreshPolicy.shouldConsumeLazyReload(for: .main, pendingSurfaces: pending))
     }
 
-    /// **Test 16**: Le swipe horizontal suit l'ordre de la native navbar, y compris BookReader et Dashboard.
+    /// **Test 16**: Le swipe horizontal suit l'ordre de la native navbar, reels inclus.
     func testNativeTabLayoutUsesNavbarAdjacency() {
         XCTAssertEqual(NativeTabLayout.adjacentTab(to: "messages", swipeTranslation: 140), "book")
-        XCTAssertEqual(NativeTabLayout.adjacentTab(to: "messages", swipeTranslation: -140), "dashboard")
-        XCTAssertEqual(NativeTabLayout.adjacentTab(to: "dashboard", swipeTranslation: 140), "messages")
-        XCTAssertEqual(NativeTabLayout.adjacentTab(to: "dashboard", swipeTranslation: -140), "profile")
+        XCTAssertEqual(NativeTabLayout.adjacentTab(to: "messages", swipeTranslation: -140), "profile")
+        XCTAssertEqual(NativeTabLayout.adjacentTab(to: "profile", swipeTranslation: 140), "messages")
+        XCTAssertEqual(NativeTabLayout.adjacentTab(to: "search", swipeTranslation: -140), "reels")
+        XCTAssertEqual(NativeTabLayout.adjacentTab(to: "reels", swipeTranslation: 140), "search")
     }
 
     /// **Test 17**: Aucun swipe ne doit sortir des bornes de la navbar.
@@ -229,7 +185,8 @@ final class InstagramViewUIStateTests: XCTestCase {
 
     /// **Test 20b**: En messages, le recognizer doit rester strict pour ne pas casser le scroll chat.
     func testHorizontalSwipeRecognizerPolicy_messagesPrioritizesVerticalScroll() {
-        XCTAssertFalse(HorizontalSwipeRecognizerPolicy.shouldAllowSectionSwipe(activeTab: "messages"))
+        XCTAssertTrue(HorizontalSwipeRecognizerPolicy.shouldAllowSectionSwipe(activeTab: "messages"))
+        XCTAssertTrue(HorizontalSwipeRecognizerPolicy.shouldAllowSectionSwipe(activeTab: "home"))
         XCTAssertTrue(HorizontalSwipeRecognizerPolicy.shouldAllowSectionSwipe(activeTab: "search"))
         XCTAssertFalse(HorizontalSwipeRecognizerPolicy.shouldBegin(velocityX: 180, velocityY: 120, activeTab: "messages"))
         XCTAssertTrue(HorizontalSwipeRecognizerPolicy.shouldBegin(velocityX: 420, velocityY: 40, activeTab: "messages"))
@@ -301,10 +258,18 @@ final class InstagramViewUIStateTests: XCTestCase {
         XCTAssertEqual(nativeNavCommandToken, 1)
     }
 
-    /// **Test 20e**: Messages section swipe is fully disabled at policy level.
+    /// **Test 20e**: Messages section swipe is allowed (each surface has its own WebView).
     func testMessagesSectionSwipeIsExplicitlyDisabled() {
-        XCTAssertFalse(HorizontalSwipeRecognizerPolicy.shouldAllowSectionSwipe(activeTab: "messages"))
+        XCTAssertTrue(HorizontalSwipeRecognizerPolicy.shouldAllowSectionSwipe(activeTab: "messages"))
         XCTAssertTrue(HorizontalSwipeRecognizerPolicy.shouldAllowSectionSwipe(activeTab: "home"))
+    }
+
+    /// **Test 20f**: En home, le swipe inter-section doit demander une intention forte.
+    func testHorizontalSwipeRecognizerPolicy_homeRequiresStrongerIntent() {
+        XCTAssertFalse(HorizontalSwipeRecognizerPolicy.shouldBegin(velocityX: 220, velocityY: 40, activeTab: "home"))
+        XCTAssertTrue(HorizontalSwipeRecognizerPolicy.shouldBegin(velocityX: 420, velocityY: 60, activeTab: "home"))
+        XCTAssertFalse(HorizontalSwipeRecognizerPolicy.shouldTrackDrag(translationX: 24, translationY: 4, activeTab: "home"))
+        XCTAssertTrue(HorizontalSwipeRecognizerPolicy.shouldTrackDrag(translationX: 42, translationY: 8, activeTab: "home"))
     }
 
     /// **Test 21**: Le preview de swipe anime la page cible depuis le bord oppose.
@@ -313,12 +278,11 @@ final class InstagramViewUIStateTests: XCTestCase {
         XCTAssertEqual(HorizontalSwipeAnimation.previewTargetOffset(translation: 120, pageWidth: 390), -270)
     }
 
-    /// **Test 22**: En mode multi-webview, la section visible suit la surface active, pas le tab sync JS.
+    /// **Test 22**: La section visible suit la surface active.
     func testVisibleSectionPolicy_usesActiveSurfaceInMultiWebViewMode() {
         let tab = VisibleSectionPolicy.currentTab(
             showingReader: false,
             showingDashboard: false,
-            normalizedWebViewCount: 4,
             nativeSelectedTab: "home",
             activeSurface: .profile
         )

@@ -73,83 +73,34 @@ final class XPProgressExtendedTests: XCTestCase {
 }
 
 // MARK: - SurfaceRouter Tests
-// Regression: correct surface assigned per tab in each WebView mode (1-4).
+// Each Instagram tab always maps to its own dedicated WebSurface (1:1 routing).
 
 final class SurfaceRouterTests: XCTestCase {
 
-    // Mode 1: everything on main
-    func testMode1AllTabsOnMain() {
-        for tab in ["home", "search", "messages", "profile"] {
-            XCTAssertEqual(SurfaceRouter.surface(for: tab, webViewCount: 1), .main,
-                           "Mode 1: \(tab) should always be .main")
-        }
+    func testHomeIsMain() {
+        XCTAssertEqual(SurfaceRouter.surface(for: "home"), .main)
     }
 
-    // Mode 2: home → main, others → messages (shared secondary)
-    func testMode2HomeIsMain() {
-        XCTAssertEqual(SurfaceRouter.surface(for: "home", webViewCount: 2), .main)
+    func testSearchIsSearch() {
+        XCTAssertEqual(SurfaceRouter.surface(for: "search"), .search)
     }
 
-    func testMode2SearchIsMessages() {
-        XCTAssertEqual(SurfaceRouter.surface(for: "search", webViewCount: 2), .messages)
+    func testReelsIsReels() {
+        XCTAssertEqual(SurfaceRouter.surface(for: "reels"), .reels)
     }
 
-    func testMode2MessagesIsMessages() {
-        XCTAssertEqual(SurfaceRouter.surface(for: "messages", webViewCount: 2), .messages)
+    func testMessagesIsMessages() {
+        XCTAssertEqual(SurfaceRouter.surface(for: "messages"), .messages)
     }
 
-    func testMode2ProfileIsMessages() {
-        XCTAssertEqual(SurfaceRouter.surface(for: "profile", webViewCount: 2), .messages)
-    }
-
-    // Mode 3: home → main, search → search, messages + profile → messages
-    func testMode3HomeIsMain() {
-        XCTAssertEqual(SurfaceRouter.surface(for: "home", webViewCount: 3), .main)
-    }
-
-    func testMode3SearchIsSearch() {
-        XCTAssertEqual(SurfaceRouter.surface(for: "search", webViewCount: 3), .search)
-    }
-
-    func testMode3MessagesIsMessages() {
-        XCTAssertEqual(SurfaceRouter.surface(for: "messages", webViewCount: 3), .messages)
-    }
-
-    func testMode3ProfileSharesMessages() {
-        // Regression: profile uses the messages surface in mode 3
-        XCTAssertEqual(SurfaceRouter.surface(for: "profile", webViewCount: 3), .messages)
-    }
-
-    // Mode 4: each tab has its own surface
-    func testMode4HomeIsMain() {
-        XCTAssertEqual(SurfaceRouter.surface(for: "home", webViewCount: 4), .main)
-    }
-
-    func testMode4SearchIsSearch() {
-        XCTAssertEqual(SurfaceRouter.surface(for: "search", webViewCount: 4), .search)
-    }
-
-    func testMode4MessagesIsMessages() {
-        XCTAssertEqual(SurfaceRouter.surface(for: "messages", webViewCount: 4), .messages)
-    }
-
-    func testMode4ProfileIsProfile() {
-        XCTAssertEqual(SurfaceRouter.surface(for: "profile", webViewCount: 4), .profile)
-    }
-
-    // Edge cases: out-of-range counts clamp to 1 or 4
-    func testWebViewCountBelowOneClampsToOne() {
-        XCTAssertEqual(SurfaceRouter.surface(for: "search", webViewCount: 0), .main)
-    }
-
-    func testWebViewCountAboveFourClampsToFour() {
-        XCTAssertEqual(SurfaceRouter.surface(for: "profile", webViewCount: 99), .profile)
+    func testProfileIsProfile() {
+        XCTAssertEqual(SurfaceRouter.surface(for: "profile"), .profile)
     }
 
     // Unknown tab falls back to main
     func testUnknownTabFallsBackToMain() {
-        XCTAssertEqual(SurfaceRouter.surface(for: "reels", webViewCount: 3), .main)
-        XCTAssertEqual(SurfaceRouter.surface(for: "", webViewCount: 3), .main)
+        XCTAssertEqual(SurfaceRouter.surface(for: "unknown_surface"), .main)
+        XCTAssertEqual(SurfaceRouter.surface(for: ""), .main)
     }
 }
 
@@ -169,6 +120,13 @@ final class InstagramSecondaryRouteExtendedTests: XCTestCase {
         XCTAssertEqual(
             InstagramSecondaryRoute.url(for: "search", username: ""),
             "https://www.instagram.com/explore/"
+        )
+    }
+
+    func testReelsURL() {
+        XCTAssertEqual(
+            InstagramSecondaryRoute.url(for: "reels", username: ""),
+            "https://www.instagram.com/reels/"
         )
     }
 
@@ -214,7 +172,7 @@ final class InstagramSecondaryRouteExtendedTests: XCTestCase {
     }
 
     func testUnknownTabReturnsNil() {
-        XCTAssertNil(InstagramSecondaryRoute.url(for: "reels", username: ""))
+        XCTAssertNil(InstagramSecondaryRoute.url(for: "not-a-tab", username: ""))
     }
 }
 
@@ -244,31 +202,31 @@ final class ScriptProfileTests: XCTestCase {
                       ".full must include card-injection")
     }
 
-    // .reelBlocker must ONLY include the 4 essential scripts
-    func testReelBlockerProfileHasFourScripts() {
-        XCTAssertEqual(InstagramWebView.reelBlockerScripts.count, 4,
-                       "reelBlockerScripts count changed — update if intentional")
+    // .searchLite must ONLY include the 4 essential scripts
+    func testSearchLiteProfileHasFourScripts() {
+        XCTAssertEqual(InstagramWebView.searchLiteScripts.count, 4,
+                       "searchLiteScripts count changed — update if intentional")
     }
 
-    func testReelBlockerContainsScrollLock() {
-        XCTAssertTrue(InstagramWebView.reelBlockerScripts.contains("scroll-lock"),
-                      ".reelBlocker must include scroll-lock")
+    func testSearchLiteContainsScrollLock() {
+        XCTAssertTrue(InstagramWebView.searchLiteScripts.contains("scroll-lock"),
+                      ".searchLite must include scroll-lock")
     }
 
-    func testReelBlockerContainsPageManager() {
-        XCTAssertTrue(InstagramWebView.reelBlockerScripts.contains("page-manager"),
-                      ".reelBlocker must include page-manager")
+    func testSearchLiteContainsPageManager() {
+        XCTAssertTrue(InstagramWebView.searchLiteScripts.contains("page-manager"),
+                      ".searchLite must include page-manager")
     }
 
-    func testReelBlockerDoesNotContainCardInjection() {
+    func testSearchLiteDoesNotContainCardInjection() {
         // Regression: secondary surfaces must NOT inject cards
-        XCTAssertFalse(InstagramWebView.reelBlockerScripts.contains("card-injection"),
-                       ".reelBlocker must NOT include card-injection")
+        XCTAssertFalse(InstagramWebView.searchLiteScripts.contains("card-injection"),
+                       ".searchLite must NOT include card-injection")
     }
 
-    func testReelBlockerDoesNotContainAdDetection() {
-        XCTAssertFalse(InstagramWebView.reelBlockerScripts.contains("ad-detection"),
-                       ".reelBlocker must NOT include ad-detection")
+    func testSearchLiteDoesNotContainAdDetection() {
+        XCTAssertFalse(InstagramWebView.searchLiteScripts.contains("ad-detection"),
+                       ".searchLite must NOT include ad-detection")
     }
 
     // .none must be empty
@@ -289,15 +247,60 @@ final class ScriptProfileTests: XCTestCase {
     }
 
     // Profiles must not share scripts that belong exclusively to .full
-    func testReelBlockerDoesNotOverlapFullOnlyModules() {
+    func testSearchLiteDoesNotOverlapFullOnlyModules() {
         let fullOnlyModules: Set<String> = [
             "card-injection", "ad-detection", "card-builder", "card-logic",
             "card-culture", "card-book", "card-mood", "card-timer", "card-stop",
             "card-stats", "card-metrics", "card-builder-helpers", "wikipedia",
             "guardian", "session-stats", "tracking",
         ]
-        let overlap = fullOnlyModules.intersection(InstagramWebView.reelBlockerScripts)
+        let overlap = fullOnlyModules.intersection(InstagramWebView.searchLiteScripts)
         XCTAssertTrue(overlap.isEmpty,
-                      ".reelBlocker must not include full-only modules: \(overlap)")
+                      ".searchLite must not include full-only modules: \(overlap)")
+    }
+}
+
+// MARK: - Native Card Decision Contract Tests
+
+final class NativeCardDecisionContractTests: XCTestCase {
+
+    override func setUp() {
+        super.setUp()
+        InstagramWebView.Coordinator.resetNativeCardDecisionHistoryForTests()
+    }
+
+    func testNativeDecisionSkipsWhenFrequencyGateNotReached() {
+        let payload: [String: Any] = [
+            "opportunityIndex": 1,
+            "frequency": 3,
+            "availableCards": [
+                ["type": "metrics", "weight": 1.0]
+            ]
+        ]
+
+        let result = InstagramWebView.Coordinator.makeCardDecisionPayload(from: payload, defaultFrequency: 1)
+
+        XCTAssertEqual(result["contractVersion"] as? Int, 1)
+        XCTAssertEqual(result["decision"] as? String, "skip")
+        XCTAssertEqual(result["reason"] as? String, "frequency_gate")
+    }
+
+    func testNativeDecisionInjectsSingleEligibleCardWithVersionedContract() {
+        let payload: [String: Any] = [
+            "opportunityIndex": 2,
+            "frequency": 2,
+            "availableCards": [
+                ["type": "culture", "weight": 3.0]
+            ]
+        ]
+
+        let result = InstagramWebView.Coordinator.makeCardDecisionPayload(from: payload, defaultFrequency: 1)
+        let card = result["card"] as? [String: Any]
+
+        XCTAssertEqual(result["contractVersion"] as? Int, 1)
+        XCTAssertEqual(result["decision"] as? String, "inject")
+        XCTAssertEqual(card?["schemaVersion"] as? Int, 1)
+        XCTAssertEqual(card?["renderMode"] as? String, "legacy-builder-v1")
+        XCTAssertEqual(card?["type"] as? String, "culture")
     }
 }

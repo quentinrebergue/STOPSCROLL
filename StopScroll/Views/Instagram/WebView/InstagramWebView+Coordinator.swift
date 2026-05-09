@@ -31,9 +31,28 @@ extension InstagramWebView {
         var lastNativeNavCommandToken: Int
         var lastRequestedURLToken: Int
         var lastIsActive: Bool
+        var lastGovernorSignature: String
         var didSendInitialActiveNavCommand: Bool
         private var horizontalPanRecognizer: UIPanGestureRecognizer?
         private var isLockingScrollForHorizontalSwipe = false
+        private var lastMessagesDiagnosticsPath = ""
+        private var isKeyboardVisible = false
+        private var keyboardObserversInstalled = false
+        private var appDidBecomeActiveObserver: NSObjectProtocol?
+        private var thermalStateObserver: NSObjectProtocol?
+        private var powerStateObserver: NSObjectProtocol?
+
+        private static func isMessagesThreadPath(_ path: String) -> Bool {
+            let normalized = path.hasSuffix("/") && path.count > 1 ? String(path.dropLast()) : path
+            return normalized.hasPrefix("/direct/t/")
+        }
+
+        private func currentMessagesPath() -> String {
+            if let path = webView?.url?.path, !path.isEmpty {
+                return path
+            }
+            return lastMessagesDiagnosticsPath
+        }
 
         init(_ parent: InstagramWebView) {
             self.parent = parent
@@ -46,7 +65,47 @@ extension InstagramWebView {
             // This is important for lazily created secondary surfaces.
             self.lastRequestedURLToken = Int.min
             self.lastIsActive = parent.isActive
+            self.lastGovernorSignature = ""
             self.didSendInitialActiveNavCommand = false
+
+            super.init()
+
+            self.appDidBecomeActiveObserver = NotificationCenter.default.addObserver(
+                forName: UIApplication.didBecomeActiveNotification,
+                object: nil,
+                queue: .main
+            ) { [weak self] _ in
+                self?.syncNativeTimerStateToWebView(markExpiredIfNeeded: true)
+                self?.applyRuntimeGovernorIfNeeded(force: true)
+            }
+
+            self.thermalStateObserver = NotificationCenter.default.addObserver(
+                forName: ProcessInfo.thermalStateDidChangeNotification,
+                object: nil,
+                queue: .main
+            ) { [weak self] _ in
+                self?.applyRuntimeGovernorIfNeeded(force: true)
+            }
+
+            self.powerStateObserver = NotificationCenter.default.addObserver(
+                forName: Notification.Name.NSProcessInfoPowerStateDidChange,
+                object: nil,
+                queue: .main
+            ) { [weak self] _ in
+                self?.applyRuntimeGovernorIfNeeded(force: true)
+            }
+        }
+
+        deinit {
+            if let appDidBecomeActiveObserver {
+                NotificationCenter.default.removeObserver(appDidBecomeActiveObserver)
+            }
+            if let thermalStateObserver {
+                NotificationCenter.default.removeObserver(thermalStateObserver)
+            }
+            if let powerStateObserver {
+                NotificationCenter.default.removeObserver(powerStateObserver)
+            }
         }
 
         func installHorizontalPanRecognizer(on webView: WKWebView) {
@@ -54,10 +113,10 @@ extension InstagramWebView {
             let recognizer = UIPanGestureRecognizer(target: self, action: #selector(handleHorizontalPan(_:)))
             recognizer.delegate = self
             recognizer.maximumNumberOfTouches = 1
-            recognizer.cancelsTouchesInView = true
+            recognizer.cancelsTouchesInView = false
             webView.addGestureRecognizer(recognizer)
-            webView.scrollView.panGestureRecognizer.require(toFail: recognizer)
             horizontalPanRecognizer = recognizer
+            installKeyboardObserversIfNeeded()
         }
 
         func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
@@ -65,7 +124,9 @@ extension InstagramWebView {
                   let pan = gestureRecognizer as? UIPanGestureRecognizer,
                   parent.allowsHorizontalSurfaceSwipe,
                   parent.isActive,
-                HorizontalSwipeRecognizerPolicy.shouldAllowSectionSwipe(activeTab: parent.activeSectionTab),
+                HorizontalSwipeRecognizerPolicy.shouldAllowSectionSwipe(
+                    activeTab: parent.activeSectionTab
+                ),
                   !parent.showingReader,
                   !parent.showingDashboard,
                   !parent.showingSettings else {
@@ -73,6 +134,25 @@ extension InstagramWebView {
             }
 
             let velocity = pan.velocity(in: pan.view)
+
+            if parent.activeSectionTab == "messages",
+               let view = pan.view {
+                if isKeyboardVisible {
+                    return false
+                }
+
+                if Self.isMessagesThreadPath(currentMessagesPath()) {
+                    return false
+                }
+
+                let location = pan.location(in: view)
+                let edgeZone: CGFloat = 24
+                let isEdgeSwipe = location.x <= edgeZone || location.x >= (view.bounds.width - edgeZone)
+                if !isEdgeSwipe {
+                    return false
+                }
+            }
+
             let shouldBegin = HorizontalSwipeRecognizerPolicy.shouldBegin(
                 velocityX: velocity.x,
                 velocityY: velocity.y,
@@ -89,7 +169,9 @@ extension InstagramWebView {
         @objc private func handleHorizontalPan(_ recognizer: UIPanGestureRecognizer) {
             guard parent.allowsHorizontalSurfaceSwipe,
                   parent.isActive,
-                HorizontalSwipeRecognizerPolicy.shouldAllowSectionSwipe(activeTab: parent.activeSectionTab),
+                  HorizontalSwipeRecognizerPolicy.shouldAllowSectionSwipe(
+                      activeTab: parent.activeSectionTab
+                  ),
                   !parent.showingReader,
                   !parent.showingDashboard,
                   !parent.showingSettings else {
@@ -129,6 +211,42 @@ extension InstagramWebView {
             guard shouldLock != isLockingScrollForHorizontalSwipe else { return }
             isLockingScrollForHorizontalSwipe = shouldLock
             webView?.scrollView.isScrollEnabled = !shouldLock
+        }
+
+        private func installKeyboardObserversIfNeeded() {
+            guard !keyboardObserversInstalled else { return }
+            keyboardObserversInstalled = true
+
+            NotificationCenter.default.addObserver(
+                forName: UIResponder.keyboardWillShowNotification,
+                object: nil,
+                queue: .main
+            ) { [weak self] _ in
+                self?.isKeyboardVisible = true
+            }
+
+            NotificationCenter.default.addObserver(
+                forName: UIResponder.keyboardWillHideNotification,
+                object: nil,
+                queue: .main
+            ) { [weak self] _ in
+                self?.isKeyboardVisible = false
+            }
+        }
+
+        func logMessagesDiagnosticsIfNeeded() {
+            guard AppSettings.shared.devMode,
+                parent.activeSectionTab == "messages",
+                  parent.isActive,
+                  let webView else { return }
+
+            webView.evaluateJavaScript("window.location && window.location.pathname") { value, _ in
+                let path = (value as? String) ?? ""
+                guard !path.isEmpty, path != self.lastMessagesDiagnosticsPath else { return }
+                self.lastMessagesDiagnosticsPath = path
+
+                webView.evaluateJavaScript(InstagramWebView.messagesDiagnosticsScript())
+            }
         }
     }
 }

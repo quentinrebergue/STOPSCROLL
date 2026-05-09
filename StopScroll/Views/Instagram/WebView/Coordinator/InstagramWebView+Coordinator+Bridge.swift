@@ -3,6 +3,10 @@ import UserNotifications
 import WebKit
 
 extension InstagramWebView.Coordinator {
+    private static let nativeCardHistoryLimit = 5
+    private static var nativeCardHistory: [String] = []
+    private static let nativeCardHistoryQueue = DispatchQueue(label: "StopScroll.NativeCardDecisionHistory")
+
     func sendNativeNavigationCommand(tab: String, onlyIfActive: Bool) {
         if onlyIfActive && !parent.isActive { return }
         if !parent.handlesInstagramNavigation { return }
@@ -10,14 +14,85 @@ extension InstagramWebView.Coordinator {
         let escapedTab = tab
             .replacingOccurrences(of: "\\", with: "\\\\")
             .replacingOccurrences(of: "'", with: "\\'")
-        let script = "(function(){var ns=window.StopScroll;if(ns&&ns.nav&&ns.nav.nativeNavigateToTab){ns.nav.nativeNavigateToTab('\(escapedTab)');}})();"
+        let script = """
+        (function(){
+            var targetTab = '\(escapedTab)';
+            var ns = window.StopScroll;
+            if (ns && ns.nav && ns.nav.nativeNavigateToTab) {
+                ns.nav.nativeNavigateToTab(targetTab);
+                return;
+            }
+
+            function normalizePath(path) {
+                if (!path) return '/';
+                var p = String(path).split('?')[0].split('#')[0];
+                if (p.length > 1 && p.charAt(p.length - 1) === '/') {
+                    p = p.slice(0, -1);
+                }
+                return p || '/';
+            }
+
+            function detectCurrentTab() {
+                var path = normalizePath(window.location && window.location.pathname);
+                if (path === '/') return 'home';
+                if (path.indexOf('/explore') === 0) return 'search';
+                if (path.indexOf('/reels') === 0) return 'reels';
+                if (path.indexOf('/direct') === 0) return 'messages';
+                if (path.indexOf('/accounts') === 0 || path.indexOf('/settings') === 0) return 'profile';
+                return 'home';
+            }
+
+            function readVerticalOffset() {
+                var scrolling = document.scrollingElement || document.documentElement || document.body;
+                var winOffset = typeof window.scrollY === 'number' ? window.scrollY : 0;
+                var nodeOffset = scrolling && typeof scrolling.scrollTop === 'number' ? scrolling.scrollTop : 0;
+                return Math.max(winOffset, nodeOffset, 0);
+            }
+
+            function scrollToTop() {
+                try {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                } catch (_) {
+                    try { window.scrollTo(0, 0); } catch (_) {}
+                }
+                var scrolling = document.scrollingElement || document.documentElement || document.body;
+                if (scrolling && typeof scrolling.scrollTop === 'number') {
+                    scrolling.scrollTop = 0;
+                }
+            }
+
+            var current = detectCurrentTab();
+            var supportsRetap = targetTab === 'home' || targetTab === 'search' || targetTab === 'reels';
+            if (supportsRetap && current === targetTab) {
+                if (readVerticalOffset() > 8) {
+                    scrollToTop();
+                } else {
+                    window.location.reload();
+                }
+                return;
+            }
+
+            if (targetTab === 'home') {
+                window.location.href = '/';
+                return;
+            }
+            if (targetTab === 'search') {
+                window.location.href = '/explore/';
+                return;
+            }
+            if (targetTab === 'reels') {
+                window.location.href = '/reels/';
+                return;
+            }
+        })();
+        """
         webView?.evaluateJavaScript(script)
     }
 
     func userContentController(_ controller: WKUserContentController, didReceive message: WKScriptMessage) {
         switch message.name {
         case "openBookReader":
-            DispatchQueue.main.async { self.parent.showingReader = true }
+            handleOpenBookReaderMessage(message.body)
         case "stopScrollBridge":
             handleBridgeMessage(message.body)
         default:
@@ -42,6 +117,21 @@ extension InstagramWebView.Coordinator {
 
         let requestId = dict["id"] as? String
         let payload = (dict["payload"] as? [String: Any]) ?? dict
+
+        if type == "requestCardForOpportunity" || type == "cardRequest" {
+            let decisionPayload = Self.makeCardDecisionPayload(
+                from: payload,
+                defaultFrequency: AppSettings.shared.injectionFrequency
+            )
+            bridgeResponse(
+                ok: true,
+                requestId: requestId,
+                type: type,
+                responsePayload: decisionPayload
+            )
+            return
+        }
+
         let handled = dispatchBridgeAction(type: type, payload: payload)
 
         if handled {
@@ -58,6 +148,10 @@ extension InstagramWebView.Coordinator {
     }
 
     func dispatchBridgeAction(type: String, payload: [String: Any]) -> Bool {
+        if type == "reelViewed" {
+            DispatchQueue.main.async { DailyUsageTracker.shared.recordReel() }
+            return true
+        }
         if type == "reloadFeed" {
             DispatchQueue.main.async { self.webView?.reload() }
             return true
@@ -73,12 +167,12 @@ extension InstagramWebView.Coordinator {
         if type == "setTimer",
            let minutes = payload["minutes"] as? Int {
             let label = payload["label"] as? String ?? "Time's up"
-            scheduleTimerNotification(minutes: minutes, label: label)
+            let endTimestampMs = Self.parseDouble(payload["endTimestamp"])
+            scheduleTimerNotification(minutes: minutes, label: label, endTimestampMs: endTimestampMs)
             return true
         }
         if type == "cancelTimer" {
-            UNUserNotificationCenter.current()
-                .removePendingNotificationRequests(withIdentifiers: ["stopscroll-timer"])
+            cancelNativeTimer()
             return true
         }
         if type == "language",
@@ -113,6 +207,9 @@ extension InstagramWebView.Coordinator {
             return true
         }
         if type == "debugLog" {
+            guard AppSettings.shared.devMode else {
+                return true
+            }
             let message = (payload["message"] as? String) ?? "[JS] debug log"
             let category = (payload["category"] as? String) ?? "JS"
             let levelRaw = ((payload["level"] as? String) ?? "DEBUG").uppercased()
@@ -177,6 +274,48 @@ extension InstagramWebView.Coordinator {
         return false
     }
 
+    func handleOpenBookReaderMessage(_ body: Any) {
+        if let payload = body as? [String: Any] {
+            openBookReader(with: payload)
+            return
+        }
+
+        DispatchQueue.main.async {
+            self.parent.selectedNativeTab = "book"
+            self.parent.showingReader = true
+        }
+    }
+
+    func openBookReader(with payload: [String: Any]) {
+        let bookId = (payload["bookId"] as? String ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        let articleId = (payload["articleId"] as? String ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        let title = (payload["title"] as? String ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        let requestedPage = max(0, Self.parseXPAmount(payload["page"]))
+
+        DispatchQueue.main.async {
+            if !title.isEmpty {
+                UserDefaults.standard.set(title, forKey: "savedBookTitle")
+            }
+
+            if !articleId.isEmpty {
+                let openToken = UserDefaults.standard.integer(forKey: "currentArticleOpenToken")
+                UserDefaults.standard.set(articleId, forKey: "currentArticleId")
+                UserDefaults.standard.set(openToken + 1, forKey: "currentArticleOpenToken")
+                UserDefaults.standard.set(0, forKey: "savedCardIndex")
+                if !bookId.isEmpty {
+                    UserDefaults.standard.set(bookId, forKey: "currentBookId")
+                }
+            } else if !bookId.isEmpty {
+                UserDefaults.standard.set(bookId, forKey: "currentBookId")
+                UserDefaults.standard.set("", forKey: "currentArticleId")
+                UserDefaults.standard.set(requestedPage, forKey: "savedCardIndex")
+            }
+
+            self.parent.selectedNativeTab = "book"
+            self.parent.showingReader = true
+        }
+    }
+
     static func parseXPAmount(_ value: Any?) -> Int {
         if let intValue = value as? Int { return intValue }
         if let doubleValue = value as? Double { return Int(doubleValue.rounded()) }
@@ -189,7 +328,8 @@ extension InstagramWebView.Coordinator {
         requestId: String?,
         type: String,
         code: String? = nil,
-        message: String? = nil
+        message: String? = nil,
+        responsePayload: [String: Any]? = nil
     ) {
         guard let requestId, !requestId.isEmpty else { return }
 
@@ -201,6 +341,7 @@ extension InstagramWebView.Coordinator {
         ]
         if let code { payload["code"] = code }
         if let message { payload["message"] = message }
+        if let responsePayload { payload["payload"] = responsePayload }
 
         guard let data = try? JSONSerialization.data(withJSONObject: payload),
               let json = String(data: data, encoding: .utf8) else { return }
@@ -212,6 +353,192 @@ extension InstagramWebView.Coordinator {
 
         DispatchQueue.main.async {
             self.webView?.evaluateJavaScript(js)
+        }
+    }
+
+    static func resetNativeCardDecisionHistoryForTests() {
+        nativeCardHistoryQueue.sync {
+            nativeCardHistory.removeAll()
+        }
+    }
+
+    static func makeCardDecisionPayload(
+        from payload: [String: Any],
+        defaultFrequency: Int
+    ) -> [String: Any] {
+        let opportunityIndex = max(0, parseXPAmount(payload["opportunityIndex"]))
+        let requestedFrequency = parseXPAmount(payload["frequency"])
+        let frequency = requestedFrequency > 0 ? requestedFrequency : max(0, defaultFrequency)
+
+        if frequency <= 0 {
+            return skipDecision(reason: "frequency_disabled")
+        }
+
+        if opportunityIndex <= 0 || (opportunityIndex % frequency != 0) {
+            return skipDecision(reason: "frequency_gate")
+        }
+
+        let availableCards = parseAvailableCards(payload["availableCards"])
+        guard !availableCards.isEmpty else {
+            return skipDecision(reason: "no_available_cards")
+        }
+
+        return nativeCardHistoryQueue.sync {
+            let lastShown = nativeCardHistory.first
+            var filtered = availableCards.filter { candidate in
+                candidate.type != lastShown
+            }
+
+            if filtered.isEmpty {
+                filtered = availableCards
+            }
+
+            let chosen = weightedCardPick(filtered)
+            nativeCardHistory.insert(chosen.type, at: 0)
+            if nativeCardHistory.count > nativeCardHistoryLimit {
+                nativeCardHistory = Array(nativeCardHistory.prefix(nativeCardHistoryLimit))
+            }
+
+            let cardContent = buildCardContent(for: chosen.type)
+            let cardActions = buildCardActions(for: chosen.type)
+
+            return [
+                "contractVersion": 1,
+                "decision": "inject",
+                "reason": "selected",
+                "card": [
+                    "schemaVersion": 1,
+                    "renderMode": "legacy-builder-v1",
+                    "type": chosen.type,
+                    "content": cardContent,
+                    "actions": cardActions,
+                    "meta": [
+                        "selectedBy": "native-policy-v1",
+                        "weight": chosen.weight
+                    ]
+                ]
+            ]
+        }
+    }
+
+    private static func skipDecision(reason: String) -> [String: Any] {
+        [
+            "contractVersion": 1,
+            "decision": "skip",
+            "reason": reason
+        ]
+    }
+
+    private static func parseAvailableCards(_ raw: Any?) -> [(type: String, weight: Double)] {
+        guard let entries = raw as? [[String: Any]] else { return [] }
+        return entries.compactMap { item in
+            guard let type = item["type"] as? String,
+                  !type.isEmpty else {
+                return nil
+            }
+            let weight = max(0.0001, parseDouble(item["weight"]) ?? 1)
+            return (type: type, weight: weight)
+        }
+    }
+
+    private static func parseDouble(_ value: Any?) -> Double? {
+        if let doubleValue = value as? Double { return doubleValue }
+        if let intValue = value as? Int { return Double(intValue) }
+        if let stringValue = value as? String, let doubleValue = Double(stringValue) {
+            return doubleValue
+        }
+        return nil
+    }
+
+    private static func weightedCardPick(_ candidates: [(type: String, weight: Double)]) -> (type: String, weight: Double) {
+        guard !candidates.isEmpty else { return (type: "stop", weight: 1) }
+        if candidates.count == 1 { return candidates[0] }
+
+        let totalWeight = candidates.reduce(0.0) { $0 + max(0.0001, $1.weight) }
+        if totalWeight <= 0 { return candidates[0] }
+
+        var roll = Double.random(in: 0..<totalWeight)
+        for candidate in candidates {
+            roll -= max(0.0001, candidate.weight)
+            if roll <= 0 {
+                return candidate
+            }
+        }
+        return candidates[candidates.count - 1]
+    }
+
+    private static func buildCardContent(for cardType: String) -> [String: Any] {
+        switch cardType {
+        case "timer":
+            return [
+                "title": "Pick an end hour",
+                "subtitle": "Set a stop time and get reminded natively",
+                "defaultMinutes": 45,
+                "cta": "Start timer"
+            ]
+        case "book":
+            return [
+                "title": "Read one useful article",
+                "subtitle": "Open in BookReader and come back after",
+                "articleTitle": "",
+                "lang": "en",
+                "cta": "Open article"
+            ]
+        case "mood":
+            return [
+                "title": "Quick mood check",
+                "subtitle": "Name your current feeling",
+                "prompt": "How do you feel right now?"
+            ]
+        case "metrics":
+            return [
+                "title": "Session pulse",
+                "subtitle": "Pause and look at your current session",
+                "cta": "Show stats"
+            ]
+        case "stop":
+            return [
+                "title": "Time to stop?",
+                "subtitle": "Take a break before another post",
+                "cta": "Open dashboard"
+            ]
+        case "stats":
+            return [
+                "title": "Your progress",
+                "subtitle": "Review your stop-scroll streak",
+                "cta": "Open dashboard"
+            ]
+        case "culture":
+            return [
+                "title": "Culture break",
+                "subtitle": "Answer one question before continuing"
+            ]
+        default:
+            return [:]
+        }
+    }
+
+    private static func buildCardActions(for cardType: String) -> [String: Any] {
+        switch cardType {
+        case "timer":
+            return [
+                "primary": "setTimer",
+                "supportsCustomEndHour": true
+            ]
+        case "book":
+            return [
+                "primary": "openArticle"
+            ]
+        case "stop", "stats", "metrics":
+            return [
+                "primary": "openDashboard"
+            ]
+        case "culture":
+            return [
+                "primary": "grantXP"
+            ]
+        default:
+            return [:]
         }
     }
 }

@@ -197,9 +197,10 @@
     }
 
     function activateTimer(time, label, originBtn) {
+      var endTimestamp = time.getTime();
       var mins = Math.max(1, Math.round((time.getTime() - Date.now()) / 60000));
-      window.__STOPSCROLL_TIMER = { end: time.getTime(), label: label };
-      postToBridge({ type: 'setTimer', minutes: mins, label: label });
+      window.__STOPSCROLL_TIMER = { end: endTimestamp, label: label };
+      postToBridge({ type: 'setTimer', minutes: mins, endTimestamp: endTimestamp, label: label });
       cb.burstParticles(originBtn);
       setTimeout(function () {
         titleEl.textContent = t.timer_active_title || 'Timer running';

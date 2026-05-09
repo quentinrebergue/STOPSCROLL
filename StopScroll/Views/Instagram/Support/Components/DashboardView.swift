@@ -3,6 +3,7 @@ import SwiftUI
 struct DashboardView: View {
     let onDismiss: () -> Void
     var onOpenSettings: (() -> Void)? = nil
+    var showsToolbarButton: Bool = true
     @ObservedObject private var settings = AppSettings.shared
 
     @AppStorage("ss_xp_total") private var totalXP = 0
@@ -46,13 +47,15 @@ struct DashboardView: View {
             .navigationTitle("Dashboard")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button {
-                        onOpenSettings?()
-                    } label: {
-                        Image(systemName: "gearshape")
+                if showsToolbarButton {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button {
+                            onOpenSettings?()
+                        } label: {
+                            Image(systemName: "gearshape")
+                        }
+                        .accessibilityIdentifier("dashboard.openSettings")
                     }
-                    .accessibilityIdentifier("dashboard.openSettings")
                 }
             }
         }

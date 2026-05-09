@@ -10,9 +10,9 @@ enum NativeTabLayout {
     static let items: [NativeTabItem] = [
         NativeTabItem(id: "home", icon: "house"),
         NativeTabItem(id: "search", icon: "magnifyingglass"),
+        NativeTabItem(id: "reels", icon: "play.square"),
         NativeTabItem(id: "book", icon: "book.closed"),
         NativeTabItem(id: "messages", icon: "paperplane"),
-        NativeTabItem(id: "dashboard", icon: "square.grid.2x2"),
         NativeTabItem(id: "profile", icon: "person.crop.circle")
     ]
 
@@ -45,13 +45,11 @@ enum VisibleSectionPolicy {
     static func currentTab(
         showingReader: Bool,
         showingDashboard: Bool,
-        normalizedWebViewCount: Int,
         nativeSelectedTab: String,
         activeSurface: WebSurface
     ) -> String {
         if showingReader { return "book" }
         if showingDashboard { return "dashboard" }
-        if normalizedWebViewCount == 1 { return nativeSelectedTab }
         return SurfaceRouter.tab(for: activeSurface)
     }
 }
@@ -69,7 +67,7 @@ enum HorizontalSwipePolicy {
 
 enum HorizontalSwipeRecognizerPolicy {
     static func shouldAllowSectionSwipe(activeTab: String) -> Bool {
-        activeTab != "messages"
+        return true
     }
 
     static func shouldBegin(velocityX: CGFloat, velocityY: CGFloat, activeTab: String) -> Bool {
@@ -77,6 +75,11 @@ enum HorizontalSwipeRecognizerPolicy {
         let minSpeed: CGFloat
 
         switch activeTab {
+        case "home":
+            // Feed cards use horizontal gestures; require a stronger intent
+            // before we switch sections.
+            ratio = 1.7
+            minSpeed = 280
         case "search":
             // Explore must win against inner Instagram horizontal gestures.
             ratio = 0.9
@@ -94,8 +97,19 @@ enum HorizontalSwipeRecognizerPolicy {
     }
 
     static func shouldTrackDrag(translationX: CGFloat, translationY: CGFloat, activeTab: String) -> Bool {
-        let ratio: CGFloat = activeTab == "search" ? 1.1 : 1.35
-        let minDistance: CGFloat = activeTab == "search" ? 12 : 16
+        let ratio: CGFloat
+        let minDistance: CGFloat
+        switch activeTab {
+        case "home":
+            ratio = 1.7
+            minDistance = 32
+        case "search":
+            ratio = 1.1
+            minDistance = 12
+        default:
+            ratio = 1.35
+            minDistance = 16
+        }
         return abs(translationX) >= minDistance && abs(translationX) > abs(translationY) * ratio
     }
 }
@@ -110,6 +124,7 @@ enum WebSurface: CaseIterable, Hashable {
     case main
     case messages
     case search
+    case reels
     case profile
 }
 
@@ -120,25 +135,14 @@ enum SurfaceSwipeDirection {
 
 /// Extracted routing logic — isolated here so it can be unit-tested.
 enum SurfaceRouter {
-    static func surface(for tab: String, webViewCount: Int) -> WebSurface {
-        let normalized = min(max(webViewCount, 1), 4)
-        guard tab == "home" || tab == "search" || tab == "messages" || tab == "profile" else {
-            return .main
-        }
-        switch normalized {
-        case 1:
-            return .main
-        case 2:
-            return tab == "home" ? .main : .messages
-        case 3:
-            if tab == "home" { return .main }
-            if tab == "search" { return .search }
-            return .messages // messages + profile share this surface
-        default:
-            if tab == "home" { return .main }
-            if tab == "search" { return .search }
-            if tab == "profile" { return .profile }
-            return .messages
+    static func surface(for tab: String) -> WebSurface {
+        switch tab {
+        case "home":     return .main
+        case "search":   return .search
+        case "reels":    return .reels
+        case "messages": return .messages
+        case "profile":  return .profile
+        default:         return .main
         }
     }
 
@@ -150,6 +154,8 @@ enum SurfaceRouter {
             return "search"
         case .messages:
             return "messages"
+        case .reels:
+            return "reels"
         case .profile:
             return "profile"
         }
@@ -157,8 +163,17 @@ enum SurfaceRouter {
 }
 
 enum WebViewLayoutPolicy {
+    /// Extra height added below the visible frame so Instagram's own bottom nav is pushed off-screen.
+    /// Messages gets 0 (it needs its own composer visible at the bottom).
+    /// Reels has its own value since the UI layout differs from the feed.
+    static let reelsBottomOverscan: CGFloat = 5
+
     static func bottomOverscan(for surface: WebSurface, defaultOverscan: CGFloat) -> CGFloat {
-        surface == .messages ? 0 : defaultOverscan
+        switch surface {
+        case .messages: return 0
+        case .reels:    return reelsBottomOverscan
+        default:        return defaultOverscan
+        }
     }
 }
 

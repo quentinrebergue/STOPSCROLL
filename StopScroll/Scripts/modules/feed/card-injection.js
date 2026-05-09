@@ -98,15 +98,14 @@
     article.setAttribute('data-ss-replaced', 'true');
     article.setAttribute('data-ss-expired', 'true');
 
-    hideOriginalContent(article);
-
-    new MutationObserver(function () {
-      hideOriginalContent(article);
-    }).observe(article, { childList: true, subtree: false });
-
     var wrapper = document.createElement('div');
     wrapper.setAttribute('data-ss-injection', 'true');
-    wrapper.style.cssText = 'position:absolute;inset:0;overflow:hidden';
+    wrapper.style.cssText = [
+      'position:absolute', 'inset:0', 'overflow:hidden',
+      '-webkit-backdrop-filter:blur(24px)', 'backdrop-filter:blur(24px)',
+      'background:rgba(0,0,0,0.52)'
+    ].join(';');
+    stripCardBackgrounds(card);
     wrapper.appendChild(card);
     article.appendChild(wrapper);
 
@@ -120,6 +119,16 @@
       var child = article.children[i];
       if (child.getAttribute && child.getAttribute('data-ss-injection')) continue;
       child.style.setProperty('display', 'none', 'important');
+    }
+  }
+
+  /** Strip all background colors/images from a card and every descendant. */
+  function stripCardBackgrounds(card) {
+    var all = [card].concat(Array.prototype.slice.call(card.querySelectorAll('*')));
+    for (var i = 0; i < all.length; i++) {
+      all[i].style.setProperty('background', 'transparent', 'important');
+      all[i].style.setProperty('background-color', 'transparent', 'important');
+      all[i].style.setProperty('background-image', 'none', 'important');
     }
   }
 
@@ -220,6 +229,17 @@
     card.style.height = '100%';
   }
 
+  function attachNativeCardPayload(card, nativeCard) {
+    if (!card || !nativeCard || typeof nativeCard !== 'object') return;
+    card.__ssNativeCard = nativeCard;
+    if (typeof nativeCard.schemaVersion === 'number') {
+      card.setAttribute('data-ss-card-schema-version', String(nativeCard.schemaVersion));
+    }
+    if (typeof nativeCard.renderMode === 'string' && nativeCard.renderMode) {
+      card.setAttribute('data-ss-card-render-mode', nativeCard.renderMode);
+    }
+  }
+
   function attachCardToArticle(article, card, type, postKey) {
     var h = article.offsetHeight;
     prepareCardForReuse(card, h, type, postKey);
@@ -231,24 +251,53 @@
     article.setAttribute('data-ss-card-type', type || card.getAttribute('data-ss-card-type') || 'unknown');
     if (postKey) article.setAttribute('data-ss-post-key', postKey);
 
-    hideOriginalContent(article);
-
-    new MutationObserver(function () {
-      hideOriginalContent(article);
-    }).observe(article, { childList: true, subtree: false });
-
     var oldWrapper = article.querySelector('[data-ss-injection]');
     if (oldWrapper) oldWrapper.remove();
 
+    var FONT = '-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';
     var wrapper = document.createElement('div');
     wrapper.setAttribute('data-ss-injection', 'true');
-    wrapper.style.cssText = 'position:absolute;inset:0;overflow:hidden';
+    wrapper.style.cssText = [
+      'position:absolute', 'inset:0', 'overflow:hidden',
+      '-webkit-backdrop-filter:blur(24px)', 'backdrop-filter:blur(24px)',
+      'background:rgba(0,0,0,0.52)'
+    ].join(';');
+
+    // Discreet reveal button — top-right corner of the overlay.
+    var revealBtn = document.createElement('button');
+    revealBtn.innerHTML = '&#x1F441;&#xFE0F; Show post';
+    revealBtn.style.cssText = [
+      'position:absolute', 'top:8px', 'right:10px', 'z-index:10',
+      'background:rgba(255,255,255,0.12)', 'border:1px solid rgba(255,255,255,0.25)',
+      'border-radius:20px', 'color:rgba(255,255,255,0.75)',
+      'font-size:11px', 'font-weight:600', 'padding:4px 10px',
+      'cursor:pointer', 'font-family:' + FONT,
+      '-webkit-tap-highlight-color:transparent'
+    ].join(';');
+    revealBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      wrapper.remove();
+      article.removeAttribute('data-ss-replaced');
+      article.removeAttribute('data-ss-card-type');
+    });
+    wrapper.appendChild(revealBtn);
+
+    // Hide card-builder's own header (SS avatar) and action bar.
+    if (card.children.length >= 2) {
+      card.children[0].style.setProperty('display', 'none', 'important');
+      var lastCardChild = card.children[card.children.length - 1];
+      if (lastCardChild !== card.children[0]) {
+        lastCardChild.style.setProperty('display', 'none', 'important');
+      }
+    }
+
+    stripCardBackgrounds(card);
     wrapper.appendChild(card);
     article.appendChild(wrapper);
     return true;
   }
 
-  function injectCardIntoPost(article, type, config) {
+  function injectCardIntoPost(article, type, config, nativeCard) {
     var h = article.offsetHeight;
     if (h < 80) return false;
 
@@ -265,7 +314,7 @@
       });
     }
     if (!card) {
-      card = ns.cardBuilder.buildCardFor(effectiveType, config);
+      card = ns.cardBuilder.buildCardFor(effectiveType, config, nativeCard || null);
     }
     if (!card) return false;
 
@@ -273,6 +322,8 @@
       _cardCacheByPostKey[postKey] = card;
       rememberCardType(postKey, effectiveType);
     }
+
+    attachNativeCardPayload(card, nativeCard || null);
 
     return attachCardToArticle(article, card, effectiveType, postKey);
   }

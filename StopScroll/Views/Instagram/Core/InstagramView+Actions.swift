@@ -23,6 +23,30 @@ extension InstagramView {
             return
         }
 
+        if tab == "search",
+           currentSectionTab == "search",
+           !showingReader,
+           !showingDashboard,
+           !showingSettings,
+           !showingBookReaderSettings {
+            LogManager.shared.log("🔎 Search re-tap: dispatch native command", category: "Navigation", level: .debug)
+            nativeSelectedTab = "search"
+            nativeNavCommandToken += 1
+            return
+        }
+
+        if tab == "reels",
+           currentSectionTab == "reels",
+           !showingReader,
+           !showingDashboard,
+           !showingSettings,
+           !showingBookReaderSettings {
+            LogManager.shared.log("🎞️ Reels re-tap: dispatch native command", category: "Navigation", level: .debug)
+            nativeSelectedTab = "reels"
+            nativeNavCommandToken += 1
+            return
+        }
+
         sectionSwipeTargetTab = nil
         sectionSwipeTranslation = 0
 
@@ -33,6 +57,7 @@ extension InstagramView {
         if tab == "book" {
             showingReader = true
             showingDashboard = false
+            profileMode = .instagram
             nativeSelectedTab = "book"
             return
         }
@@ -40,32 +65,30 @@ extension InstagramView {
         if tab == "dashboard" {
             showingReader = false
             showingDashboard = true
-            nativeSelectedTab = "dashboard"
+            profileMode = .stopScroll
+            nativeSelectedTab = "profile"
             return
         }
 
         showingReader = false
         showingDashboard = false
+
+        if tab == "profile" {
+            profileMode = .instagram
+        }
+
         openInstagramTab(tab)
     }
 
     func openInstagramTab(_ tab: String) {
-        LogManager.shared.log("🔗 Tab selected: \(tab), mode: \(normalizedWebViewCount), surface: \(surfaceFor(tab: tab))", category: "Navigation", level: .info)
+        LogManager.shared.log("🔗 Tab selected: \(tab), surface: \(surfaceFor(tab: tab))", category: "Navigation", level: .info)
         
         if tab == "home" {
             ensureSurfaceAvailable(.main)
             activeSurface = .main
+            profileMode = .instagram
             nativeSelectedTab = "home"
             LogManager.shared.log("→ Home: activeSurface = main", category: "Navigation", level: .debug)
-            return
-        }
-
-        if normalizedWebViewCount == 1 {
-            ensureSurfaceAvailable(.main)
-            activeSurface = .main
-            nativeSelectedTab = tab
-            nativeNavCommandToken += 1
-            LogManager.shared.log("→ Mode 1: all tabs on main surface", category: "Navigation", level: .debug)
             return
         }
 
@@ -81,6 +104,7 @@ extension InstagramView {
             return
         }
 
+        let reelsWasMounted = hasReelsSurface
         let targetSurface = surfaceFor(tab: tab)
         ensureSurfaceAvailable(targetSurface)
         activeSurface = targetSurface
@@ -100,6 +124,16 @@ extension InstagramView {
             searchNavigationURL = targetURL
             searchNavigationToken += 1
             LogManager.shared.log("→ Search: loading started", category: "Navigation", level: .debug)
+        case .reels:
+            if reelsWasMounted {
+                // Preserve the currently viewed reel + scroll position when returning to this surface.
+                isLoadingReels = false
+                LogManager.shared.log("→ Reels: preserving existing WebView state", category: "Navigation", level: .debug)
+            } else {
+                // First mount uses initialURLString (reels home) from InstagramWebView.
+                isLoadingReels = true
+                LogManager.shared.log("→ Reels: first mount loading", category: "Navigation", level: .debug)
+            }
         case .profile:
             isLoadingProfile = true
             profileNavigationURL = targetURL
@@ -188,7 +222,7 @@ extension InstagramView {
     func prepareSwipePreviewTargetIfNeeded() {
         guard let targetTab = sectionSwipeTargetTab else { return }
         switch targetTab {
-        case "home", "search", "messages", "profile":
+        case "home", "search", "reels", "messages", "profile":
             ensureSurfaceAvailable(surfaceFor(tab: targetTab))
         default:
             break
@@ -240,6 +274,8 @@ extension InstagramView {
             reloadTokenMessages += 1
         case .search:
             reloadTokenSearch += 1
+        case .reels:
+            reloadTokenReels += 1
         case .profile:
             reloadTokenProfile += 1
         }
@@ -248,7 +284,7 @@ extension InstagramView {
     }
 
     func surfaceFor(tab: String) -> WebSurface {
-        SurfaceRouter.surface(for: tab, webViewCount: normalizedWebViewCount)
+        SurfaceRouter.surface(for: tab)
     }
 
     func ensureSurfaceAvailable(_ surface: WebSurface) {
@@ -268,6 +304,11 @@ extension InstagramView {
                 hasSearchSurface = true
                 isLoadingSearch = true
             }
+        case .reels:
+            if !hasReelsSurface {
+                hasReelsSurface = true
+                isLoadingReels = true
+            }
         case .profile:
             if !hasProfileSurface {
                 hasProfileSurface = true
@@ -277,47 +318,37 @@ extension InstagramView {
     }
 
     func reconfigureSurfacesForCurrentMode() {
-        LogManager.shared.log("🔄 Reconfiguring surfaces for mode \(normalizedWebViewCount)", category: "Routing", level: .info)
+        LogManager.shared.log("🔄 Reconfiguring surfaces", category: "Routing", level: .info)
         
         activeSurface = surfaceFor(tab: nativeSelectedTab)
 
-        // Lazy mode: keep only the active surface mounted after config changes.
         hasMainSurface = false
         hasMessagesSurface = false
         hasSearchSurface = false
+        hasReelsSurface = false
         hasProfileSurface = false
 
         ensureSurfaceAvailable(activeSurface)
-
-        if normalizedWebViewCount < 2 {
-            hasMessagesSurface = false
-        }
-        if normalizedWebViewCount < 3 {
-            hasSearchSurface = false
-        }
-        if normalizedWebViewCount < 4 {
-            hasProfileSurface = false
-        }
     }
 
     func evictInactiveSurface() {
-        if normalizedWebViewCount < 2 {
-            return
-        }
-
         if activeSurface != .main {
             hasMainSurface = false
             isLoadingMain = true
         }
-        if normalizedWebViewCount >= 2, activeSurface != .messages {
+        if activeSurface != .messages {
             hasMessagesSurface = false
             isLoadingMessages = true
         }
-        if normalizedWebViewCount >= 3, activeSurface != .search {
+        if activeSurface != .search {
             hasSearchSurface = false
             isLoadingSearch = true
         }
-        if normalizedWebViewCount == 4, activeSurface != .profile {
+        if activeSurface != .reels {
+            hasReelsSurface = false
+            isLoadingReels = true
+        }
+        if activeSurface != .profile {
             hasProfileSurface = false
             isLoadingProfile = true
         }
@@ -357,7 +388,7 @@ extension InstagramView {
         } else {
             // Show the current ratio immediately, then animate only the gained progression.
             xpDisplayedProgress = XPProgress.progress(for: previousTotal)
-            withAnimation(.interactiveSpring(response: 0.56, dampingFraction: 0.82, blendDuration: 0.2)) {
+            withAnimation(.spring(duration: 0.52, bounce: 0.28)) {
                 xpIslandVisible = true
             }
 
@@ -380,11 +411,36 @@ extension InstagramView {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.72, execute: infoItem)
 
         let workItem = DispatchWorkItem {
-            withAnimation(.easeOut(duration: 0.34)) {
+            withAnimation(.spring(duration: 0.36, bounce: 0)) {
                 xpIslandVisible = false
             }
         }
         xpHideWorkItem = workItem
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.15, execute: workItem)
+    }
+
+    func showSessionBanner() {
+        sessionBannerWorkItem?.cancel()
+        // Show 0.4s after open, auto-dismiss after 2.5s
+        let showItem = DispatchWorkItem {
+            withAnimation(.spring(duration: 0.52, bounce: 0.28)) {
+                sessionBannerVisible = true
+            }
+            // Tick the counter 0.6s after banner settles in
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                withAnimation(.spring(duration: 0.4, bounce: 0.25)) {
+                    DailyUsageTracker.shared.tickDisplayedOpens()
+                }
+            }
+            let hideItem = DispatchWorkItem {
+                withAnimation(.spring(duration: 0.36, bounce: 0)) {
+                    sessionBannerVisible = false
+                }
+            }
+            self.sessionBannerWorkItem = hideItem
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.5, execute: hideItem)
+        }
+        sessionBannerWorkItem = showItem
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4, execute: showItem)
     }
 }

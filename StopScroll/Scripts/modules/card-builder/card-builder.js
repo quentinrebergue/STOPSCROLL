@@ -203,24 +203,7 @@
     return media;
   }
 
-  // ── Animated gradient style (injected once) ─────────────
-  var GRADIENT_STYLE_ID = 'ss-gradient-anim';
-  function ensureGradientStyle() {
-    if (document.getElementById(GRADIENT_STYLE_ID)) return;
-    var s = document.createElement('style');
-    s.id = GRADIENT_STYLE_ID;
-    s.textContent = [
-      '@keyframes ss-grad-shift{',
-      '  0%{background-position:0% 50%}',
-      '  50%{background-position:100% 50%}',
-      '  100%{background-position:0% 50%}',
-      '}'
-    ].join('');
-    document.head.appendChild(s);
-  }
-
   function applyGradientBg(card, type) {
-    ensureGradientStyle();
     var accent = CARD_ACCENTS[type] || '#7ad8ff';
     var media = ensureMediaArea(card);
     if (!media) return;
@@ -237,8 +220,8 @@
     };
 
     media.style.background = GRAD_MAP[type] || ('linear-gradient(135deg, #1a1a22, ' + accent + '60, #1a1a22)');
-    media.style.backgroundSize = '200% 200%';
-    media.style.animation = 'ss-grad-shift 10s ease infinite';
+    media.style.backgroundSize = '100% 100%';
+    media.style.animation = 'none';
     media.style.position = 'relative';
 
     // ── Glassmorphism overlay with subtle noise texture ──────
@@ -246,28 +229,20 @@
     if (!glass) {
       glass = document.createElement('div');
       glass.setAttribute('data-ss-glass', '');
-      glass.style.cssText = [
-        'position:absolute', 'inset:0', 'z-index:0',
-        'background:rgba(255,255,255,0.06)',
-        'backdrop-filter:blur(18px) saturate(1.3)',
-        '-webkit-backdrop-filter:blur(18px) saturate(1.3)',
-        'pointer-events:none'
-      ].join(';');
       media.insertBefore(glass, media.firstChild);
     }
+    glass.style.cssText = [
+      'position:absolute', 'inset:0', 'z-index:0',
+      'background:rgba(255,255,255,0.04)',
+      'backdrop-filter:none',
+      '-webkit-backdrop-filter:none',
+      'pointer-events:none'
+    ].join(';');
 
     // Noise texture via tiny inline SVG data-URI (no extra request)
     var noise = media.querySelector('[data-ss-noise]');
-    if (!noise) {
-      noise = document.createElement('div');
-      noise.setAttribute('data-ss-noise', '');
-      noise.style.cssText = [
-        'position:absolute', 'inset:0', 'z-index:0',
-        'opacity:0.045', 'pointer-events:none', 'mix-blend-mode:overlay',
-        'background-image:url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'200\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\'/%3E%3C/svg%3E")',
-        'background-size:200px 200px'
-      ].join(';');
-      media.insertBefore(noise, media.firstChild);
+    if (noise && noise.parentNode) {
+      noise.parentNode.removeChild(noise);
     }
 
     // Make sure actual content sits above the glass
@@ -429,7 +404,7 @@
   }
 
   // ── Entry point ────────────────────────────────────────────
-  function buildCardFor(type, config) {
+  function buildCardFor(type, config, nativeCard) {
     var card = null;
     if (type === 'metrics') card = cb.buildMetricsCard(config);
     if (type === 'mood')    card = cb.buildMoodCard(config);
@@ -440,6 +415,15 @@
     if (type === 'culture') card = cb.buildCultureCard(config);
     if (card) {
       card.setAttribute('data-ss-card-type', type);
+      if (nativeCard && typeof nativeCard === 'object') {
+        card.__ssNativeCard = nativeCard;
+        if (typeof nativeCard.schemaVersion === 'number') {
+          card.setAttribute('data-ss-card-schema-version', String(nativeCard.schemaVersion));
+        }
+        if (typeof nativeCard.renderMode === 'string' && nativeCard.renderMode) {
+          card.setAttribute('data-ss-card-render-mode', nativeCard.renderMode);
+        }
+      }
       var colors = detectInstagramColors();
       applyGradientBg(card, type);
       applyContentColors(card, type);

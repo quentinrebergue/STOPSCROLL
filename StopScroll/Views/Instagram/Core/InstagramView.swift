@@ -8,14 +8,17 @@ struct InstagramView: View {
     @State var isLoadingMain = true
     @State var isLoadingMessages = true
     @State var isLoadingSearch = true
+    @State var isLoadingReels = true
     @State var isLoadingProfile = true
     @State var showingReader = false
     @State var reloadTokenMain = 0
     @State var reloadTokenMessages = 0
     @State var reloadTokenSearch = 0
+    @State var reloadTokenReels = 0
     @State var reloadTokenProfile = 0
     @State var showingSettings = false
     @State var showingDashboard = false
+    @State var profileMode: NativeInstagramTabBar.ProfileMode = .instagram
     /// Incremented when the user closes Settings so the WebView re-injects the updated label list.
     @State var labelsToken = 0
     @AppStorage("ss_xp_total") var totalXP = 0
@@ -34,6 +37,8 @@ struct InstagramView: View {
     @State var messagesNavigationToken: Int = 0
     @State var searchNavigationURL: String? = nil
     @State var searchNavigationToken: Int = 0
+    @State var reelsNavigationURL: String? = nil
+    @State var reelsNavigationToken: Int = 0
     @State var profileNavigationURL: String? = nil
     @State var profileNavigationToken: Int = 0
     @State var showControlCenterChooser = false
@@ -41,9 +46,9 @@ struct InstagramView: View {
     @State var hasMainSurface = true
     @State var hasMessagesSurface = false
     @State var hasSearchSurface = false
+    @State var hasReelsSurface = false
     @State var hasProfileSurface = false
     @AppStorage("ss_instagram_username") var instagramUsername = ""
-    @AppStorage("ss_webview_count") var webViewCount = 2
     @State var showInstagramUsernamePrompt = false
     @State var instagramUsernameDraft = ""
     @AppStorage("ss_instagram_theme_dark") var instagramThemeIsDark = true
@@ -54,28 +59,30 @@ struct InstagramView: View {
     @State var sectionSwipeTranslation: CGFloat = 0
     @State var sectionSwipeTargetTab: String? = nil
     @State var showingBookReaderSettings = false
+    @State var sessionBannerVisible = false
+    @State var sessionBannerWorkItem: DispatchWorkItem?
 
     var isActiveSurfaceLoading: Bool {
         switch activeSurface {
         case .main: return isLoadingMain
         case .messages: return isLoadingMessages
         case .search: return isLoadingSearch
+        case .reels: return isLoadingReels
         case .profile: return isLoadingProfile
         }
     }
 
-    var normalizedWebViewCount: Int {
-        min(max(webViewCount, 1), 4)
-    }
+    let normalizedWebViewCount = 5
 
     let webViewBottomOverscan: CGFloat = 116
+    let webViewTopInset: CGFloat = 0.17
     let sharedBottomNavReservedHeight: CGFloat = 92
+    let messagesBottomReservedHeight: CGFloat = 62
 
     var currentSectionTab: String {
         VisibleSectionPolicy.currentTab(
             showingReader: showingReader,
             showingDashboard: showingDashboard,
-            normalizedWebViewCount: normalizedWebViewCount,
             nativeSelectedTab: nativeSelectedTab,
             activeSurface: activeSurface
         )
@@ -101,149 +108,215 @@ struct InstagramView: View {
     var body: some View {
         ZStack {
             if hasMainSurface {
-                InstagramWebView(
-                    isLoading: $isLoadingMain,
-                    showingReader: $showingReader,
-                    showingSettings: $showingSettings,
-                    showingDashboard: $showingDashboard,
-                    reloadToken: $reloadTokenMain,
-                    labelsToken: $labelsToken,
-                    themeRefreshToken: $themeRefreshToken,
-                    selectedNativeTab: $nativeSelectedTab,
-                    nativeMessageBadgeCount: $nativeMessageBadgeCount,
-                    nativeNavCommandToken: $nativeNavCommandToken,
-                    initialURLString: "https://www.instagram.com/",
-                    isActive: currentSectionTab == "home" && activeSurface == .main,
-                    tracksLoading: true,
-                    scriptProfile: .full,
-                    handlesInstagramNavigation: true,
-                    allowsHorizontalSurfaceSwipe: !showingSettings,
-                    activeSectionTab: currentSectionTab,
-                    onHorizontalSurfaceDragChanged: handleHorizontalSurfaceDragChanged,
-                    onHorizontalSurfaceDragEnded: handleHorizontalSurfaceDragEnded,
-                    requestedURLString: nil,
-                    requestedURLToken: 0,
-                    instagramThemeIsDark: $instagramThemeIsDark,
-                    onGrantXP: { amount, source in
-                        grantXP(amount: amount, source: source)
-                    }
-                )
-                // Extend the webview below the bottom edge so Instagram's bottom nav
-                // stays outside of the visible area behind our native bar.
-                .padding(.bottom, -WebViewLayoutPolicy.bottomOverscan(for: .main, defaultOverscan: webViewBottomOverscan))
-                .ignoresSafeArea(edges: .bottom)
-                .offset(x: sectionOffset(for: "home"))
-                .opacity(sectionOpacity(for: "home"))
-                .allowsHitTesting(isInteractiveSection("home"))
-                .id("surface-main")
+                GeometryReader { geo in
+                    InstagramWebView(
+                        isLoading: $isLoadingMain,
+                        showingReader: $showingReader,
+                        showingSettings: $showingSettings,
+                        showingDashboard: $showingDashboard,
+                        reloadToken: $reloadTokenMain,
+                        labelsToken: $labelsToken,
+                        themeRefreshToken: $themeRefreshToken,
+                        selectedNativeTab: $nativeSelectedTab,
+                        nativeMessageBadgeCount: $nativeMessageBadgeCount,
+                        nativeNavCommandToken: $nativeNavCommandToken,
+                        initialURLString: "https://www.instagram.com/",
+                        isActive: currentSectionTab == "home" && activeSurface == .main,
+                        tracksLoading: true,
+                        scriptProfile: .full,
+                        handlesInstagramNavigation: true,
+                        allowsHorizontalSurfaceSwipe: !showingSettings,
+                        bottomOverlayInset: 0,
+                        activeSectionTab: currentSectionTab,
+                        onHorizontalSurfaceDragChanged: handleHorizontalSurfaceDragChanged,
+                        onHorizontalSurfaceDragEnded: handleHorizontalSurfaceDragEnded,
+                        requestedURLString: nil,
+                        requestedURLToken: 0,
+                        instagramThemeIsDark: $instagramThemeIsDark,
+                        onGrantXP: { amount, source in
+                            grantXP(amount: amount, source: source)
+                        }
+                    )
+                    // Extend the webview below the bottom edge so Instagram's bottom nav
+                    // stays outside of the visible area behind our native bar.
+                    .padding(.bottom, -WebViewLayoutPolicy.bottomOverscan(for: .main, defaultOverscan: webViewBottomOverscan))
+                    .ignoresSafeArea(edges: [.top, .bottom])
+                    .padding(.top, webViewTopInset)
+                    .offset(x: sectionOffset(for: "home"))
+                    .opacity(sectionOpacity(for: "home"))
+                    .allowsHitTesting(isInteractiveSection("home"))
+                    .id("surface-main")
+                }
             }
 
-            if normalizedWebViewCount >= 2 && hasMessagesSurface {
-                InstagramWebView(
-                    isLoading: $isLoadingMessages,
-                    showingReader: $showingReader,
-                    showingSettings: $showingSettings,
-                    showingDashboard: $showingDashboard,
-                    reloadToken: $reloadTokenMessages,
-                    labelsToken: $labelsToken,
-                    themeRefreshToken: $themeRefreshToken,
-                    selectedNativeTab: $nativeSelectedTab,
-                    nativeMessageBadgeCount: $nativeMessageBadgeCount,
-                    nativeNavCommandToken: $nativeNavCommandToken,
-                    initialURLString: "https://www.instagram.com/direct/inbox/",
-                    isActive: currentSectionTab == "messages" && activeSurface == .messages,
-                    tracksLoading: true,
-                    scriptProfile: .reelBlocker,
-                    handlesInstagramNavigation: true,
-                    allowsHorizontalSurfaceSwipe: !showingSettings,
-                    activeSectionTab: currentSectionTab,
-                    onHorizontalSurfaceDragChanged: handleHorizontalSurfaceDragChanged,
-                    onHorizontalSurfaceDragEnded: handleHorizontalSurfaceDragEnded,
-                    requestedURLString: messagesNavigationURL,
-                    requestedURLToken: messagesNavigationToken,
-                    instagramThemeIsDark: $instagramThemeIsDark,
-                    onGrantXP: { amount, source in
-                        grantXP(amount: amount, source: source)
+            if hasMessagesSurface {
+                GeometryReader { geo in
+                    InstagramWebView(
+                        isLoading: $isLoadingMessages,
+                        showingReader: $showingReader,
+                        showingSettings: $showingSettings,
+                        showingDashboard: $showingDashboard,
+                        reloadToken: $reloadTokenMessages,
+                        labelsToken: $labelsToken,
+                        themeRefreshToken: $themeRefreshToken,
+                        selectedNativeTab: $nativeSelectedTab,
+                        nativeMessageBadgeCount: $nativeMessageBadgeCount,
+                        nativeNavCommandToken: $nativeNavCommandToken,
+                        initialURLString: "https://www.instagram.com/direct/inbox/",
+                        isActive: currentSectionTab == "messages" && activeSurface == .messages,
+                        tracksLoading: true,
+                        scriptProfile: .none,
+                        handlesInstagramNavigation: true,
+                        allowsHorizontalSurfaceSwipe: !showingSettings,
+                        bottomOverlayInset: 0,
+                        activeSectionTab: currentSectionTab,
+                        onHorizontalSurfaceDragChanged: handleHorizontalSurfaceDragChanged,
+                        onHorizontalSurfaceDragEnded: handleHorizontalSurfaceDragEnded,
+                        requestedURLString: messagesNavigationURL,
+                        requestedURLToken: messagesNavigationToken,
+                        instagramThemeIsDark: $instagramThemeIsDark,
+                        onGrantXP: { amount, source in
+                            grantXP(amount: amount, source: source)
+                        }
+                    )
+                    .frame(
+                        width: geo.size.width,
+                        height: max(0, geo.size.height - messagesBottomReservedHeight),
+                        alignment: .top
+                    )
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                    .padding(.top, webViewTopInset)
+                    .clipped()
+                    .overlay(alignment: .bottom) {
+                        instagramSurfaceColor
+                            .frame(height: messagesBottomReservedHeight)
+                            .allowsHitTesting(false)
                     }
-                )
-                .padding(.bottom, -WebViewLayoutPolicy.bottomOverscan(for: .messages, defaultOverscan: webViewBottomOverscan))
-                .ignoresSafeArea(edges: .bottom)
+                }
                 .offset(x: sectionOffset(for: "messages"))
                 .opacity(sectionOpacity(for: "messages"))
                 .allowsHitTesting(isInteractiveSection("messages"))
                 .id("surface-messages")
             }
 
-            if normalizedWebViewCount >= 3 && hasSearchSurface {
-                InstagramWebView(
-                    isLoading: $isLoadingSearch,
-                    showingReader: $showingReader,
-                    showingSettings: $showingSettings,
-                    showingDashboard: $showingDashboard,
-                    reloadToken: $reloadTokenSearch,
-                    labelsToken: $labelsToken,
-                    themeRefreshToken: $themeRefreshToken,
-                    selectedNativeTab: $nativeSelectedTab,
-                    nativeMessageBadgeCount: $nativeMessageBadgeCount,
-                    nativeNavCommandToken: $nativeNavCommandToken,
-                    initialURLString: "https://www.instagram.com/explore/",
-                    isActive: currentSectionTab == "search" && activeSurface == .search,
-                    tracksLoading: true,
-                    scriptProfile: .reelBlocker,
-                    handlesInstagramNavigation: true,
-                    allowsHorizontalSurfaceSwipe: !showingSettings,
-                    activeSectionTab: currentSectionTab,
-                    onHorizontalSurfaceDragChanged: handleHorizontalSurfaceDragChanged,
-                    onHorizontalSurfaceDragEnded: handleHorizontalSurfaceDragEnded,
-                    requestedURLString: searchNavigationURL,
-                    requestedURLToken: searchNavigationToken,
-                    instagramThemeIsDark: $instagramThemeIsDark,
-                    onGrantXP: { amount, source in
-                        grantXP(amount: amount, source: source)
-                    }
-                )
-                .padding(.bottom, -WebViewLayoutPolicy.bottomOverscan(for: .search, defaultOverscan: webViewBottomOverscan))
-                .ignoresSafeArea(edges: .bottom)
-                .offset(x: sectionOffset(for: "search"))
-                .opacity(sectionOpacity(for: "search"))
-                .allowsHitTesting(isInteractiveSection("search"))
-                .id("surface-search")
+            if hasSearchSurface {
+                GeometryReader { geo in
+                    InstagramWebView(
+                        isLoading: $isLoadingSearch,
+                        showingReader: $showingReader,
+                        showingSettings: $showingSettings,
+                        showingDashboard: $showingDashboard,
+                        reloadToken: $reloadTokenSearch,
+                        labelsToken: $labelsToken,
+                        themeRefreshToken: $themeRefreshToken,
+                        selectedNativeTab: $nativeSelectedTab,
+                        nativeMessageBadgeCount: $nativeMessageBadgeCount,
+                        nativeNavCommandToken: $nativeNavCommandToken,
+                        initialURLString: "https://www.instagram.com/explore/",
+                        isActive: currentSectionTab == "search" && activeSurface == .search,
+                        tracksLoading: true,
+                        scriptProfile: .searchLite,
+                        handlesInstagramNavigation: true,
+                        allowsHorizontalSurfaceSwipe: !showingSettings,
+                        bottomOverlayInset: 0,
+                        activeSectionTab: currentSectionTab,
+                        onHorizontalSurfaceDragChanged: handleHorizontalSurfaceDragChanged,
+                        onHorizontalSurfaceDragEnded: handleHorizontalSurfaceDragEnded,
+                        requestedURLString: searchNavigationURL,
+                        requestedURLToken: searchNavigationToken,
+                        instagramThemeIsDark: $instagramThemeIsDark,
+                        onGrantXP: { amount, source in
+                            grantXP(amount: amount, source: source)
+                        }
+                    )
+                    .padding(.bottom, -WebViewLayoutPolicy.bottomOverscan(for: .search, defaultOverscan: webViewBottomOverscan))
+                    .ignoresSafeArea(edges: [.top, .bottom])
+                    .padding(.top, webViewTopInset)
+                    .offset(x: sectionOffset(for: "search"))
+                    .opacity(sectionOpacity(for: "search"))
+                    .allowsHitTesting(isInteractiveSection("search"))
+                    .id("surface-search")
+                }
             }
 
-            if normalizedWebViewCount == 4 && hasProfileSurface {
-                InstagramWebView(
-                    isLoading: $isLoadingProfile,
-                    showingReader: $showingReader,
-                    showingSettings: $showingSettings,
-                    showingDashboard: $showingDashboard,
-                    reloadToken: $reloadTokenProfile,
-                    labelsToken: $labelsToken,
-                    themeRefreshToken: $themeRefreshToken,
-                    selectedNativeTab: $nativeSelectedTab,
-                    nativeMessageBadgeCount: $nativeMessageBadgeCount,
-                    nativeNavCommandToken: $nativeNavCommandToken,
-                    initialURLString: "https://www.instagram.com/",
-                    isActive: currentSectionTab == "profile" && activeSurface == .profile,
-                    tracksLoading: true,
-                    scriptProfile: .navigationLite,
-                    handlesInstagramNavigation: true,
-                    allowsHorizontalSurfaceSwipe: !showingSettings,
-                    activeSectionTab: currentSectionTab,
-                    onHorizontalSurfaceDragChanged: handleHorizontalSurfaceDragChanged,
-                    onHorizontalSurfaceDragEnded: handleHorizontalSurfaceDragEnded,
-                    requestedURLString: profileNavigationURL,
-                    requestedURLToken: profileNavigationToken,
-                    instagramThemeIsDark: $instagramThemeIsDark,
-                    onGrantXP: { amount, source in
-                        grantXP(amount: amount, source: source)
-                    }
-                )
-                .padding(.bottom, -WebViewLayoutPolicy.bottomOverscan(for: .profile, defaultOverscan: webViewBottomOverscan))
-                .ignoresSafeArea(edges: .bottom)
-                .offset(x: sectionOffset(for: "profile"))
-                .opacity(sectionOpacity(for: "profile"))
-                .allowsHitTesting(isInteractiveSection("profile"))
-                .id("surface-profile")
+            if hasReelsSurface {
+                GeometryReader { geo in
+                    InstagramWebView(
+                        isLoading: $isLoadingReels,
+                        showingReader: $showingReader,
+                        showingSettings: $showingSettings,
+                        showingDashboard: $showingDashboard,
+                        reloadToken: $reloadTokenReels,
+                        labelsToken: $labelsToken,
+                        themeRefreshToken: $themeRefreshToken,
+                        selectedNativeTab: $nativeSelectedTab,
+                        nativeMessageBadgeCount: $nativeMessageBadgeCount,
+                        nativeNavCommandToken: $nativeNavCommandToken,
+                        initialURLString: "https://www.instagram.com/reels/",
+                        isActive: currentSectionTab == "reels" && activeSurface == .reels,
+                        tracksLoading: true,
+                        scriptProfile: .reelsLite,
+                        handlesInstagramNavigation: true,
+                        allowsHorizontalSurfaceSwipe: !showingSettings,
+                        bottomOverlayInset: 0,
+                        activeSectionTab: currentSectionTab,
+                        onHorizontalSurfaceDragChanged: handleHorizontalSurfaceDragChanged,
+                        onHorizontalSurfaceDragEnded: handleHorizontalSurfaceDragEnded,
+                        requestedURLString: reelsNavigationURL,
+                        requestedURLToken: reelsNavigationToken,
+                        instagramThemeIsDark: $instagramThemeIsDark,
+                        onGrantXP: { amount, source in
+                            grantXP(amount: amount, source: source)
+                        }
+                    )
+                    .padding(.bottom, -WebViewLayoutPolicy.bottomOverscan(for: .reels, defaultOverscan: webViewBottomOverscan))
+                    .ignoresSafeArea(edges: [.top, .bottom])
+                    .padding(.top, 0)
+                    .offset(x: sectionOffset(for: "reels"))
+                    .opacity(sectionOpacity(for: "reels"))
+                    .allowsHitTesting(isInteractiveSection("reels"))
+                    .id("surface-reels")
+                }
+            }
+
+            if hasProfileSurface {
+                GeometryReader { geo in
+                    InstagramWebView(
+                        isLoading: $isLoadingProfile,
+                        showingReader: $showingReader,
+                        showingSettings: $showingSettings,
+                        showingDashboard: $showingDashboard,
+                        reloadToken: $reloadTokenProfile,
+                        labelsToken: $labelsToken,
+                        themeRefreshToken: $themeRefreshToken,
+                        selectedNativeTab: $nativeSelectedTab,
+                        nativeMessageBadgeCount: $nativeMessageBadgeCount,
+                        nativeNavCommandToken: $nativeNavCommandToken,
+                        initialURLString: "https://www.instagram.com/",
+                        isActive: currentSectionTab == "profile" && activeSurface == .profile,
+                        tracksLoading: true,
+                        scriptProfile: .navigationLite,
+                        handlesInstagramNavigation: true,
+                        allowsHorizontalSurfaceSwipe: !showingSettings,
+                        bottomOverlayInset: 0,
+                        activeSectionTab: currentSectionTab,
+                        onHorizontalSurfaceDragChanged: handleHorizontalSurfaceDragChanged,
+                        onHorizontalSurfaceDragEnded: handleHorizontalSurfaceDragEnded,
+                        requestedURLString: profileNavigationURL,
+                        requestedURLToken: profileNavigationToken,
+                        instagramThemeIsDark: $instagramThemeIsDark,
+                        onGrantXP: { amount, source in
+                            grantXP(amount: amount, source: source)
+                        }
+                    )
+                    .padding(.bottom, -WebViewLayoutPolicy.bottomOverscan(for: .profile, defaultOverscan: webViewBottomOverscan))
+                    .ignoresSafeArea(edges: [.top, .bottom])
+                    .padding(.top, webViewTopInset)
+                    .offset(x: sectionOffset(for: "profile"))
+                    .opacity(sectionOpacity(for: "profile"))
+                    .allowsHitTesting(isInteractiveSection("profile"))
+                    .id("surface-profile")
+                }
             }
 
             BookReaderView(onDismiss: {
@@ -263,12 +336,17 @@ struct InstagramView: View {
 
             DashboardView(onDismiss: {
                 showingDashboard = false
-                nativeSelectedTab = SurfaceRouter.tab(for: activeSurface)
+                let resumedTab = SurfaceRouter.tab(for: activeSurface)
+                nativeSelectedTab = resumedTab
+                if resumedTab == "profile" {
+                    profileMode = .instagram
+                }
             }, onOpenSettings: {
                 // Show settings first to avoid one-frame feed flash.
                 showingSettings = true
                 showingDashboard = false
-            })
+                profileMode = .stopScroll
+            }, showsToolbarButton: isInteractiveSection("dashboard"))
             .offset(x: sectionOffset(for: "dashboard"))
             .opacity(sectionOpacity(for: "dashboard"))
             .allowsHitTesting(isInteractiveSection("dashboard"))
@@ -282,25 +360,24 @@ struct InstagramView: View {
             }, onOpenDashboard: {
                 showingSettings = false
                 showingDashboard = true
-                nativeSelectedTab = "dashboard"
-            })
+                profileMode = .stopScroll
+                nativeSelectedTab = "profile"
+            }, showsToolbarButton: showingSettings)
             .opacity(showingSettings ? 1 : 0)
             .allowsHitTesting(showingSettings)
             .ignoresSafeArea(edges: .bottom)
             .zIndex(13)
 
-            GeometryReader { geo in
-                instagramSurfaceColor
-                    .frame(height: geo.safeAreaInsets.top)
-                    .ignoresSafeArea(edges: .top)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            }
-            .allowsHitTesting(false)
-            .zIndex(5)
-
             if isActiveSurfaceLoading && !showingReader && !showingDashboard && !showingSettings {
                 VStack(spacing: 0) {
                     LoadingBar()
+                    GeometryReader { _ in
+                        instagramSurfaceColor
+                            .frame(height: 5)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                    }
+                    .allowsHitTesting(false)
+                    .zIndex(5)
                     Spacer()
                 }
                 .background(instagramSurfaceColor.ignoresSafeArea())
@@ -308,34 +385,35 @@ struct InstagramView: View {
             }
 
             if xpIslandVisible {
-                GeometryReader { geo in
-                    let cutoutStyle = XPCutoutStyle.from(topInset: geo.safeAreaInsets.top)
-                    let cutoutTopOffset: CGFloat = cutoutStyle == .dynamicIsland ? 4 : 6
-
-                    VStack(spacing: 0) {
-                        XPCutoutAnchorView(style: cutoutStyle)
-
-                        XPDynamicIslandView(
-                            gain: xpLastGain,
-                            level: XPProgress.level(for: totalXP),
-                            progress: xpDisplayedProgress,
-                            currentXPInLevel: XPProgress.xpInCurrentLevel(for: totalXP),
-                            xpPerLevel: XPProgress.xpPerLevel,
-                            infoPhase: xpInfoPhase
-                        )
-                        .padding(.top, 2)
-                        .scaleEffect(1 + xpIslandNudge, anchor: .top)
-                        .offset(y: xpIslandNudge * -3)
-
-                        Spacer(minLength: 0)
-                    }
-                    .padding(.top, cutoutTopOffset)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-                    .compositingGroup()
+                VStack {
+                    XPDynamicIslandView(
+                        gain: xpLastGain,
+                        level: XPProgress.level(for: totalXP),
+                        progress: xpDisplayedProgress,
+                        currentXPInLevel: XPProgress.xpInCurrentLevel(for: totalXP),
+                        xpPerLevel: XPProgress.xpPerLevel,
+                        infoPhase: xpInfoPhase
+                    )
+                    .scaleEffect(1 + xpIslandNudge, anchor: .top)
+                    .offset(y: xpIslandNudge * -3)
+                    Spacer(minLength: 0)
                 }
-                .ignoresSafeArea(edges: .top)
-                .transition(.xpIslandOrganic)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                .padding(.top, 6)
+                .transition(.appleNotificationBanner)
                 .zIndex(20)
+                .allowsHitTesting(false)
+            }
+
+            if sessionBannerVisible {
+                VStack {
+                    SessionBannerView()
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                .padding(.top, 6)
+                .transition(.appleNotificationBanner)
+                .zIndex(18)
                 .allowsHitTesting(false)
             }
 
@@ -346,16 +424,24 @@ struct InstagramView: View {
                     messageBadgeCount: nativeMessageBadgeCount,
                     onSelectTab: { tab in
                         selectSection(tab)
-                    }
+                    },
+                    onSelectInstagramProfile: {
+                        selectSection("profile")
+                    },
+                    onSelectStopScrollProfile: {
+                        selectSection("dashboard")
+                    },
+                    profileMode: profileMode
                 )
             }
-            .ignoresSafeArea(edges: .bottom)
             .zIndex(15)
         }
         .background(instagramSurfaceColor.ignoresSafeArea())
         .confirmationDialog("StopScroll", isPresented: $showControlCenterChooser, titleVisibility: .visible) {
             Button("Dashboard") {
                 showingDashboard = true
+                profileMode = .stopScroll
+                nativeSelectedTab = "profile"
             }
             Button("Parametres") {
                 showingSettings = true
@@ -386,13 +472,6 @@ struct InstagramView: View {
         .onChange(of: instagramUsername) { _ in
             labelsToken += 1
         }
-        .onChange(of: webViewCount) { newValue in
-            let clamped = min(max(newValue, 1), 4)
-            if clamped != newValue {
-                webViewCount = clamped
-            }
-            reconfigureSurfacesForCurrentMode()
-        }
         .onReceive(settings.$adLabels) { _ in
             labelsToken += 1
         }
@@ -407,7 +486,6 @@ struct InstagramView: View {
                 oldValue: lastObservedInjectionFrequency,
                 newValue: newValue
             ) {
-                reloadTokenMain += 1
                 labelsToken += 1
                 lastObservedInjectionFrequency = newValue
             }
@@ -428,6 +506,18 @@ struct InstagramView: View {
         .onAppear {
             reconfigureSurfacesForCurrentMode()
             consumePendingLazyReloadIfNeeded(for: activeSurface)
+            DailyUsageTracker.shared.recordOpen()
+            showSessionBanner()
+        }
+        .onDisappear {
+            DailyUsageTracker.shared.recordBackground()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+            DailyUsageTracker.shared.recordOpen()
+            showSessionBanner()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)) { _ in
+            DailyUsageTracker.shared.recordBackground()
         }
     }
 

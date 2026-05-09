@@ -78,16 +78,12 @@
   }
 
   function scanForNewAds(state, callback) {
-    var freq = Number(state.config.cards.every_n_opportunities) || 1;
-    var replaceAll = freq === 1; // "Every post" mode: bypass ad/suggested check
     var posts = document.querySelectorAll('article');
     for (var i = 0; i < posts.length; i++) {
       var post = posts[i];
       if (state.seenPosts.has(post)) continue;
       state.seenPosts.add(post);
       if (ns.sessionStats) ns.sessionStats.trackPost();
-      if (!replaceAll && !shouldReplace(post, state.config)) continue;
-      if (ns.sessionStats) ns.sessionStats.trackAd();
       callback(post);
     }
   }

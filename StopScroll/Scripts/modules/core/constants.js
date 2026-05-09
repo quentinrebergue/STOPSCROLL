@@ -24,6 +24,9 @@
             'patrocinado', 'sugerido para você'
         ],
         SCROLL_KEYS: new Set(['ArrowDown', 'ArrowUp', 'Space', ' ', 'PageDown', 'PageUp']),
+        // JS-side fallback/default config.
+        // Native can now override card decisions and live settings through the bridge,
+        // but these defaults still matter for bootstrap, fallback behavior, and legacy renderers.
         DEFAULT_CONFIG: {
             feed_injection: {
                 enabled: true,
@@ -84,9 +87,11 @@
             },
             seenPosts: new WeakSet(),
             periodicScanTimer: null,
+            idleScanStreak: 0,
             scanScheduled: false,
             scrollLockActive: false,
             paused: false,
+            governorMode: 'nominal',
             trackingSetupDone: false
         }
     };

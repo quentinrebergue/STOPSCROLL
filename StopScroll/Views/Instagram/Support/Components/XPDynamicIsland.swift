@@ -9,56 +9,47 @@ struct XPDynamicIslandView: View {
     let infoPhase: XPInfoPhase
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack(alignment: .firstTextBaseline, spacing: 8) {
-                Group {
-                    if infoPhase == .gain {
-                        Text("+\(gain) XP")
-                    } else {
-                        Text("\(currentXPInLevel) / \(xpPerLevel) XP")
-                    }
-                }
-                    .font(.system(size: 12, weight: .bold, design: .rounded))
-                    .foregroundColor(.white)
-                Spacer(minLength: 6)
-                Text("Lv \(level)")
-                    .font(.system(size: 10, weight: .bold, design: .rounded))
-                    .foregroundColor(Color(red: 0.53, green: 0.88, blue: 1.0))
-            }
-
-            GeometryReader { geo in
-                let clamped = max(0.0, min(1.0, progress))
-                ZStack(alignment: .leading) {
-                    Capsule()
-                        .fill(Color.white.opacity(0.14))
-                    Capsule()
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    Color(red: 0.20, green: 1.0, blue: 0.24),
-                                    Color(red: 0.36, green: 1.0, blue: 0.42)
-                                ],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                        .frame(width: geo.size.width * clamped)
-                }
-            }
-            .frame(height: 6)
+        HStack(spacing: 12) {
+            metricItem(
+                label: "XP gagné",
+                value: infoPhase == .gain ? "+\(gain)" : "\(currentXPInLevel)/\(xpPerLevel)",
+                color: Color(red: 0.28, green: 0.92, blue: 0.46)
+            )
+            divider
+            metricItem(
+                label: "Niveau",
+                value: "\(level)",
+                color: Color(red: 0.53, green: 0.88, blue: 1.0)
+            )
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 8)
-        .frame(width: 164)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
         .background(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(Color.black.opacity(0.88))
+            Capsule()
+                .fill(.ultraThinMaterial)
+                .shadow(color: .black.opacity(0.25), radius: 10, x: 0, y: 4)
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(Color.white.opacity(0.08), lineWidth: 1)
+            Capsule()
+                .stroke(Color.white.opacity(0.1), lineWidth: 1)
         )
-        .shadow(color: Color.black.opacity(0.45), radius: 20, y: 6)
+    }
+
+    private var divider: some View {
+        Rectangle()
+            .fill(Color.white.opacity(0.18))
+            .frame(width: 1, height: 18)
+    }
+
+    private func metricItem(label: String, value: String, color: Color) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(label)
+                .font(.system(size: 9, weight: .medium, design: .rounded))
+                .foregroundColor(Color.white.opacity(0.5))
+            Text(value)
+                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .foregroundColor(color)
+        }
     }
 }
 
@@ -109,6 +100,20 @@ private struct XPIslandTransitionModifier: ViewModifier {
 }
 
 extension AnyTransition {
+    /// Classic iOS notification banner: springs in from above with slight overshoot, snaps back up on dismiss.
+    static var appleNotificationBanner: AnyTransition {
+        .asymmetric(
+            insertion: .modifier(
+                active:   XPIslandTransitionModifier(opacity: 0, scale: 0.88, yOffset: -80),
+                identity: XPIslandTransitionModifier(opacity: 1, scale: 1,    yOffset: 0)
+            ),
+            removal: .modifier(
+                active:   XPIslandTransitionModifier(opacity: 0, scale: 0.94, yOffset: -50),
+                identity: XPIslandTransitionModifier(opacity: 1, scale: 1,    yOffset: 0)
+            )
+        )
+    }
+
     static var xpIslandOrganic: AnyTransition {
         .asymmetric(
             insertion: .modifier(

@@ -45,3 +45,12 @@ This folder groups Instagram UI, support types, and WebView logic by responsibil
 
 - `InstagramView.swift` and `InstagramWebView.swift` stay the main entry points.
 - The split is structural only: behavior should stay unchanged while reducing file size and merge conflicts.
+
+## Card Decision Contract (V1)
+
+- Feed card opportunity detection and DOM injection remain in injected JS.
+- Card type decision is now requested from native Swift through `stopScrollBridge` action `requestCardForOpportunity`.
+- Native returns a versioned payload (`contractVersion: 1`) with `decision`:
+	- `inject` with `card.type` (rendered by existing JS builders)
+	- `skip` when frequency gate/policy says no card
+- JS keeps a timeout/availability fallback to legacy local decision (`card-logic`) to avoid empty injections when bridge is unavailable.

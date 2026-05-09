@@ -219,21 +219,32 @@
         }));
     }
 
+    function refreshAccountsEditBackgroundWatcher() {
+        var shouldRun = !document.hidden && isAccountsEditPage();
+
+        if (shouldRun) {
+            if (!_backgroundWatchTimer) {
+                _backgroundWatchTimer = global.setInterval(watchAccountsEditBackgroundTick, 1200);
+            }
+            watchAccountsEditBackgroundTick();
+            return;
+        }
+
+        if (_backgroundWatchTimer) {
+            global.clearInterval(_backgroundWatchTimer);
+            _backgroundWatchTimer = null;
+        }
+        _lastWatchedBackground = '';
+    }
+
     function ensureAccountsEditBackgroundWatcher() {
-        if (_backgroundWatchTimer) return;
-
-        _backgroundWatchTimer = global.setInterval(watchAccountsEditBackgroundTick, 1200);
-        watchAccountsEditBackgroundTick();
-
-        global.addEventListener('popstate', watchAccountsEditBackgroundTick);
         if (!_watchVisibilityHandlerInstalled) {
             _watchVisibilityHandlerInstalled = true;
-            document.addEventListener('visibilitychange', function () {
-                if (!document.hidden) {
-                    watchAccountsEditBackgroundTick();
-                }
-            });
+            document.addEventListener('visibilitychange', refreshAccountsEditBackgroundWatcher);
+            global.addEventListener('popstate', refreshAccountsEditBackgroundWatcher);
         }
+
+        refreshAccountsEditBackgroundWatcher();
     }
 
     ensureAccountsEditBackgroundWatcher();

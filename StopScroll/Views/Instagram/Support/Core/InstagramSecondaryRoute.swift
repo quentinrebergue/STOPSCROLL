@@ -7,6 +7,8 @@ enum InstagramSecondaryRoute {
             return "https://www.instagram.com/direct/inbox/"
         case "search":
             return "https://www.instagram.com/explore/"
+        case "reels":
+            return "https://www.instagram.com/reels/"
         case "profile":
             let cleaned = username
                 .trimmingCharacters(in: .whitespacesAndNewlines)

@@ -4,7 +4,7 @@ import XCTest
 final class SwipeFromExploreRegressionTests: XCTestCase {
     func testSwipeDirectionMatchesNavbarOrderFromSearch() {
         XCTAssertEqual(NativeTabLayout.adjacentTab(to: "search", swipeTranslation: 120), "home")
-        XCTAssertEqual(NativeTabLayout.adjacentTab(to: "search", swipeTranslation: -120), "book")
+        XCTAssertEqual(NativeTabLayout.adjacentTab(to: "search", swipeTranslation: -120), "reels")
     }
 
     func testSearchSwipeRecognizerIsAppFirst() {

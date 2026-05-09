@@ -48,9 +48,13 @@ final class StopScrollUITests: XCTestCase {
 
     @MainActor
     func testDashboardCanOpenAppSettings() throws {
-        let dashboardTab = findElement(["native.tab.dashboard", "native-tab-dashboard"])
-        XCTAssertTrue(dashboardTab.waitForExistence(timeout: 12))
-        dashboardTab.tap()
+        let profileTab = findElement(["native.tab.profile", "native-tab-profile"])
+        XCTAssertTrue(profileTab.waitForExistence(timeout: 12))
+        profileTab.tap()
+
+        let dashboardModeButton = app.buttons["Dashboard"]
+        XCTAssertTrue(dashboardModeButton.waitForExistence(timeout: 12))
+        dashboardModeButton.tap()
 
         let openSettingsButton = app.buttons["dashboard.openSettings"]
         XCTAssertTrue(openSettingsButton.waitForExistence(timeout: 12))

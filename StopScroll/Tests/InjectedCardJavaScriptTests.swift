@@ -1,5 +1,6 @@
 import XCTest
 import JavaScriptCore
+@testable import StopScroll
 
 final class InjectedCardJavaScriptTests: XCTestCase {
     func testCachedCardTypeWinsOverNewRequestedType() throws {
@@ -122,13 +123,14 @@ final class InjectedCardJavaScriptTests: XCTestCase {
         let context = try makeJSContext()
         context.evaluateScript("""
         window.__lockEvents = [];
+        window.__debugEvents = [];
         window.StopScroll = {
           dom: {
             isReelsTab: function(){ return false; },
             isDirectPath: function(){ return true; },
             isReelPage: function(){ return false; },
             isSingleContentPage: function(){ return false; },
-            postToBridge: function(){}
+            postToBridge: function(payload){ if (payload && payload.message) { window.__debugEvents.push(payload.message); } }
           },
           scrollLock: {
             applyScrollLock: function(){ window.__lockEvents.push('apply'); },
@@ -141,7 +143,34 @@ final class InjectedCardJavaScriptTests: XCTestCase {
         context.evaluateScript("window.StopScroll.pageManager.manageReelPageRestrictions({});")
 
         let lockEvents = context.evaluateScript("window.__lockEvents.join(',')")?.toString()
+        let debugEvents = context.evaluateScript("window.__debugEvents.join(',')")?.toString()
         XCTAssertEqual(lockEvents, "remove")
+        XCTAssertEqual(debugEvents, "skip_reel_lock_on_direct_path")
+    }
+
+    func testNavManagement_reportsMessagesOnDirectThreadPath() throws {
+        let context = try makeJSContext()
+        context.evaluateScript("""
+        window.__nativeTab = '';
+        window.StopScroll.constants = window.StopScroll.constants || {};
+        window.StopScroll.dom = {
+          postToBridge: function(payload){
+            if (payload && payload.type === 'nativeNavState') {
+              window.__nativeTab = payload.tab;
+            }
+          }
+        };
+        window.location = { pathname: '/direct/t/123456/', origin: 'https://www.instagram.com' };
+        window.innerHeight = 844;
+        window.getComputedStyle = function(){ return { position: 'fixed' }; };
+        window.StopScroll = window.StopScroll || {};
+        """)
+
+        try evaluateScript(atRelativePath: "StopScroll/Scripts/modules/navigation/nav-management.js", in: context)
+        context.evaluateScript("window.StopScroll.nav.syncNativeNavState();")
+
+        let result = context.evaluateScript("window.__nativeTab")
+        XCTAssertEqual(result?.toString(), "messages")
     }
 
     func testDomUtils_isDirectPathMatchesDirectRoutes() throws {
@@ -185,6 +214,161 @@ final class InjectedCardJavaScriptTests: XCTestCase {
         let debugEvents = context.evaluateScript("window.__debugEvents.join(',')")?.toString()
         XCTAssertEqual(lockEvents, "apply")
         XCTAssertEqual(debugEvents, "apply_reel_lock")
+    }
+
+      func testMessagingHeaderCleanupScriptTargetsDirectRoutesAndLogs() {
+        let script = InstagramWebView.messagingHeaderCleanupScript()
+
+        XCTAssertTrue(script.contains("location.pathname.indexOf('/direct') !== 0"))
+        XCTAssertTrue(script.contains("window.__STOPSCROLL_LAST_MSG_CLEANUP_PATH"))
+        XCTAssertTrue(script.contains("category: 'MessagingInjection'"))
+        XCTAssertTrue(script.contains("messages_header_cleanup path="))
+        XCTAssertTrue(script.contains("messages_header_cleanup_error"))
+      }
+
+      func testMessagingHeaderCleanupScriptHidesDirectHeaderActions() {
+        let script = InstagramWebView.messagingHeaderCleanupScript()
+
+        XCTAssertTrue(script.contains("header a[href=\"/direct/inbox/\"]"))
+        XCTAssertTrue(script.contains("header button[aria-label*=\"Back\" i]"))
+        XCTAssertTrue(script.contains("location.pathname.indexOf('/direct/t/') === 0"))
+        XCTAssertTrue(script.contains("style.setProperty('display', 'none', 'important')"))
+        XCTAssertTrue(script.contains("style.setProperty('pointer-events', 'none', 'important')"))
+      }
+
+    func testTrackingUsesNativeDecisionWhenBridgeReturnsInject() throws {
+        let context = try makeJSContext()
+        context.evaluateScript("""
+        window.__injectedType = '';
+        window.__nativeRenderMode = '';
+        window.setTimeout = function(fn){ fn(); return 1; };
+        window.StopScroll = {
+          cardInjection: {
+            repairBrokenInjections: function(){},
+            getPostKey: function(){ return 'post-native-1'; },
+            hasCachedCard: function(){ return false; },
+            injectCardIntoPost: function(_post, type, _config, nativeCard){
+              window.__injectedType = type;
+              window.__nativeRenderMode = nativeCard && nativeCard.renderMode ? nativeCard.renderMode : '';
+              return true;
+            }
+          },
+          pageManager: {
+            isMainFeedPage: function(){ return true; },
+            feedInjectingEnabled: function(){ return true; }
+          },
+          adDetection: {
+            scanForNewAds: function(_state, cb){ cb({}); }
+          },
+          cardLogic: {
+            chooseCardType: function(){ return 'mood'; },
+            recordChoice: function(){}
+          },
+          dom: {
+            postToBridgeWithCallback: function(_payload, cb){
+              cb({
+                ok: true,
+                payload: {
+                  contractVersion: 1,
+                  decision: 'inject',
+                  card: {
+                    type: 'book',
+                    renderMode: 'legacy-builder-v1',
+                    content: { title: 'Read now' },
+                    actions: { primary: 'openArticle' }
+                  }
+                }
+              });
+              return 'req-1';
+            }
+          }
+        };
+        """)
+
+        try evaluateScript(atRelativePath: "StopScroll/Scripts/modules/analytics/tracking.js", in: context)
+        context.evaluateScript("""
+        var state = {
+          paused: false,
+          config: {
+            feed_injection: {
+              ad_replacement: true
+            },
+            cards: {
+              every_n_opportunities: 1,
+              metrics: { enabled: true, weight: 1 },
+              mood: { enabled: true, weight: 1 },
+              timer: { enabled: true, weight: 1 },
+              stop: { enabled: true, weight: 1 },
+              stats: { enabled: true, weight: 1 },
+              book: { enabled: true, weight: 1 },
+              culture: { enabled: true, weight: 1 }
+            }
+          },
+          opportunities: 0,
+          shownCards: 0,
+          byTypeCount: { metrics: 0, mood: 0, timer: 0, stop: 0, stats: 0, book: 0, culture: 0 }
+        };
+        window.StopScroll.tracking.scanNewPosts(state);
+        """)
+
+        XCTAssertEqual(context.evaluateScript("window.__injectedType")?.toString(), "book")
+    XCTAssertEqual(context.evaluateScript("window.__nativeRenderMode")?.toString(), "legacy-builder-v1")
+    }
+
+    func testTrackingFallsBackToLegacyPolicyWhenBridgeUnavailable() throws {
+        let context = try makeJSContext()
+        context.evaluateScript("""
+        window.__injectedType = '';
+        window.setTimeout = function(fn){ fn(); return 1; };
+        window.StopScroll = {
+          cardInjection: {
+            repairBrokenInjections: function(){},
+            getPostKey: function(){ return 'post-fallback-1'; },
+            hasCachedCard: function(){ return false; },
+            injectCardIntoPost: function(_post, type){ window.__injectedType = type; return true; }
+          },
+          pageManager: {
+            isMainFeedPage: function(){ return true; },
+            feedInjectingEnabled: function(){ return true; }
+          },
+          adDetection: {
+            scanForNewAds: function(_state, cb){ cb({}); }
+          },
+          cardLogic: {
+            chooseCardType: function(){ return 'timer'; },
+            recordChoice: function(){}
+          },
+          dom: {}
+        };
+        """)
+
+        try evaluateScript(atRelativePath: "StopScroll/Scripts/modules/analytics/tracking.js", in: context)
+        context.evaluateScript("""
+        var state = {
+          paused: false,
+          config: {
+            feed_injection: {
+              ad_replacement: true
+            },
+            cards: {
+              every_n_opportunities: 1,
+              metrics: { enabled: true, weight: 1 },
+              mood: { enabled: true, weight: 1 },
+              timer: { enabled: true, weight: 1 },
+              stop: { enabled: true, weight: 1 },
+              stats: { enabled: true, weight: 1 },
+              book: { enabled: true, weight: 1 },
+              culture: { enabled: true, weight: 1 }
+            }
+          },
+          opportunities: 0,
+          shownCards: 0,
+          byTypeCount: { metrics: 0, mood: 0, timer: 0, stop: 0, stats: 0, book: 0, culture: 0 }
+        };
+        window.StopScroll.tracking.scanNewPosts(state);
+        """)
+
+        XCTAssertEqual(context.evaluateScript("window.__injectedType")?.toString(), "timer")
     }
 
     private func makeJSContext() throws -> JSContext {

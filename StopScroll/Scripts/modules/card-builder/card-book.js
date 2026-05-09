@@ -23,7 +23,12 @@
     var accent = '#90eeb0';
     var ui = cb.createCardContainer(heading, body, accent);
     ui.row.appendChild(cb.makeButton('Reprendre la lecture', '#90eeb0', function () {
-      ns.dom.postToNative('open');
+      ns.dom.postToNative({
+        bookId: book.bookId || '',
+        articleId: book.articleId || '',
+        title: title,
+        page: page
+      });
     }));
     return ui.card;
   }

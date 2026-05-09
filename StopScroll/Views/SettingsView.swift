@@ -3,11 +3,11 @@ import SwiftUI
 struct SettingsView: View {
     @ObservedObject private var settings = AppSettings.shared
     @AppStorage("ss_instagram_username") private var instagramUsername = ""
-    @AppStorage("ss_webview_count") private var webViewCount = 2
     @State private var newLabel = ""
     @State private var showResetAlert = false
     let onDismiss: () -> Void
     var onOpenDashboard: (() -> Void)? = nil
+    var showsToolbarButton: Bool = true
 
     /// Discrete frequency steps mapped to slider positions.
     /// 0 = off (no cards injected).
@@ -79,31 +79,6 @@ struct SettingsView: View {
                         .onChange(of: freqSliderIndex) { _ in
                             settings.injectionFrequency = currentFreq
                         }
-                    }
-                    .padding(.vertical, 4)
-                }
-
-                Section(header: Text("Instagram WebViews")) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack {
-                            Text("Nombre de WebViews")
-                            Spacer()
-                            Text("\(webViewCount)")
-                                .foregroundColor(.secondary)
-                        }
-
-                        Slider(
-                            value: Binding(
-                                get: { Double(webViewCount) },
-                                set: { webViewCount = Int($0.rounded()) }
-                            ),
-                            in: 1...4,
-                            step: 1
-                        )
-
-                        Text("1: navigation classique, 2: feed + secondaire, 3: feed + search + (messages/profile), 4: une WebView par section")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
                     }
                     .padding(.vertical, 4)
                 }
@@ -223,15 +198,17 @@ struct SettingsView: View {
             .navigationTitle("StopScroll Settings")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button {
-                        if let onOpenDashboard {
-                            onOpenDashboard()
-                        } else {
-                            onDismiss()
+                if showsToolbarButton {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button {
+                            if let onOpenDashboard {
+                                onOpenDashboard()
+                            } else {
+                                onDismiss()
+                            }
+                        } label: {
+                            Label("Dashboard", systemImage: "chevron.left")
                         }
-                    } label: {
-                        Label("Dashboard", systemImage: "chevron.left")
                     }
                 }
             }

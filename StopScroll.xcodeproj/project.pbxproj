@@ -16,6 +16,8 @@
 		11B6E904AA844DB3963CA7A7 /* Progress/ProgressViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ABC52A2B03C4E9A86B34D97 /* Progress/ProgressViews.swift */; };
 		13106EBB3137418E9E2213D2 /* Support/Core/SurfaceRouting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5689B23C1AF54C20978DD126 /* Support/Core/SurfaceRouting.swift */; };
 		167E89196B678BCEBA68007A /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6A095CCE50876F59118428 /* AppSettings.swift */; };
+		A1B2C3D4E5F60001A1B2C3D4 /* DailyUsageTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60000A1B2C3D4 /* DailyUsageTracker.swift */; };
+		A1B2C3D4E5F60003A1B2C3D4 /* Support/Components/SessionBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60002A1B2C3D4 /* Support/Components/SessionBannerView.swift */; };
 		16FB9CE04FB0416C949F6797 /* Support/Components/LoadingBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = C41D6FA073DE4585B532C0A7 /* Support/Components/LoadingBar.swift */; };
 		1711C7E266074EFFAD963692 /* WebView/InstagramWebViewScripts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36FCB25113904961B1510777 /* WebView/InstagramWebViewScripts.swift */; };
 		1862791F43FE4589B467F8FE /* Models/StoredChapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D820FA81FBD40B4AF55275C /* Models/StoredChapter.swift */; };
@@ -125,6 +127,8 @@
 		0629F99C39F502C163050F96 /* core/dom-utils.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "core/dom-utils.js"; sourceTree = "<group>"; };
 		06E1D5530CDF4C7CA6BEA71F /* Support/InstagramViewSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support/InstagramViewSupport.swift; sourceTree = "<group>"; };
 		0C6A095CCE50876F59118428 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60000A1B2C3D4 /* DailyUsageTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyUsageTracker.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60002A1B2C3D4 /* Support/Components/SessionBannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Support/Components/SessionBannerView.swift"; sourceTree = "<group>"; };
 		0EE8292651B5683F1566C909 /* dorian-gray.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "dorian-gray.json"; sourceTree = "<group>"; };
 		1879AAEFA6274D458828501A /* Components/ChapterCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/ChapterCard.swift; sourceTree = "<group>"; };
 		1BC40A222F95342B002C7492 /* StopScrollUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StopScrollUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -477,6 +481,7 @@
 			children = (
 				1BCF5AD02F94EAF70042FC96 /* LogManager.swift */,
 				0C6A095CCE50876F59118428 /* AppSettings.swift */,
+				A1B2C3D4E5F60000A1B2C3D4 /* DailyUsageTracker.swift */,
 				6AFF02DF949F413AE232B75E /* BookParsing */,
 			);
 			path = Models;
@@ -508,6 +513,7 @@
 				4F753773FB34419AB19782C2 /* Support/Components/NativeInstagramTabBar.swift */,
 				C41D6FA073DE4585B532C0A7 /* Support/Components/LoadingBar.swift */,
 				C61A44706D4243B09E49265F /* Support/Components/XPDynamicIsland.swift */,
+				A1B2C3D4E5F60002A1B2C3D4 /* Support/Components/SessionBannerView.swift */,
 				9B4FAD839023458C87E7EA20 /* Support/Components/DashboardView.swift */,
 				98D36FB79C7EDDFDA593A7C9 /* WebView/InstagramWebView.swift */,
 				36FCB25113904961B1510777 /* WebView/InstagramWebViewScripts.swift */,
@@ -701,6 +707,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				167E89196B678BCEBA68007A /* AppSettings.swift in Sources */,
+					A1B2C3D4E5F60001A1B2C3D4 /* DailyUsageTracker.swift in Sources */,
+					A1B2C3D4E5F60003A1B2C3D4 /* Support/Components/SessionBannerView.swift in Sources */,
 				1BCF5AD52F94EB120042FC96 /* ConsoleView.swift in Sources */,
 				596CA626D098C5B97511B1FA /* BookCard.swift in Sources */,
 				D9C99F5FA0994BBFE0BD0DB5 /* BookParser.swift in Sources */,
