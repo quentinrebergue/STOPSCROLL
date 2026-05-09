@@ -82,11 +82,16 @@
     post.setAttribute('data-ss-xp-card', '1');
     post.style.cssText = [
       'display:flex', 'flex-direction:column', 'width:100%', 'height:100%',
-      'background:#1a1a22',
+      'background:transparent',
       'font-family:' + FONT, 'box-sizing:border-box', 'overflow:hidden'
     ].join(';');
 
+    var topLine = document.createElement('div');
+    topLine.style.cssText = 'width:100%;height:3px;flex-shrink:0;background:linear-gradient(90deg,' + accent + ',rgba(255,255,255,0.15))';
+    post.appendChild(topLine);
+
     var header = document.createElement('div');
+    header.setAttribute('data-ss-card-header', '');
     header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.07)';
 
     var avatarRow = document.createElement('div');
@@ -119,14 +124,11 @@
     var content = document.createElement('div');
     content.style.cssText = [
       'flex:1', 'display:flex', 'flex-direction:column',
-      'padding:16px 16px 8px', 'gap:10px', 'overflow:hidden'
+      'padding:14px 14px 8px', 'gap:10px', 'overflow:hidden'
     ].join(';');
 
-    var accentBar = document.createElement('div');
-    accentBar.style.cssText = 'width:36px;height:3px;border-radius:2px;background:' + accent + ';align-self:center';
-
     var titleEl = document.createElement('div');
-    titleEl.style.cssText = 'font-size:18px;font-weight:700;line-height:1.3;text-align:center;padding-bottom:4px';
+    titleEl.style.cssText = 'font-size:22px;font-weight:800;line-height:1.2;letter-spacing:-0.4px;text-align:center;padding-bottom:4px;color:#ffffff';
 
     var optionsView = document.createElement('div');
     optionsView.style.cssText = 'display:flex;flex-direction:column;gap:8px;flex:1;justify-content:center';
@@ -217,22 +219,31 @@
       var btn = document.createElement('button');
       btn.type = 'button';
       var mins = minutesFrom(time);
-      btn.textContent = hhmm(time) + '  ·  ' + mins + ' min';
       btn.style.cssText = [
         'appearance:none',
-        'border:1px solid rgba(255,255,255,0.14)',
-        'border-radius:12px',
-        'padding:10px 14px',
-        'font-size:13px', 'font-weight:500',
+        'border:1.5px solid rgba(255,255,255,0.22)',
+        'border-radius:16px',
+        'padding:14px 18px',
+        'font-size:15px', 'font-weight:700',
         'cursor:pointer',
         'color:#f4f6fa',
-        'background:rgba(255,255,255,0.05)',
+        'background:rgba(255,255,255,0.10)',
         'font-family:' + FONT,
-        'text-align:center',
-        'transition:background 0.6s,border-color 0.6s,transform 0.1s',
+        'text-align:left',
+        'display:flex', 'align-items:center', 'justify-content:space-between',
+        'gap:8px',
+        'transition:background 0.15s,border-color 0.15s,transform 0.1s',
         'width:100%'
       ].join(';');
       btn.setAttribute('data-ss-glass-btn', '1');
+
+      var btnLeft = document.createElement('span');
+      btnLeft.textContent = hhmm(time) + '  ·  ' + mins + ' min';
+      var btnArrow = document.createElement('span');
+      btnArrow.textContent = '\u203a';
+      btnArrow.style.cssText = 'font-size:18px;font-weight:300;opacity:0.5;flex-shrink:0';
+      btn.appendChild(btnLeft);
+      btn.appendChild(btnArrow);
 
       btn.addEventListener('click', function (event) {
         event.preventDefault();
@@ -260,7 +271,6 @@
       postToBridge({ type: 'cancelTimer' });
     });
 
-    content.appendChild(accentBar);
     content.appendChild(titleEl);
     content.appendChild(optionsView);
     content.appendChild(resultView);

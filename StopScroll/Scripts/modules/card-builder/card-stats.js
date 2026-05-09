@@ -22,11 +22,16 @@
     var post = document.createElement('div');
     post.style.cssText = [
       'display:flex', 'flex-direction:column', 'width:100%', 'height:100%',
-      'background:#1a1a22',
+      'background:transparent',
       'font-family:' + FONT, 'box-sizing:border-box', 'overflow:hidden'
     ].join(';');
 
+    var topLine = document.createElement('div');
+    topLine.style.cssText = 'width:100%;height:3px;flex-shrink:0;background:linear-gradient(90deg,' + accent + ',rgba(255,255,255,0.15))';
+    post.appendChild(topLine);
+
     var header = document.createElement('div');
+    header.setAttribute('data-ss-card-header', '');
     header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.07)';
 
     var avatarRow = document.createElement('div');

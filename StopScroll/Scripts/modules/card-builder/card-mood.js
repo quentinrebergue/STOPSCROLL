@@ -22,11 +22,17 @@
     post.setAttribute('data-ss-xp-card', '1');
     post.style.cssText = [
       'display:flex', 'flex-direction:column', 'width:100%', 'height:100%',
-      'background:#1a1a22',
+      'background:transparent',
       'font-family:' + FONT, 'box-sizing:border-box', 'overflow:hidden'
     ].join(';');
 
+    // Accent gradient top line
+    var topLine = document.createElement('div');
+    topLine.style.cssText = 'width:100%;height:3px;flex-shrink:0;background:linear-gradient(90deg,' + accent + ',rgba(255,255,255,0.15))';
+    post.appendChild(topLine);
+
     var header = document.createElement('div');
+    header.setAttribute('data-ss-card-header', '');
     header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.07)';
 
     var avatarRow = document.createElement('div');
@@ -59,15 +65,12 @@
     var content = document.createElement('div');
     content.style.cssText = [
       'flex:1', 'display:flex', 'flex-direction:column',
-      'padding:16px 16px 8px', 'gap:10px', 'overflow:hidden'
+      'padding:14px 14px 8px', 'gap:10px', 'overflow:hidden'
     ].join(';');
-
-    var accentBar = document.createElement('div');
-    accentBar.style.cssText = 'width:36px;height:3px;border-radius:2px;background:' + accent + ';align-self:center';
 
     var questionEl = document.createElement('div');
     questionEl.textContent = t.mood_title || 'How do you feel right now?';
-    questionEl.style.cssText = 'font-size:18px;font-weight:700;line-height:1.3;text-align:center;padding-bottom:4px';
+    questionEl.style.cssText = 'font-size:22px;font-weight:800;line-height:1.2;letter-spacing:-0.4px;text-align:center;padding-bottom:4px;color:#ffffff';
 
     var answersView = document.createElement('div');
     answersView.style.cssText = 'display:flex;flex-direction:column;gap:8px;flex:1;justify-content:center';
@@ -114,22 +117,31 @@
     ANSWERS.forEach(function (answer) {
       var btn = document.createElement('button');
       btn.type = 'button';
-      btn.textContent = answer.text;
       btn.style.cssText = [
         'appearance:none',
-        'border:1px solid rgba(255,255,255,0.14)',
-        'border-radius:12px',
-        'padding:10px 14px',
-        'font-size:13px', 'font-weight:500',
+        'border:1.5px solid rgba(255,255,255,0.22)',
+        'border-radius:16px',
+        'padding:14px 16px',
+        'font-size:14px', 'font-weight:600',
         'cursor:pointer',
         'color:#f4f6fa',
-        'background:rgba(255,255,255,0.05)',
+        'background:rgba(255,255,255,0.10)',
         'font-family:' + FONT,
         'text-align:left',
-        'transition:background 0.6s,border-color 0.6s',
+        'display:flex', 'align-items:center', 'justify-content:space-between',
+        'gap:8px',
+        'transition:background 0.15s,border-color 0.15s',
         'width:100%'
       ].join(';');
       btn.setAttribute('data-ss-glass-btn', '1');
+
+      var btnLabel = document.createElement('span');
+      btnLabel.textContent = answer.text;
+      var btnArrow = document.createElement('span');
+      btnArrow.textContent = '›';
+      btnArrow.style.cssText = 'font-size:18px;font-weight:300;opacity:0.5;flex-shrink:0';
+      btn.appendChild(btnLabel);
+      btn.appendChild(btnArrow);
 
       btn.addEventListener('click', function (event) {
         event.preventDefault();
@@ -159,7 +171,6 @@
       answersView.style.display = 'flex';
     });
 
-    content.appendChild(accentBar);
     content.appendChild(questionEl);
     content.appendChild(answersView);
     content.appendChild(resultView);

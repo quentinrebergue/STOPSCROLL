@@ -39,18 +39,18 @@
     var btn = document.createElement('button');
     btn.type = 'button';
     btn.textContent = label;
-    // Start grey; real color applied on scroll-into-view via IntersectionObserver
     btn.setAttribute('data-ss-btn-color', background);
     btn.style.cssText = [
-      'appearance:none', 'border:none', 'border-radius:999px',
-      'padding:12px 26px', 'font-size:14px', 'font-weight:700',
-      'cursor:pointer', 'color:#0a0a12', 'background:#8e8e93',
-      'font-family:' + FONT, 'flex-shrink:0', 'white-space:nowrap',
-      'transition:transform 0.12s ease,filter 0.12s ease,background 0.6s ease',
+      'appearance:none', 'border:none', 'border-radius:18px',
+      'padding:16px 0', 'font-size:16px', 'font-weight:800',
+      'cursor:pointer', 'color:#0a0a12', 'background:' + background,
+      'font-family:' + FONT, 'width:100%', 'white-space:nowrap',
+      'letter-spacing:-0.2px',
+      'transition:transform 0.12s ease,filter 0.12s ease',
       'transform:scale(1)',
       'filter:brightness(1)'
     ].join(';');
-    btn.addEventListener('pointerdown', function () { btn.style.transform = 'scale(0.95)'; btn.style.filter = 'brightness(0.92)'; });
+    btn.addEventListener('pointerdown', function () { btn.style.transform = 'scale(0.97)'; btn.style.filter = 'brightness(0.9)'; });
     btn.addEventListener('pointerup',   function () { btn.style.transform = 'scale(1)'; btn.style.filter = 'brightness(1)'; });
     btn.addEventListener('pointerleave',function () { btn.style.transform = 'scale(1)'; btn.style.filter = 'brightness(1)'; });
     btn.addEventListener('click', function (event) {
@@ -75,11 +75,17 @@
     post.setAttribute('data-ss-xp-card', '1');
     post.style.cssText = [
       'display:flex', 'flex-direction:column', 'width:100%', 'height:100%',
-      'background:#1a1a22',
+      'background:transparent',
       'font-family:' + FONT, 'box-sizing:border-box', 'overflow:hidden'
     ].join(';');
 
+    // Full-width accent gradient line at the very top
+    var topLine = document.createElement('div');
+    topLine.style.cssText = 'width:100%;height:3px;flex-shrink:0;background:linear-gradient(90deg,' + accent + ',rgba(255,255,255,0.15))';
+    post.appendChild(topLine);
+
     var header = document.createElement('div');
+    header.setAttribute('data-ss-card-header', '');
     header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.07)';
 
     var avatarRow = document.createElement('div');
@@ -116,26 +122,22 @@
     content.style.cssText = [
       'flex:1', 'display:flex', 'flex-direction:column',
       'align-items:center', 'justify-content:center',
-      'padding:20px 22px 10px', 'text-align:center', 'gap:12px'
+      'padding:20px 22px 10px', 'text-align:center', 'gap:14px'
     ].join(';');
-
-    var accentBar = document.createElement('div');
-    accentBar.style.cssText = 'width:36px;height:3px;border-radius:2px;background:' + accent;
 
     var titleEl = document.createElement('div');
     titleEl.textContent = title;
-    titleEl.style.cssText = 'font-size:19px;font-weight:700;line-height:1.25;letter-spacing:0.1px';
+    titleEl.style.cssText = 'font-size:24px;font-weight:800;line-height:1.15;letter-spacing:-0.5px;color:#ffffff';
 
     var bodyEl = document.createElement('div');
     bodyEl.textContent = body;
-    bodyEl.style.cssText = 'font-size:14px;line-height:1.55;opacity:0.78;max-width:300px';
+    bodyEl.style.cssText = 'font-size:15px;line-height:1.55;opacity:0.82;max-width:300px';
 
-    content.appendChild(accentBar);
     content.appendChild(titleEl);
     content.appendChild(bodyEl);
 
     var row = document.createElement('div');
-    row.style.cssText = 'display:flex;gap:10px;flex-wrap:wrap;justify-content:center;padding:10px 14px 14px';
+    row.style.cssText = 'display:flex;gap:10px;flex-wrap:wrap;justify-content:center;padding:8px 14px 12px';
 
     var actionBar = document.createElement('div');
     actionBar.setAttribute('data-ss-actionbar', '');
@@ -152,7 +154,7 @@
 
     var mediaArea = document.createElement('div');
     mediaArea.setAttribute('data-ss-media', '');
-    mediaArea.style.cssText = 'flex:1;display:flex;flex-direction:column;background:#1a1a22;overflow:hidden;color:#f4f6fa';
+    mediaArea.style.cssText = 'flex:1;display:flex;flex-direction:column;overflow:hidden;color:#f4f6fa';
     mediaArea.appendChild(content);
     mediaArea.appendChild(row);
 

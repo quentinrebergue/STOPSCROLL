@@ -283,12 +283,11 @@
     wrapper.appendChild(revealBtn);
 
     // Hide card-builder's own header (SS avatar) and action bar.
-    if (card.children.length >= 2) {
-      card.children[0].style.setProperty('display', 'none', 'important');
-      var lastCardChild = card.children[card.children.length - 1];
-      if (lastCardChild !== card.children[0]) {
-        lastCardChild.style.setProperty('display', 'none', 'important');
-      }
+    var cardHeader = card.querySelector('[data-ss-card-header]');
+    if (cardHeader) cardHeader.style.setProperty('display', 'none', 'important');
+    var lastCardChild = card.children[card.children.length - 1];
+    if (lastCardChild && lastCardChild !== cardHeader) {
+      lastCardChild.style.setProperty('display', 'none', 'important');
     }
 
     stripCardBackgrounds(card);

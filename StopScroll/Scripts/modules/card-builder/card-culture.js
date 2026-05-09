@@ -76,12 +76,18 @@
     post.setAttribute('data-ss-xp-card', '1');
     post.style.cssText = [
       'display:flex', 'flex-direction:column', 'width:100%', 'height:100%',
-      'background:#1a1a22',
+      'background:transparent',
       'font-family:' + FONT, 'box-sizing:border-box', 'overflow:hidden'
     ].join(';');
 
+    // Accent gradient top line
+    var topLine = document.createElement('div');
+    topLine.style.cssText = 'width:100%;height:3px;flex-shrink:0;background:linear-gradient(90deg,' + accent + ',rgba(255,255,255,0.15))';
+    post.appendChild(topLine);
+
     // Header (StopScroll identity)
     var header = document.createElement('div');
+    header.setAttribute('data-ss-card-header', '');
     header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.07)';
 
     var avatarRow = document.createElement('div');
@@ -148,8 +154,7 @@
     var lead = document.createElement('div');
     lead.textContent = snippet;
     lead.style.cssText = [
-      'font-size:14px', 'line-height:1.6', 'color:rgba(244,246,250,0.8)',
-      'font-family:Georgia,\"Times New Roman\",serif',
+      'font-size:14px', 'line-height:1.6', 'color:rgba(244,246,250,0.82)',
       'flex:1'
     ].join(';');
 
@@ -174,7 +179,7 @@
     mediaArea.appendChild(divider);
     mediaArea.appendChild(lead);
 
-    // Button inside the media area
+    // Button inside the media area — full width
     var btnWrap = document.createElement('div');
     btnWrap.style.cssText = 'display:flex;justify-content:center;padding:12px 0 6px';
     btnWrap.appendChild(cb.makeButton(t.culture_btn || l.btn, accent, function () {

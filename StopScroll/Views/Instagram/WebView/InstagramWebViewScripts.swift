@@ -194,11 +194,13 @@ extension InstagramWebView {
                 // The card-builder root has its own header (SS avatar) and action bar —
                 // hide them to avoid duplication with our bottom bar.
                 var cardRoot = coreContent.parentElement || coreContent;
-                if (cardRoot !== coreContent && cardRoot.children.length >= 2) {
-                    // Hide first child (header: avatar row) and last child (action bar)
-                    cardRoot.children[0].style.setProperty('display', 'none', 'important');
+                if (cardRoot !== coreContent) {
+                    // Hide the SS avatar header row (identified by data-ss-card-header)
+                    var cardHeader = cardRoot.querySelector('[data-ss-card-header]');
+                    if (cardHeader) cardHeader.style.setProperty('display', 'none', 'important');
+                    // Hide action bar (last child that is not the media area)
                     var lastChild = cardRoot.children[cardRoot.children.length - 1];
-                    if (lastChild !== coreContent) {
+                    if (lastChild && lastChild !== coreContent) {
                         lastChild.style.setProperty('display', 'none', 'important');
                     }
                     cardRoot.style.setProperty('height', 'auto', 'important');
@@ -216,7 +218,7 @@ extension InstagramWebView {
                 coreContent.style.setProperty('color', '#fff', 'important');
                 coreContent.style.setProperty('display', 'flex', 'important');
                 coreContent.style.setProperty('flex-direction', 'column', 'important');
-                coreContent.style.setProperty('align-items', 'center', 'important');
+                coreContent.style.setProperty('align-items', 'stretch', 'important');
                 coreContent.style.setProperty('justify-content', 'center', 'important');
                 coreContent.style.setProperty('padding', '24px 24px 90px 24px', 'important');
                 coreContent.style.setProperty('box-sizing', 'border-box', 'important');
