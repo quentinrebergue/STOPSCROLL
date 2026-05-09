@@ -371,14 +371,7 @@ struct InstagramView: View {
             if isActiveSurfaceLoading && !showingReader && !showingDashboard && !showingSettings {
                 VStack(spacing: 0) {
                     LoadingBar()
-                    GeometryReader { _ in
-                        instagramSurfaceColor
-                            .frame(height: 5)
-                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-                    }
-                    .allowsHitTesting(false)
-                    .zIndex(5)
-                    Spacer()
+                    WebViewSkeletonView(surface: activeSurface, isDark: instagramThemeIsDark)
                 }
                 .background(instagramSurfaceColor.ignoresSafeArea())
                 .transition(.opacity)

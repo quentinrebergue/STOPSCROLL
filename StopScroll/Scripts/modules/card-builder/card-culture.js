@@ -122,7 +122,7 @@
     // Media area — newspaper layout
     var mediaArea = document.createElement('div');
     mediaArea.setAttribute('data-ss-media', '');
-    mediaArea.style.cssText = 'flex:1;display:flex;flex-direction:column;overflow:hidden;color:#f4f6fa;padding:20px 18px 8px';
+    mediaArea.style.cssText = 'flex:1;display:flex;flex-direction:column;overflow:hidden;color:#f4f6fa;padding:16px 18px 8px';
 
     // Category tag (like a newspaper section)
     var desc = article.description || '';
@@ -130,8 +130,11 @@
     var tag = document.createElement('div');
     tag.textContent = tagText;
     tag.style.cssText = [
-      'font-size:10px', 'font-weight:800', 'letter-spacing:1.8px',
-      'color:' + accent, 'text-transform:uppercase', 'margin-bottom:10px'
+      'display:inline-block', 'padding:4px 10px', 'border-radius:999px',
+      'background:rgba(255,255,255,0.08)', 'border:1px solid rgba(255,255,255,0.15)',
+      'font-size:11px', 'font-weight:700', 'letter-spacing:0.5px',
+      'color:' + accent, 'text-transform:uppercase', 'margin-bottom:12px',
+      'align-self:flex-start'
     ].join(';');
 
     // Headline
@@ -139,13 +142,8 @@
     headline.textContent = article.title;
     headline.style.cssText = [
       'font-size:22px', 'font-weight:800', 'line-height:1.2',
-      'letter-spacing:-0.3px', 'margin-bottom:10px',
-      'font-family:Georgia,\"Times New Roman\",serif'
+      'letter-spacing:-0.4px', 'color:#ffffff', 'margin-bottom:10px'
     ].join(';');
-
-    // Divider line
-    var divider = document.createElement('div');
-    divider.style.cssText = 'width:40px;height:2px;background:' + accent + ';margin-bottom:10px;border-radius:1px';
 
     // Lead paragraph — editorial snippet
     var snippet = article.extract.length > 220
@@ -154,7 +152,7 @@
     var lead = document.createElement('div');
     lead.textContent = snippet;
     lead.style.cssText = [
-      'font-size:14px', 'line-height:1.6', 'color:rgba(244,246,250,0.82)',
+      'font-size:14px', 'line-height:1.55', 'color:rgba(244,246,250,0.82)',
       'flex:1'
     ].join(';');
 
@@ -176,7 +174,6 @@
 
     mediaArea.appendChild(tag);
     mediaArea.appendChild(headline);
-    mediaArea.appendChild(divider);
     mediaArea.appendChild(lead);
 
     // Button inside the media area — full width
