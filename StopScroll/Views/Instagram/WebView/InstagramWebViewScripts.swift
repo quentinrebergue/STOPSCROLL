@@ -413,6 +413,62 @@ extension InstagramWebView {
                 attempt();
             }
 
+            // ── Timer-expired blur overlay for reels ────────────────────────
+
+            var _expiredReelMessages = [
+                { emoji: '🏁', text: "Time's up! You set a goal — now respect it." },
+                { emoji: '🌿', text: "Your reel session is over. Take a deep breath." },
+                { emoji: '🚶', text: "Get up. Walk around. Your body will thank you." },
+                { emoji: '💪', text: "You set a stop time and respected it. That's discipline." },
+                { emoji: '☀️', text: "The real world is waiting for you out there." },
+                { emoji: '🧠', text: "Your brain needs rest from the feed. Go offline." },
+                { emoji: '🎯', text: "You've watched enough. Time to be productive." },
+                { emoji: '🌊', text: "Close the app. Go outside. Feel alive." },
+                { emoji: '✨', text: "Every reel you skip is a win." },
+                { emoji: '🔋', text: "Recharge yourself, not just your phone." }
+            ];
+            var _expiredReelIdx = 0;
+
+            function buildExpiredReelOverlay() {
+                var msg = _expiredReelMessages[_expiredReelIdx % _expiredReelMessages.length];
+                _expiredReelIdx++;
+
+                var overlay = document.createElement('div');
+                overlay.setAttribute('data-ss-reel-card', 'true');
+                overlay.style.cssText = [
+                    'position:absolute', 'inset:0', 'z-index:9999',
+                    'display:flex', 'flex-direction:column',
+                    'align-items:center', 'justify-content:center',
+                    '-webkit-backdrop-filter:blur(28px)', 'backdrop-filter:blur(28px)',
+                    'background:rgba(10,26,42,0.72)',
+                    'font-family:' + FONT, 'color:#fff',
+                    'box-sizing:border-box', 'padding:40px 28px',
+                    'text-align:center'
+                ].join(';');
+
+                var emojiEl = document.createElement('div');
+                emojiEl.textContent = msg.emoji;
+                emojiEl.style.cssText = 'font-size:52px;line-height:1;margin-bottom:20px';
+
+                var textEl = document.createElement('div');
+                textEl.textContent = msg.text;
+                textEl.style.cssText = 'font-size:20px;font-weight:700;line-height:1.4;max-width:280px;color:#e8f4ff';
+
+                overlay.appendChild(emojiEl);
+                overlay.appendChild(textEl);
+                return overlay;
+            }
+
+            function injectExpiredReelOverlay(container) {
+                if (container.getAttribute('data-ss-reel-replaced')) return;
+                container.setAttribute('data-ss-reel-replaced', 'true');
+                container.style.setProperty('position', 'relative', 'important');
+                container.style.setProperty('overflow', 'hidden', 'important');
+                var vid = container.querySelector('video');
+                if (vid) { try { vid.pause(); } catch(_) {} }
+                container.appendChild(buildExpiredReelOverlay());
+            }
+
             // ── SPA navigation detection ─────────────────────────────────────
 
             function extractId(path) {
@@ -434,6 +490,14 @@ extension InstagramWebView {
                     var ss = window.StopScroll;
                     if (ss && ss.sessionStats && ss.sessionStats.trackReel) { ss.sessionStats.trackReel(); }
                 } catch(_e) {}
+                // If timer is expired, blur this reel instead of showing a regular card
+                if (window.__STOPSCROLL_TIMER_EXPIRED) {
+                    setTimeout(function() {
+                        var container = findNextReelContainer();
+                        if (container) { injectExpiredReelOverlay(container); }
+                    }, 120);
+                    return;
+                }
                 try { webkit.messageHandlers.stopScrollBridge.postMessage({ type: 'reelViewed' }); } catch(_e) {}
                 if (_count % FREQ === 0) { tryInjectNext(); }
             }

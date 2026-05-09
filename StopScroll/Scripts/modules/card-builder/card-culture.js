@@ -68,7 +68,7 @@
 
     var l = labels();
     var t = config.card_templates || {};
-    var accent = isGuardian ? '#005689' : '#f9a825';
+    var accent = isGuardian ? '#00b4ff' : '#ffb300';
     var sourceLabel = isGuardian ? 'THE GUARDIAN' : null;
 
     // ── Newspaper-style card ──────────────────────────────────
