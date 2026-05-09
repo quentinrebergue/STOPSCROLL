@@ -6,6 +6,9 @@ struct TimerLockView: View {
     @ObservedObject private var limiter = SessionLimitManager.shared
     @ObservedObject private var settings = AppSettings.shared
 
+    /// Bottom inset to clear the native tab bar. Pass `sharedBottomNavReservedHeight` from the parent.
+    var bottomInset: CGFloat = 0
+
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
@@ -37,10 +40,10 @@ struct TimerLockView: View {
 
                 Spacer()
 
-                // Long session button
+                // Long session button — leave room for the native tab bar
                 longSessionButton
                     .padding(.horizontal, 28)
-                    .padding(.bottom, 48)
+                    .padding(.bottom, max(20, bottomInset) + 20)
             }
         }
     }

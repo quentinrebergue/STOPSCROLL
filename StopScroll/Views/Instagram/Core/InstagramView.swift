@@ -31,7 +31,7 @@ struct InstagramView: View {
     @State var xpIslandNudge: CGFloat = 0
     @State var xpDisplayedProgress: Double = 0
     @State var xpInfoPhase: XPInfoPhase = .gain
-    @State var nativeSelectedTab: String = "home"
+    @State var nativeSelectedTab: String = SessionLimitManager.shared.isLocked ? "timer" : "home"
     @State var nativeMessageBadgeCount: Int = 0
     @State var nativeNavCommandToken: Int = 0
     @State var messagesNavigationURL: String? = nil
@@ -369,7 +369,7 @@ struct InstagramView: View {
             .ignoresSafeArea(edges: .bottom)
             .zIndex(13)
 
-            TimerLockView()
+            TimerLockView(bottomInset: sharedBottomNavReservedHeight)
                 .opacity(currentSectionTab == "timer" ? 1 : 0)
                 .allowsHitTesting(currentSectionTab == "timer")
                 .ignoresSafeArea(edges: .bottom)
